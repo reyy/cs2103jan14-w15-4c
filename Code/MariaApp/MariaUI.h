@@ -8,33 +8,20 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QlineEdit>
 
+#define WINDOW_SIZE_X 480
+#define WINDOW_SIZE_Y 120
+
 class MariaUI :	public QMainWindow
 {
 public:
-	MariaUI(void);
-	~MariaUI(void);
 	QLineEdit *inputBox;
 
-    void setupUi()
-    {
-        if (this->objectName().isEmpty())
-            this->setObjectName(QStringLiteral("MariaUI"));
-
-        this->resize(480, 120);
-
-		inputBox = new QLineEdit(this);
-		inputBox->setGeometry(QRect(30, 30, 400, 30));
-
-        retranslateUi();
-
-        //QMetaObject::connectSlotsByName(this);
-    } 
-
+	MariaUI(void);
+	~MariaUI(void);
+    
 private:
-    void retranslateUi()
-    {
-        this->setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
-    } 
-
+	void setupUI();
+    void initWindowTitle();
+	void initTextBox();
 };
 
