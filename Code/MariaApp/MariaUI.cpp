@@ -1,28 +1,27 @@
 #include "MariaUI.h"
 
 
-MariaUI::MariaUI(void)
+MariaUI::MariaUI() 
 {
-	setupUI();
+	initWindowTitle();
+	initTextBox();
+
+	resize(WINDOW_SIZE_X, WINDOW_SIZE_Y);
+	show();
 }
 
 
 MariaUI::~MariaUI(void)
 {
+	delete inputBox;
 }
 
-void MariaUI::setupUI()
-{
-	initWindowTitle();
-	resize(WINDOW_SIZE_X, WINDOW_SIZE_Y);
-	initTextBox();
-} 
 void MariaUI::initWindowTitle()
 {
-	if (this->objectName().isEmpty())
-            this->setObjectName(QStringLiteral("MariaUI"));
+	if (objectName().isEmpty())
+            setObjectName(QStringLiteral("MariaUI"));
 
-        this->setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
+    setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
 }
 void MariaUI::initTextBox()
 {

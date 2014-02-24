@@ -11,17 +11,18 @@
 #define WINDOW_SIZE_X 480
 #define WINDOW_SIZE_Y 120
 
-class MariaUI :	public QMainWindow
+class MariaUI : QMainWindow
 {
-public:
+private:
+
 	QLineEdit *inputBox;
 
-	MariaUI(void);
-	~MariaUI(void);
-    
-private:
-	void setupUI();
     void initWindowTitle();
 	void initTextBox();
+
+public:
+	MariaUI();
+	~MariaUI(void);
+    
 };
 
