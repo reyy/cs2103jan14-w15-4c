@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -11,18 +12,14 @@
 #define WINDOW_SIZE_X 480
 #define WINDOW_SIZE_Y 120
 
-class MariaUI : QMainWindow
-{
+class MariaUI : QMainWindow {
 private:
-
 	QLineEdit *inputBox;
 
-    void initWindowTitle();
+	void initWindowTitle();
 	void initTextBox();
 
 public:
 	MariaUI();
 	~MariaUI(void);
-    
 };
-

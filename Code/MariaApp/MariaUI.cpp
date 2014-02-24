@@ -1,8 +1,6 @@
 #include "MariaUI.h"
 
-
-MariaUI::MariaUI() 
-{
+MariaUI::MariaUI() {
 	initWindowTitle();
 	initTextBox();
 
@@ -10,21 +8,19 @@ MariaUI::MariaUI()
 	show();
 }
 
-
-MariaUI::~MariaUI(void)
-{
+MariaUI::~MariaUI(void) {
 	delete inputBox;
 }
 
-void MariaUI::initWindowTitle()
-{
-	if (objectName().isEmpty())
-            setObjectName(QStringLiteral("MariaUI"));
+void MariaUI::initWindowTitle() {
+	if (objectName().isEmpty()) {
+		setObjectName(QStringLiteral("MariaUI"));
+	}
 
-    setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
+	setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
 }
-void MariaUI::initTextBox()
-{
+
+void MariaUI::initTextBox() {
 	inputBox = new QLineEdit(this);
 	inputBox->setGeometry(QRect(30, 30, 400, 30));
 }
