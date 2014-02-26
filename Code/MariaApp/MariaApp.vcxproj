@@ -138,8 +138,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MariaFileWriter.cpp" />
+    <ClCompile Include="MariaInterpreter.cpp" />
     <ClCompile Include="MariaLogic.cpp" />
     <ClCompile Include="MariaTask.cpp" />
+    <ClCompile Include="MariaTaskManager.cpp" />
     <ClCompile Include="MariaUI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,8 +174,11 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MariaFileWriter.h" />
+    <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaTask.h" />
+    <ClInclude Include="MariaTaskManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
