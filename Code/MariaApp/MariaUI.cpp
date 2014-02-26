@@ -1,5 +1,5 @@
 #include "MariaUI.h"
-
+#include <QKeyEvent>
 MariaUI::MariaUI() {
 	initWindowTitle();
 	initTextBox();
@@ -23,4 +23,13 @@ void MariaUI::initWindowTitle() {
 void MariaUI::initTextBox() {
 	inputBox = new QLineEdit(this);
 	inputBox->setGeometry(QRect(30, 30, 400, 30));
+
+	inputBox->installEventFilter(this);
+}
+
+void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
+	if(keyevent->key() == Qt::Key_Enter){
+		//todo: process command
+	}
+	
 }

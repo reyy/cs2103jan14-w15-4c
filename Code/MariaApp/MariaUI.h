@@ -7,7 +7,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QlineEdit>
+#include <QtWidgets/QlineEdit> 
 
 #define WINDOW_SIZE_X 480
 #define WINDOW_SIZE_Y 120
@@ -18,7 +18,7 @@ private:
 
 	void initWindowTitle();
 	void initTextBox();
-
+	void keyReleaseEvent(QKeyEvent* keyevent);
 public:
 	MariaUI();
 	~MariaUI(void);
