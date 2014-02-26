@@ -1,11 +1,10 @@
 #include "MariaInterpreter.h"
 
 
-MariaInterpreter::MariaInterpreter(void)
-{
+MariaInterpreter::MariaInterpreter(map<string, CommandType> *inputCommandList){
+	userDefinedCommands = inputCommandList;
 }
 
 
-MariaInterpreter::~MariaInterpreter(void)
-{
+MariaInterpreter::~MariaInterpreter(void){
 }

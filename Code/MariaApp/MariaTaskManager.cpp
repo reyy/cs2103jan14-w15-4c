@@ -1,11 +1,14 @@
 #include "MariaTaskManager.h"
 
 
-MariaTaskManager::MariaTaskManager(void)
-{
+MariaTaskManager::MariaTaskManager(vector<MariaTask> *inputTaskList){
+	taskList = inputTaskList;
+	if(taskList == NULL){
+		taskList = new vector<MariaTask>();
+	}
 }
 
 
-MariaTaskManager::~MariaTaskManager(void)
-{
+MariaTaskManager::~MariaTaskManager(void){
+	delete taskList;
 }
