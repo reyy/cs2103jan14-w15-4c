@@ -2,9 +2,20 @@
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaUI = new MariaUI();
+
+	
+	mariaUI->beginLoading();
 	mariaIntepreter = new MariaInterpreter();
 	mariaTaskManager = new MariaTaskManager();
 	mariaFileWriter = new MariaFileWriter();
+	
+	//Put loading intensive stuffs in-between begin and end.
+	mariaUI->endLoading();
+
+	//Below are things that you can edit.
+	mariaUI->setStatus(MariaUI::WAIT);
+	mariaUI->setBaseText("add Meeting tomorrow for discussion.");
+
 }
 
 MariaLogic::~MariaLogic(void) {
