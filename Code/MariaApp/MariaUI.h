@@ -35,11 +35,13 @@ private:
 	QPixmap **_imageHandle;
 	QLabel *_statusIcon;
 	QLabel *_suggestText;
+	QLabel *_questionText;
 	STATUS_TYPE _currentStatus;
 	STATE_TYPE _currentState;
 	QToolButton *_btClose;
 	QPointF _toolBoxCoordinate;
 	MariaUILoading *_mariaUILoading;
+	QString _backgroundColor;
 
 	//Load images used in application.
 	void initState();
@@ -72,7 +74,10 @@ public:
 	STATE_TYPE getState();
 
 	void setBaseText(const QString text);
+	void setQuestionText(const QString text);
 	QString getUserInput();
+
+	void setBackgroundColor(const QString text);
 
 	void beginLoading();
 	void endLoading();

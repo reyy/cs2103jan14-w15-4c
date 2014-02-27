@@ -14,10 +14,12 @@ MariaUI::MariaUI(QWidget *parent) : QMainWindow(parent)
 }
 
 MariaUI::~MariaUI(void) {
+	delete _mariaUILoading;
 	delete _statusAnimationTimer;
 	delete _stateAnimationTimer;
 	delete _statusIcon;
 	delete _suggestText;
+	delete _questionText;
 	delete _btClose;
 
 	for(int i=0;i<AMOUNT_OF_IMAGES;i++) {
@@ -61,10 +63,13 @@ void MariaUI::initWindowTitle() {
 
 void MariaUI::initTextBox() {
 	_inputBox = new QLineEdit(this);
-	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;");
+	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;");
 
 	_suggestText = new QLabel(this);
 	_suggestText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;");	
+
+	_questionText = new QLabel(this);
+	_questionText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;color:#ffffff;font-weight:bold;");	
 }
 
 void MariaUI::initStatusIcon(){
@@ -143,7 +148,7 @@ void MariaUI::updateStateAnimation() {
 		}
 		break;
 	case FOCUS:
-		targetY=20;
+		targetY=25;
 		if(abs(_toolBoxCoordinate.y()-targetY)>0.5) {
 			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(targetY-_toolBoxCoordinate.y())*0.01);
 			updateGUI();
@@ -178,6 +183,7 @@ void MariaUI::updateGUI() {
 	_statusIcon->setGeometry(QRect(_toolBoxCoordinate.x(), _toolBoxCoordinate.y(), 20, 20));
 	_inputBox->setGeometry(QRect(_toolBoxCoordinate.x()+30, _toolBoxCoordinate.y(), width()-_toolBoxCoordinate.x()-70, 20));
 	_suggestText->setGeometry(QRect(_toolBoxCoordinate.x()+33, _toolBoxCoordinate.y(), width()-_toolBoxCoordinate.x()-70, 20));
+	_questionText->setGeometry(QRect(_toolBoxCoordinate.x()+33, _toolBoxCoordinate.y()-20, width()-_toolBoxCoordinate.x()-75, 20));
 	_btClose->setGeometry(QRect(width()-10-10, 10-10, 20, 20));	
 }
 
@@ -207,8 +213,17 @@ void MariaUI::setBaseText(const QString text) {
 	_suggestText->setText(text);
 }
 
+void MariaUI::setQuestionText(const QString text) {
+	_questionText->setText(text);
+}
+
 QString MariaUI::getUserInput() {
 	return _inputBox->text();
+}
+
+void MariaUI::setBackgroundColor(const QString text) {
+	_backgroundColor=text;
+	this->setStyleSheet("QMainWindow  {background-color: "+text+";min-width:400px;min-height:120px;}");
 }
 
 void MariaUI::beginLoading() {
