@@ -25,9 +25,13 @@ private:
 	QTimer *_loadingAnimationTimer;
 	QLabel *_logo;
 	float _logoYPos;						//Y position of logo.
+	
 	QLabel *_loadingDots[AMOUNT_OF_DOTS];
 	float _dotsXPos[AMOUNT_OF_DOTS];		//X position of dots.
+	
 	STATE_TYPE _currentState;
+	
+	bool _toEndAnimation;					//Flag to queue for animation end.
 
 private slots:
 	void updateStateAnimation();

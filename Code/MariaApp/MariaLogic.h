@@ -2,12 +2,16 @@
 
 #include <QtCore/QCoreApplication>
 #include "MariaUI.h"
+#include "MariaInterpreter.h"
+#include "MariaTaskManager.h"
+#include "MariaFileWriter.h"
 
 class MariaLogic : QApplication {
 private:
 	MariaUI *mariaUI;
-
-protected:
+	MariaInterpreter *mariaIntepreter;
+	MariaTaskManager *mariaTaskManager;
+	MariaFileWriter *mariaFileWriter;
 
 public:
 	MariaLogic(int argc, char *argv[]);

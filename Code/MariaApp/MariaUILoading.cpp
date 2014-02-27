@@ -23,7 +23,8 @@ MariaUILoading::MariaUILoading(QMainWindow *parent) {
 
 	_loadingAnimationTimer = new QTimer(this);
     connect(_loadingAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStateAnimation()));
-
+	
+	updateGUI();
 }
 
 MariaUILoading::~MariaUILoading() {
@@ -52,7 +53,10 @@ void MariaUILoading::updateStateAnimation() {
 		for(int i=0;i<AMOUNT_OF_DOTS;i++) {
 			if(_dotsXPos[i]<-DOTS_XOFFSET) {
 				_dotsXPos[i]=_parent->width()+DOTS_XOFFSET;
-				_currentState=AFTER;//Remove this line soon.
+
+				if(_toEndAnimation) {
+					_currentState=AFTER;
+				}
 			} else {
 				float newSpeed=_dotsXPos[i]/_parent->width();
 				
@@ -102,10 +106,10 @@ void MariaUILoading::startLoadingAnimation() {
 	if(!_loadingAnimationTimer->isActive()) {
 		_loadingAnimationTimer->start(1);
 		_currentState=BEFORE;
+		_toEndAnimation=false;
 	}
 }
 
 void MariaUILoading::endLoadingAnimation() {
-	if(_currentState==DURING)
-		_currentState=AFTER;
+	_toEndAnimation=true;
 }

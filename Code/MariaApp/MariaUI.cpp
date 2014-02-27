@@ -10,8 +10,6 @@ MariaUI::MariaUI(QWidget *parent) : QMainWindow(parent)
 	initButtons();
 	initLoading();
 
-	setState(INTRO);
-	setStatus(NONE);
 	show();
 }
 
@@ -211,4 +209,13 @@ void MariaUI::setBaseText(const QString text) {
 
 QString MariaUI::getUserInput() {
 	return _inputBox->text();
+}
+
+void MariaUI::beginLoading() {
+	setState(INTRO);
+	setStatus(NONE);
+}
+
+void MariaUI::endLoading() {
+	_mariaUILoading->endLoadingAnimation();
 }

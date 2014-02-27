@@ -73,4 +73,7 @@ public:
 
 	void setBaseText(const QString text);
 	QString getUserInput();
+
+	void beginLoading();
+	void endLoading();
 };

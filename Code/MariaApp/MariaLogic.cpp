@@ -2,19 +2,26 @@
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaUI = new MariaUI();
-	mariaUI->setStatus(MariaUI::WAIT);
-	mariaUI->setState(MariaUI::INTRO);
-	mariaUI->setBaseText("add Meeting tomorrow");
-	//Somewhere somehow, add this to test the dynamic text thingy.
-	/*
-	QString test=mariaUI->getUserInput();
 
-	if(test.endsWith("o"))
-		mariaUI->setBaseText(QString(test+" world"));
-		*/
+	
+	mariaUI->beginLoading();
+	mariaIntepreter = new MariaInterpreter();
+	mariaTaskManager = new MariaTaskManager();
+	mariaFileWriter = new MariaFileWriter();
+	
+	//Put loading intensive stuffs in-between begin and end.
+	mariaUI->endLoading();
+
+	//Below are things that you can edit.
+	mariaUI->setStatus(MariaUI::WAIT);
+	mariaUI->setBaseText("add Meeting tomorrow for discussion.");
+
 }
 
 MariaLogic::~MariaLogic(void) {
+	delete mariaFileWriter;
+	delete mariaTaskManager;
+	delete mariaIntepreter;
 	delete mariaUI;
 }
 
