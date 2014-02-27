@@ -1,12 +1,10 @@
 #pragma once
-#include<vector>
+
+#include <vector>
 #include "MariaTask.h"
 using namespace std;
 
-class MariaTaskManager{
-
-private:
-	vector<MariaTask> *taskList;	
+class MariaTaskManager {
 public:
 	MariaTaskManager(vector<MariaTask> *inputTaskList = NULL);
 	~MariaTaskManager(void);
@@ -16,4 +14,7 @@ public:
 
 	bool archiveTask(MariaTask);
 	bool deleteArchive();
+
+private:
+	vector<MariaTask> *taskList;
 };

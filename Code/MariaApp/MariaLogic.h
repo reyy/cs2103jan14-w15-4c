@@ -7,15 +7,16 @@
 #include "MariaFileWriter.h"
 
 class MariaLogic : QApplication {
-private:
-	MariaUI *mariaUI;
-	MariaInterpreter *mariaIntepreter;
-	MariaTaskManager *mariaTaskManager;
-	MariaFileWriter *mariaFileWriter;
-
 public:
 	MariaLogic(int argc, char *argv[]);
 	~MariaLogic(void);
 
 	bool processCommand(QString inputText);
+
+private:
+	MariaUI				*mariaUI;
+	MariaInterpreter	*mariaIntepreter;
+	MariaTaskManager	*mariaTaskManager;
+	MariaFileWriter		*mariaFileWriter;
+
 };
