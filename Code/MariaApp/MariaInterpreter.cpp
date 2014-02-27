@@ -21,6 +21,9 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(QString &inputStr
 	} else if (inputString == "exit") {
 		inputString = replaceText(inputString, "exit", "");
 		return MariaInterpreter::Exit;
+	} else if (inputString == "quit") {
+		inputString = replaceText(inputString, "quit", "");
+		return MariaInterpreter::Quit;
 	}
 
 	return MariaInterpreter::Invalid;

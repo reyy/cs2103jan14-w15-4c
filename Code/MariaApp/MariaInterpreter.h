@@ -15,6 +15,7 @@ public:
 		ShowAllTask,
 		DeleteTask,
 		Exit,
+		Quit,
 	} CommandType;
 
 	MariaInterpreter(map<QString, CommandType>* inputCommandList = NULL);

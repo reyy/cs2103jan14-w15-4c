@@ -4,13 +4,17 @@
 MariaUILoading::MariaUILoading(QMainWindow *parent) {
 	
 	_parent=parent;
-	_logoYPos=-LOGO_YOFFSET;
 	_imageHandleLogo = new QPixmap("./Resources/ui_maria_logo.png");
 	_imageHandleDots = new QPixmap("./Resources/ui_loadingdots.png");
 
+	_displayText = new QLabel(_parent);
+	_displayText->setStyleSheet("color:#ffffff;");
+	_displayText->setAlignment(Qt::AlignCenter);
+
+	_logoYPos=-LOGO_YOFFSET;
 	_logo = new QLabel(_parent);
 	_logo->setPixmap(*_imageHandleLogo);
-	_logo->setStyleSheet("");
+	_logo->setAlignment(Qt::AlignCenter);
 
 	_currentState=BEFORE;
 
@@ -28,6 +32,7 @@ MariaUILoading::MariaUILoading(QMainWindow *parent) {
 }
 
 MariaUILoading::~MariaUILoading() {
+	delete _displayText;
 	delete _logo;
 	for(int i=0;i<AMOUNT_OF_DOTS;i++) {
 		delete _loadingDots[i];
@@ -45,6 +50,7 @@ void MariaUILoading::updateStateAnimation() {
 		} else {
 			_currentState = DURING;
 			_logoYPos=_parent->height()*0.4;
+			_displayText->show();
 			for(int i=0;i<AMOUNT_OF_DOTS;i++) {
 				_loadingDots[i]->show();
 			}
@@ -56,11 +62,11 @@ void MariaUILoading::updateStateAnimation() {
 				_dotsXPos[i]=_parent->width()+DOTS_XOFFSET;
 
 				if(_toEndAnimation) {
+					_displayText->hide();
 					_currentState=AFTER;
 				}
 			} else {
 				float newSpeed=_dotsXPos[i]/_parent->width();
-				
 				_dotsXPos[i]-=abs(newSpeed-0.5)*0.5+(float)(DOTS_XSPEED*0.1);
 			}
 		}
@@ -88,9 +94,11 @@ void MariaUILoading::updateStateAnimation() {
 }
 
 void MariaUILoading::updateGUI() {
-	_logo->setGeometry(QRect(width()*0.5-130, _logoYPos-30, 120,60));
+	_logo->setGeometry(QRect(_parent->width()*0.5-60, _logoYPos-35, 120,60));
+	_displayText->setGeometry(QRect(_parent->width()*0.5-150, _logoYPos+25, 300,20));
+	
 	for(int i=0;i<AMOUNT_OF_DOTS;i++) {
-		_loadingDots[i]->setGeometry(QRect((int)(_dotsXPos[i]),(int)(_parent->height()*0.75),8,8));
+		_loadingDots[i]->setGeometry(QRect((int)(_dotsXPos[i]),(int)(_parent->height()*0.8),8,8));
 	}
 }
 
@@ -105,12 +113,20 @@ bool MariaUILoading::isAnimationDone() {
 void MariaUILoading::startLoadingAnimation() {
 
 	if(!_loadingAnimationTimer->isActive()) {
+		for(int i=0;i<AMOUNT_OF_DOTS;i++) {
+			_dotsXPos[i]=_parent->width()+DOTS_XOFFSET+DOTS_XSEPARATE*i;
+		}
 		_loadingAnimationTimer->start(1);
 		_currentState=BEFORE;
+		_displayText->hide();
 		_toEndAnimation=false;
 	}
 }
 
 void MariaUILoading::endLoadingAnimation() {
 	_toEndAnimation=true;
+}
+
+void MariaUILoading::setDisplayText(const QString text) {
+	_displayText->setText(text);
 }

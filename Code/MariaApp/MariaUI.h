@@ -11,12 +11,16 @@
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
 #include <QtWidgets/qtoolbutton.h>
+#include <queue>
 #include "MariaUILoading.h"
 
 #define WINDOW_DEFAULT_SIZE_X 480
 #define WINDOW_DEFAULT_SIZE_Y 120
 
-#define AMOUNT_OF_IMAGES 10
+#define WINDOW_DEFAULT_EXPAND_SIZE_X 480
+#define WINDOW_DEFAULT_EXPAND_SIZE_Y 360
+
+#define AMOUNT_OF_IMAGES 7
 
 class MariaLogic;
 class MariaUI : QMainWindow {
@@ -26,35 +30,39 @@ public:
 		OK, INVALID, WAIT, UNKNOWN, NONE
 	};
 	enum STATE_TYPE {
-		DEFAULT, FOCUS, INTRO
+		DEFAULT, FOCUS, INTRO, QUIT
 	};
 private:
-	int _statusImageIndex;				//The actual index for QLabel to reference to QPixmap. Change to switch image.
+	MariaLogic *_mariaLogic;
+
 	QTimer *_statusAnimationTimer;
 	QTimer *_statePreAnimationTimer;
 	QTimer *_statePosAnimationTimer;
-
-	QLineEdit *_inputBox;
+	
 	QPixmap **_imageHandle;
 	QLabel *_statusIcon;
-	QLabel *_suggestText;
-	QLabel *_questionText;
+	int _statusImageIndex;				//The actual index for QLabel to reference to QPixmap. Change to switch image.
 	STATUS_TYPE _currentStatus;
+
+	QLabel *_questionText;
+	QLineEdit *_inputBox;
+	QLabel *_suggestText;
+	
 	STATE_TYPE _currentState;
-	STATE_TYPE _queueState;				//The state to transit into.
-	QToolButton *_btClose;
+	std::queue<STATE_TYPE> _stateQueue;		//The state to transit into.
+	bool _processingState;
 	QPointF _toolBoxCoordinate;
 	float _stateTargetY;
-
-	MariaUILoading *_mariaUILoading;
+	
+	QToolButton *_btClose;
+	MariaUILoading *_loading;
 	QString _backgroundColor;
-
-	MariaLogic *_mariaLogic;
+	bool _expandView;
 
 	//Load images used in application.
 	void initState();
 	void initImages();
-	void initWindowTitle();
+	void initWindow();
 	void initTextBox();
 	void initStatusIcon();
 	void initButtons();
@@ -67,14 +75,14 @@ private slots:
 
 protected:
 	void resizeEvent(QResizeEvent *event);
-	void setInternalState();
+	void keyReleaseEvent(QKeyEvent* keyevent);
+	void beginNewState();
+	void endOldState();
 
 public:
 
 	MariaUI(MariaLogic *mariaLogic, QWidget *parent=0);
 	~MariaUI(void);
-
-	void keyReleaseEvent(QKeyEvent* keyevent);
 
 	//Force UI Class to update values prematurelly.
 	void updateGUI();
@@ -82,12 +90,19 @@ public:
 	void setStatus(STATUS_TYPE type);
 	STATUS_TYPE getStatus();
 
-	bool setState(STATE_TYPE type);
+	void setState(STATE_TYPE type);
 	STATE_TYPE getState();
 
 	void setBaseText(const QString text);
 	void setQuestionText(const QString text);
+	
 	QString getUserInput();
+	void setUserInput(const QString text);
+
+	void setExpand(bool value);
+	bool getExpand();
 
 	void setBackgroundColor(const QString text);
+
+	MariaUILoading* getLoading();
 };

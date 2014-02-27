@@ -23,6 +23,7 @@ private:
 	QPixmap *_imageHandleDots;
 	
 	QTimer *_loadingAnimationTimer;
+	QLabel *_displayText;
 	QLabel *_logo;
 	float _logoYPos;						//Y position of logo.
 	
@@ -49,5 +50,7 @@ public:
 
 	//Call the function after loading has been completed.
 	void endLoadingAnimation();
+
+	void setDisplayText(const QString text);
 };
 

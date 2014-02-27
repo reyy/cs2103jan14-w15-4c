@@ -2,13 +2,14 @@
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaUI = new MariaUI(this);
-	
+
 	mariaUI->setState(MariaUI::INTRO);
+	mariaUI->getLoading()->setDisplayText("Loading");
 	mariaIntepreter = new MariaInterpreter();
 	mariaTaskManager = new MariaTaskManager();
 	mariaFileWriter = new MariaFileWriter();
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
-	mariaUI->setState(MariaUI::FOCUS);
+	mariaUI->setState(MariaUI::DEFAULT);
 
 
 	//Below are things that you can edit.
@@ -27,11 +28,27 @@ MariaLogic::~MariaLogic(void) {
 
 bool MariaLogic::processCommand(QString inputText){
 	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
+	mariaUI->setUserInput("");
 
 	if(commandType == MariaInterpreter::CommandType::Invalid){
+		mariaUI->setQuestionText("I don't understand. Please try again.");
+		mariaUI->setStatus(MariaUI::UNKNOWN);
 		return false;
-	}else if(commandType == MariaInterpreter::CommandType::Exit){
-		quit();
+	} else {
+		mariaUI->setStatus(MariaUI::OK);
+
+		if(commandType == MariaInterpreter::CommandType::Exit){
+			mariaUI->setState(MariaUI::INTRO);
+			mariaUI->getLoading()->setDisplayText("Saving");
+			//Do uploading to google etc.
+			//Save files operation etc.
+			mariaUI->setState(MariaUI::QUIT);
+		}else if(commandType == MariaInterpreter::CommandType::Quit){
+			quit();
+		} else {
+			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
+			mariaUI->setState(MariaUI::FOCUS);
+		}
 	}
 
 	//todo: call interpreter to generate task & pass to task manager
