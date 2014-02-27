@@ -16,6 +16,7 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+			Assert::IsTrue(input == "");
 
 			delete program;
 		}
@@ -30,6 +31,7 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+			Assert::IsTrue(input == "");
 
 			delete program;
 		}
@@ -44,6 +46,7 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+			Assert::IsTrue(input == "");
 
 			delete program;
 		}
@@ -58,6 +61,7 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+			Assert::IsTrue(input == "");
 
 			delete program;
 		}
@@ -72,6 +76,7 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+			Assert::IsTrue(input == "");
 
 			delete program;
 		}
