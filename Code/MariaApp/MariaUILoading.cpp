@@ -34,6 +34,7 @@ MariaUILoading::~MariaUILoading() {
 	}
 	delete _imageHandleLogo;
 	delete _imageHandleDots;
+	delete _loadingAnimationTimer;
 }
 
 void MariaUILoading::updateStateAnimation() {
