@@ -168,8 +168,10 @@
     <ClCompile Include="MariaTask.cpp" />
     <ClCompile Include="MariaTaskManager.cpp" />
     <ClCompile Include="MariaUI.cpp" />
+    <ClCompile Include="MariaUICalendar.cpp" />
     <ClCompile Include="MariaUILoading.cpp" />
     <ClCompile Include="MariaUIRolling.cpp" />
+    <ClCompile Include="MariaUISetting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -197,6 +199,8 @@
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaTask.h" />
     <ClInclude Include="MariaTaskManager.h" />
+    <ClInclude Include="MariaUICalendar.h" />
+    <ClInclude Include="MariaUISetting.h" />
     <CustomBuild Include="MariaUIRolling.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing MariaUIRolling.h...</Message>
