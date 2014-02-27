@@ -1,18 +1,22 @@
 #include "MariaInterpreter.h"
 
-
 MariaInterpreter::MariaInterpreter(map<string, CommandType> *inputCommandList){
 	userDefinedCommands = inputCommandList;
 }
 
-
 MariaInterpreter::~MariaInterpreter(void){
 }
 
-void MariaInterpreter::setApple(int a){
-	apple = a;
-}
+MariaInterpreter::CommandType MariaInterpreter::getCommandType(string inputString) {
+	if (inputString == "create") {
+		return MariaInterpreter::AddFloatingTask;
+	} else if (inputString == "show") {
+		return MariaInterpreter::ShowAllTask;
+	} else if (inputString == "delete") {
+		return MariaInterpreter::DeleteTask;
+	} else if (inputString == "exit") {
+		return MariaInterpreter::Exit;
+	}
 
-int MariaInterpreter::getApple() {
-	return apple;
+	return MariaInterpreter::Invalid;
 }
