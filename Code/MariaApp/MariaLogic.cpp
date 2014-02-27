@@ -15,7 +15,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->setBackgroundColor("#ff88ff");
 	mariaUI->setQuestionText("What would you like to do?");
 	mariaUI->setStatus(MariaUI::WAIT);
-	mariaUI->setBaseText("add Meeting tomorrow for discussion");
+	//mariaUI->setBaseText("add Meeting tomorrow for discussion");
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -30,6 +30,8 @@ bool MariaLogic::processCommand(QString inputText){
 
 	if(commandType == MariaInterpreter::CommandType::Invalid){
 		return false;
+	}else if(commandType == MariaInterpreter::CommandType::Exit){
+		quit();
 	}
 
 	//todo: call interpreter to generate task & pass to task manager
@@ -37,7 +39,10 @@ bool MariaLogic::processCommand(QString inputText){
 }
 
 int main(int argc, char *argv[]) {
-	MariaLogic mariaLogic(argc, argv);
+	MariaLogic *mariaLogic = new MariaLogic(argc, argv);
 
-	return QApplication::exec();
+	int returnCode = QApplication::exec();
+	delete mariaLogic;
+
+	return returnCode;
 }

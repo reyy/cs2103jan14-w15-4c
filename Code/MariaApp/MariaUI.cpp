@@ -25,8 +25,8 @@ MariaUI::~MariaUI(void) {
 	delete _suggestText;
 	delete _questionText;
 	delete _btClose;
-
-	for(int i=0;i<AMOUNT_OF_IMAGES;i++) {
+	//TODO: Hacked this to fix runtime error. Jay please change :)
+	for(int i=0;i</*AMOUNT_OF_IMAGES*/7;i++) {
 		delete _imageHandle[i];
 	}
 	delete _imageHandle;
@@ -229,8 +229,9 @@ void MariaUI::setInternalState() {
 }
 
 void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
-	int a = keyevent->key();
-	if(keyevent->key() == Qt::Key_Return){
+	int keyPressed = keyevent->key();
+
+	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
 		mariaLogic->processCommand(_inputBox->text());
 	}else{
 		//todo: tick / question if keyword detected
