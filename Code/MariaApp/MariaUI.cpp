@@ -16,7 +16,8 @@ MariaUI::MariaUI(QWidget *parent) : QMainWindow(parent)
 MariaUI::~MariaUI(void) {
 	delete _mariaUILoading;
 	delete _statusAnimationTimer;
-	delete _stateAnimationTimer;
+	delete _statePreAnimationTimer;
+	delete _statePosAnimationTimer;
 	delete _statusIcon;
 	delete _suggestText;
 	delete _questionText;
@@ -30,11 +31,15 @@ MariaUI::~MariaUI(void) {
 }
 
 void MariaUI::initState() {
+	_stateTargetY=-WINDOW_DEFAULT_SIZE_Y*0.5;
 	_toolBoxCoordinate.setX(30.0);
 	_toolBoxCoordinate.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
 
-	_stateAnimationTimer = new QTimer(this);
-    connect(_stateAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStateAnimation()));
+	_statePreAnimationTimer = new QTimer(this);
+    connect(_statePreAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePreAnimation()));
+
+	_statePosAnimationTimer = new QTimer(this);
+    connect(_statePosAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePosAnimation()));
 }
 
 void MariaUI::initImages() {
@@ -133,50 +138,91 @@ void MariaUI::updateStatusAnimation() {
 	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
 }
 
-void MariaUI::updateStateAnimation() {
-	float targetY=0;
+void MariaUI::updateStatePreAnimation() {
 	bool canstop=false;
 	switch(_currentState)
 	{
 	case DEFAULT:
-		targetY=height()*0.5-10;
-		if(abs(_toolBoxCoordinate.y()-targetY)>0.5) {
-			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(targetY-_toolBoxCoordinate.y())*0.01);
-			updateGUI();
-		} else {
-			canstop=true;
-		}
-		break;
 	case FOCUS:
-		targetY=25;
-		if(abs(_toolBoxCoordinate.y()-targetY)>0.5) {
-			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(targetY-_toolBoxCoordinate.y())*0.01);
+		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
+			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
 			updateGUI();
 		} else {
 			canstop=true;
+			_toolBoxCoordinate.setY(_stateTargetY);
 		}
 		break;
 	case INTRO:
-		targetY=-WINDOW_DEFAULT_SIZE_Y;
-		if(!_mariaUILoading->isAnimationDone()) {
-			_mariaUILoading->startLoadingAnimation();
-		} else {
-			_currentState=DEFAULT;
-		}
+		canstop=true;
 		break;
 	default:
+		canstop=true;
 		break;
 	}
 	
 	if(canstop) {
-		_stateAnimationTimer->stop();
-		_toolBoxCoordinate.setY(targetY);
+		_statePreAnimationTimer->stop();
+	}
+}
+void MariaUI::updateStatePosAnimation() {
+	bool canstop=false;
+	switch(_currentState)
+	{
+	case DEFAULT:
+	case FOCUS:
+		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
+			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
+			updateGUI();
+		} else {
+			canstop=true;
+			_toolBoxCoordinate.setY(_stateTargetY);
+		}
+		break;
+	case INTRO:
+		if(_mariaUILoading->isAnimationDone()) {
+			canstop=true;
+		}
+		break;
+	default:
+		canstop=true;
+		break;
+	}
+	
+	if(canstop) {
+		_statePosAnimationTimer->stop();
+		setInternalState();
 	}
 }
 
 void MariaUI::resizeEvent(QResizeEvent* event) {
 	updateGUI();
 	QWidget::resizeEvent(event);
+}
+
+/*
+Function starts the new state and its animation before hand.
+*/
+void MariaUI::setInternalState() {
+	_currentState=_queueState;
+	switch(_currentState) {
+	case DEFAULT:
+		_stateTargetY=height()*0.5-10;
+		break;
+	case FOCUS:
+		_stateTargetY=25;
+		break;
+	case INTRO:
+		setStatus(NONE);
+		_mariaUILoading->startLoadingAnimation();
+		break;
+	default:
+		break;
+	}
+
+	updateStatePreAnimation();
+
+	if(!_statePreAnimationTimer->isActive())
+		_statePreAnimationTimer->start(1);
 }
 
 void MariaUI::updateGUI() {
@@ -198,11 +244,34 @@ MariaUI::STATUS_TYPE MariaUI::getStatus() {
 	return _currentStatus;
 }
 
-void MariaUI::setState(STATE_TYPE state) {
-	_currentState=state;
-	updateStateAnimation();
-	if(!_stateAnimationTimer->isActive())
-		_stateAnimationTimer->start(1);
+/*
+Function cleans up the animation for previous states
+before starting the new state.
+*/
+bool MariaUI::setState(STATE_TYPE state) {
+	if(_queueState==_currentState&&_currentState!=state) {
+		_queueState=state;
+
+		switch(_currentState) {
+		case DEFAULT:
+		case FOCUS:
+			_stateTargetY=-WINDOW_DEFAULT_SIZE_Y;
+			break;
+		case INTRO:
+			_mariaUILoading->endLoadingAnimation();
+			break;
+		default:
+			break;
+		}
+
+		updateStatePosAnimation();
+		if(!_statePosAnimationTimer->isActive())
+			_statePosAnimationTimer->start(1);
+
+		return true;
+	} else {
+		return false;
+	}
 }
 
 MariaUI::STATE_TYPE MariaUI::getState() {
@@ -224,13 +293,4 @@ QString MariaUI::getUserInput() {
 void MariaUI::setBackgroundColor(const QString text) {
 	_backgroundColor=text;
 	this->setStyleSheet("QMainWindow  {background-color: "+text+";min-width:400px;min-height:120px;}");
-}
-
-void MariaUI::beginLoading() {
-	setState(INTRO);
-	setStatus(NONE);
-}
-
-void MariaUI::endLoading() {
-	_mariaUILoading->endLoadingAnimation();
 }

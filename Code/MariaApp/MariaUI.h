@@ -30,7 +30,9 @@ public:
 private:
 	int _statusImageIndex;				//The actual index for QLabel to reference to QPixmap. Change to switch image.
 	QTimer *_statusAnimationTimer;
-	QTimer *_stateAnimationTimer;
+	QTimer *_statePreAnimationTimer;
+	QTimer *_statePosAnimationTimer;
+
 	QLineEdit *_inputBox;
 	QPixmap **_imageHandle;
 	QLabel *_statusIcon;
@@ -38,8 +40,11 @@ private:
 	QLabel *_questionText;
 	STATUS_TYPE _currentStatus;
 	STATE_TYPE _currentState;
+	STATE_TYPE _queueState;				//The state to transit into.
 	QToolButton *_btClose;
 	QPointF _toolBoxCoordinate;
+	float _stateTargetY;
+
 	MariaUILoading *_mariaUILoading;
 	QString _backgroundColor;
 
@@ -54,10 +59,12 @@ private:
 
 private slots:
 	void updateStatusAnimation();
-	void updateStateAnimation();
+	void updateStatePreAnimation();
+	void updateStatePosAnimation();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
+	void setInternalState();
 
 public:
 
@@ -70,7 +77,7 @@ public:
 	void setStatus(STATUS_TYPE type);
 	STATUS_TYPE getStatus();
 
-	void setState(STATE_TYPE type);
+	bool setState(STATE_TYPE type);
 	STATE_TYPE getState();
 
 	void setBaseText(const QString text);
@@ -78,7 +85,4 @@ public:
 	QString getUserInput();
 
 	void setBackgroundColor(const QString text);
-
-	void beginLoading();
-	void endLoading();
 };
