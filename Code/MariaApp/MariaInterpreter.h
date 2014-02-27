@@ -1,5 +1,5 @@
 #pragma once
-#include<string>
+#include<QtCore\qstring.h>
 #include<map>
 using namespace std;
 class MariaInterpreter{
@@ -16,11 +16,11 @@ public:
 	} CommandType;
 
 private:
-	map<string, CommandType> *userDefinedCommands;
+	map<QString, CommandType> *userDefinedCommands;
 
 public:
-	MariaInterpreter(map<string, CommandType>* inputCommandList = NULL);
+	MariaInterpreter(map<QString, CommandType>* inputCommandList = NULL);
 	~MariaInterpreter(void);
 
-	CommandType getCommandType(string inputString);
+	CommandType getCommandType(QString inputString);
 };

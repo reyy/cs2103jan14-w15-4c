@@ -25,6 +25,17 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
+bool MariaLogic::processCommand(QString inputText){
+	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
+
+	if(commandType == MariaInterpreter::CommandType::Invalid){
+		return false;
+	}
+
+	//todo: call interpreter to generate task & pass to task manager
+	return true;
+}
+
 int main(int argc, char *argv[]) {
 	MariaLogic mariaLogic(argc, argv);
 

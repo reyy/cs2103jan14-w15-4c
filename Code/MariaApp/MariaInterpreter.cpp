@@ -1,13 +1,13 @@
 #include "MariaInterpreter.h"
 
-MariaInterpreter::MariaInterpreter(map<string, CommandType> *inputCommandList){
+MariaInterpreter::MariaInterpreter(map<QString, CommandType> *inputCommandList){
 	userDefinedCommands = inputCommandList;
 }
 
 MariaInterpreter::~MariaInterpreter(void){
 }
 
-MariaInterpreter::CommandType MariaInterpreter::getCommandType(string inputString) {
+MariaInterpreter::CommandType MariaInterpreter::getCommandType(QString inputString) {
 	if (inputString == "create") {
 		return MariaInterpreter::AddFloatingTask;
 	} else if (inputString == "show") {

@@ -1,4 +1,5 @@
 #include "MariaUI.h"
+#include "MariaLogic.h"
 #include <QkeyEvent>
 
 MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent)
@@ -228,8 +229,9 @@ void MariaUI::setInternalState() {
 }
 
 void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
-	if(keyevent->key() == Qt::Key_Enter){
-		//todo: process command
+	int a = keyevent->key();
+	if(keyevent->key() == Qt::Key_Return){
+		mariaLogic->processCommand(_inputBox->text());
 	}else{
 		//todo: tick / question if keyword detected
 	}
