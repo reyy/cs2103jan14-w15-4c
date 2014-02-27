@@ -15,7 +15,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->setBackgroundColor("#ff88ff");
 	mariaUI->setQuestionText("What would you like to do?");
 	mariaUI->setStatus(MariaUI::WAIT);
-	//mariaUI->setBaseText("add Meeting tomorrow for discussion");
+	mariaUI->setBaseText("add Meeting tomorrow for discussion");
 }
 
 MariaLogic::~MariaLogic(void) {

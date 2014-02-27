@@ -49,7 +49,7 @@ private:
 	MariaUILoading *_mariaUILoading;
 	QString _backgroundColor;
 
-	MariaLogic *mariaLogic;
+	MariaLogic *_mariaLogic;
 
 	//Load images used in application.
 	void initState();

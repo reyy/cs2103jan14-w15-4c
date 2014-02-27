@@ -4,7 +4,7 @@
 
 MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent)
 {
-	this->mariaLogic = mariaLogic;
+	this->_mariaLogic = mariaLogic;
 
 	initState();
 	initImages();
@@ -232,9 +232,10 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		mariaLogic->processCommand(_inputBox->text());
+		_mariaLogic->processCommand(_inputBox->text());
 	}else{
 		//todo: tick / question if keyword detected
+		_suggestText->setText("");
 	}
 }
 
