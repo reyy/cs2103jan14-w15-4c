@@ -1,6 +1,6 @@
 #include "MariaTask.h"
 
-MariaTask::MariaTask(string title, time_t start, time_t end){
+MariaTask::MariaTask(QString title,time_t start, time_t end){
 	this->title = title;
 	this->start = start;
 	this->end = end;
@@ -13,11 +13,35 @@ MariaTask::MariaTask(string title, time_t start, time_t end){
 		type = TaskType::TIMED;
 	}
 }
+
+MariaTask::MariaTask(QString title, QString description,time_t start, time_t end){
+	this->title = title;
+	this->description=description;
+	this->start = start;
+	this->end = end;
+	
+	if(start == NULL && end == NULL){
+		type = TaskType::FLOATING;
+	}else if(start == NULL){
+		type = TaskType::DEADLINE;
+	}else{
+		type = TaskType::TIMED;
+	}
+}
+
 MariaTask::~MariaTask(void){
 }
 
-string MariaTask::getTitle(){
+MariaTask::TaskType MariaTask::getType() {
+	return type;
+}
+
+QString MariaTask::getTitle(){
 	return title;
+}
+
+QString MariaTask::getDescription(){
+	return description;
 }
 
 time_t MariaTask::getStart(){

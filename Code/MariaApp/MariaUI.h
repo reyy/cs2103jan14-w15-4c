@@ -13,9 +13,10 @@
 #include <QtWidgets/qtoolbutton.h>
 #include <queue>
 #include "MariaUILoading.h"
+#include "MariaUICalendar.h"
 
 #define WINDOW_DEFAULT_SIZE_X 480
-#define WINDOW_DEFAULT_SIZE_Y 120
+#define WINDOW_DEFAULT_SIZE_Y 160
 
 #define WINDOW_DEFAULT_EXPAND_SIZE_X 480
 #define WINDOW_DEFAULT_EXPAND_SIZE_Y 360
@@ -30,7 +31,7 @@ public:
 		OK, INVALID, WAIT, UNKNOWN, NONE
 	};
 	enum STATE_TYPE {
-		DEFAULT, FOCUS, INTRO, QUIT
+		DEFAULT, FOCUS_CALENDAR,FOCUS_SETTING, INTRO, QUIT
 	};
 private:
 	MariaLogic *_mariaLogic;
@@ -55,9 +56,10 @@ private:
 	float _stateTargetY;
 	
 	QToolButton *_btClose;
-	MariaUILoading *_loading;
 	QString _backgroundColor;
 	bool _expandView;
+	MariaUILoading *_loading;
+	MariaUICalendar *_calendar;
 
 	//Load images used in application.
 	void initState();
@@ -66,7 +68,7 @@ private:
 	void initTextBox();
 	void initStatusIcon();
 	void initButtons();
-	void initLoading();
+	void initLayers();
 
 private slots:
 	void updateStatusAnimation();
@@ -103,6 +105,7 @@ public:
 	bool getExpand();
 
 	void setBackgroundColor(const QString text);
-
+	
 	MariaUILoading* getLoading();
+	MariaUICalendar* getCalendar();
 };

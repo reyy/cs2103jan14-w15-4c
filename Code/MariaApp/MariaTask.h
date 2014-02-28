@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string>
-using namespace std;
+#include <QtCore/QCoreApplication>
 
 class MariaTask{
 public:
@@ -10,18 +9,22 @@ public:
 		DEADLINE,
 		TIMED
 	} TaskType;
-
-	MariaTask(string title, time_t start, time_t end);
-	~MariaTask(void);
-
-	string getTitle();
+	
+	MariaTask(QString title, time_t start, time_t end);
+	MariaTask(QString title, QString description,time_t start, time_t end);
+	~MariaTask();
+	
+	
+	TaskType getType();
+	QString getTitle();
+	QString getDescription();
 	time_t getStart();
 	time_t getEnd();
 
 private:
-	int		type;
-	string	title;
-	string	description;
-	time_t	start;
-	time_t	end;
+	TaskType	type;
+	QString		title;
+	QString		description;
+	time_t		start;
+	time_t		end;
 };
