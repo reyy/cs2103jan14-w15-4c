@@ -9,7 +9,13 @@ MariaInterpreter::~MariaInterpreter(void){
 
 MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputString) {
 	CommandType command = Invalid;
-	vector<string> input = tokenizeString(inputString);
+	vector<string> input;
+
+	if (inputString.size() > 0) {
+		input = tokenizeString(inputString);
+	} else {
+		return command;
+	}
 
 	//TODO: Loop through all available keywords using map.
 
