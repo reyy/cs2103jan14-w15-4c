@@ -10,8 +10,8 @@ public:
 	~MariaTaskManager(void);
 
 	bool addTask(MariaTask);
-	bool addTask(string name, time_t start = NULL, time_t end = NULL);
-	vector<MariaTask*> findTask(string searchString);
+	bool addTask(QString name, time_t start = NULL, time_t end = NULL);
+	vector<MariaTask*> findTask(QString searchString);
 	vector<MariaTask*> findTask(time_t start, time_t end);
 
 	bool archiveTask(MariaTask);

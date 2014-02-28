@@ -22,7 +22,7 @@ public:
 	QString backgroundColor;
 
 	displayPack(QMainWindow *parent);
-	displayPack(QMainWindow *parent, QString title,int type, time_t start,time_t end);
+	displayPack(QMainWindow *parent, QString title,MariaTask::TaskType type, time_t start,time_t end);
 	~displayPack();
 
 	void setDestinationX(float x);
@@ -58,7 +58,7 @@ public:
 	MariaUICalendar(QMainWindow *parent);
 	~MariaUICalendar();
 
-	void addTask(const MariaTask task);
+	void addDisplay(MariaTask task);
 	void clearActiveDisplay();
 	void updateGUI();
 };

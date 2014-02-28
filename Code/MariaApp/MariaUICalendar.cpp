@@ -15,7 +15,7 @@ displayPack::displayPack(QMainWindow *parent) {
 	_y=0;
 }
 
-displayPack::displayPack(QMainWindow *parent, QString title,int type, time_t start,time_t end) {
+displayPack::displayPack(QMainWindow *parent, QString title,MariaTask::TaskType type, time_t start,time_t end) {
 	_parent=parent;
 
 	displayTitle = new QLabel(_parent);
@@ -131,9 +131,9 @@ void MariaUICalendar::clearQueueDisplay() {
 	}
 }
 
-void MariaUICalendar::addTask(const MariaTask task) {
+void MariaUICalendar::addDisplay(MariaTask task) {
 
-	displayPack* newDisplay=new displayPack(_parent,task.title,task.type,task.start,task.end);
+	displayPack* newDisplay=new displayPack(_parent,task.getTitle(),task.getType(),task.getStart(),task.getEnd());
 	newDisplay->setDestinationX(-_parent->width()*0.5+30);
 	newDisplay->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
 	newDisplay->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);

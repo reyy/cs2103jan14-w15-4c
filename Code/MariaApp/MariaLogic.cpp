@@ -26,11 +26,11 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
-bool MariaLogic::processCommand(QString inputText){
-	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
+bool MariaLogic::processCommand(QString inputText) {
+	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText.toStdString());
 	mariaUI->setUserInput("");
 
-	if(commandType == MariaInterpreter::CommandType::Invalid){
+	if(commandType == MariaInterpreter::CommandType::Invalid) {
 		mariaUI->setQuestionText("I don't understand. Please try again.");
 		mariaUI->setStatus(MariaUI::UNKNOWN);
 		return false;
@@ -47,21 +47,19 @@ bool MariaLogic::processCommand(QString inputText){
 			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			if(mariaTaskManager->addTask(inputText, NULL, NULL)){
-				mariaUI->setBaseText(QString::fromStdString("Task "+ inputText +" has been added!"));
-
+				mariaUI->setBaseText("Task "+ inputText +" has been added!");
+			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
 
 			//Generating some existing crappy task.
 			for(int i=0;i<5;i++) {
-				MariaTask task;
-				task.type=0;
-				task.title="Temporary Task "+ QString::number(i+1);
-				task.description="Very important";
-				task.start=time(NULL);
-				task.end=time(NULL);
-				mariaUI->getCalendar()->addTask(task);
+				QString temp=QString("Temporary Task ") + QString::number(i+1);
+				MariaTask task(temp,"Very important",NULL,NULL);
+
+				mariaUI->getCalendar()->addDisplay(task);
+			}
 		} else {
 			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
 			mariaUI->setState(MariaUI::DEFAULT);
