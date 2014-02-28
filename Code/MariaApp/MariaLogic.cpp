@@ -53,12 +53,10 @@ bool MariaLogic::processCommand(QString inputText) {
 			mariaUI->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
 
-			//Generating some existing crappy task.
-			for(int i=0;i<5;i++) {
-				QString temp=QString("Temporary Task ") + QString::number(i+1);
-				MariaTask task(temp,"Very important",NULL,NULL);
-
-				mariaUI->getCalendar()->addDisplay(task);
+			//todo : move into UI code for change state calendar
+			vector<MariaTask*> tempList = mariaTaskManager->findTask("");
+			for(MariaTask* temp : tempList){
+				mariaUI->getCalendar()->addDisplay(*temp);
 			}
 		} else {
 			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
