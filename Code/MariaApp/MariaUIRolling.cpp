@@ -11,6 +11,9 @@ MariaUIRolling::MariaUIRolling(QMainWindow *parent) {
 	_preAnimationTimer = new QTimer(this);
     connect(_preAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePreAnimation()));
 
+	_mainAnimationTimer = new QTimer(this);
+    connect(_mainAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStateMainAnimation()));
+
 	_posAnimationTimer = new QTimer(this);
     connect(_posAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePosAnimation()));
 }
@@ -18,6 +21,7 @@ MariaUIRolling::MariaUIRolling(QMainWindow *parent) {
 MariaUIRolling::~MariaUIRolling() {
 	
 	delete _preAnimationTimer;
+	delete _mainAnimationTimer;
 	delete _posAnimationTimer;
 }
 
@@ -27,6 +31,20 @@ float MariaUIRolling::getRollingX() {
 
 float MariaUIRolling::getRollingY() {
 	return _rollingYPos;
+}
+
+void MariaUIRolling::startMainAnimationTimer() {
+	if(!_mainAnimationTimer->isActive()) {
+		_mainAnimationTimer->start(1);
+	}
+}
+
+void MariaUIRolling::stopMainAnimationTimer() {
+	_mainAnimationTimer->stop();
+}
+
+MariaUIRolling::STATE_TYPE MariaUIRolling::getCurrentState() {
+	return _currentState;
 }
 
 void MariaUIRolling::updateStatePreAnimation() {
@@ -48,6 +66,9 @@ void MariaUIRolling::updateStatePreAnimation() {
 	}
 
 	updateGUI();
+}
+
+void MariaUIRolling::updateStateMainAnimation() {
 }
 
 void MariaUIRolling::updateStatePosAnimation() {
@@ -80,10 +101,10 @@ bool MariaUIRolling::startRolling() {
 			_preAnimationTimer->start(1);
 		}
 		_toEndAnimation=false;
+		return true;
 	} else {
 		return false;
 	}
-	return true;
 }
 
 bool MariaUIRolling::isStartRollingDone() {
@@ -96,7 +117,7 @@ bool MariaUIRolling::isStartRollingDone() {
 
 bool MariaUIRolling::endRolling() {
 	if(_currentState==BEFORE||_currentState==DURING) {
-
+		_currentState=AFTER;
 		_toEndAnimation=true;
 
 		if((!_posAnimationTimer->isActive())&&(!_preAnimationTimer->isActive())) {

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
-#include <QtWidgets/QMainWindow>
 
 #define DEFAULT_BEFORE_X 1
 #define DEFAULT_BEFORE_Y 0
@@ -40,6 +40,7 @@ private:
 	QMainWindow *_parent;
 	STATE_TYPE _currentState;
 	QTimer *_preAnimationTimer;
+	QTimer *_mainAnimationTimer;
 	QTimer *_posAnimationTimer;
 
 	float _rollingXPos;
@@ -50,10 +51,16 @@ private:
 protected:
 	float getRollingX();
 	float getRollingY();
+	void startMainAnimationTimer();
+	void stopMainAnimationTimer();
+	STATE_TYPE getCurrentState();
 
 private slots:
 	void updateStatePreAnimation();
 	void updateStatePosAnimation();
+
+protected slots:
+	virtual void updateStateMainAnimation();
 
 public:
 	MariaUIRolling(QMainWindow *parent);

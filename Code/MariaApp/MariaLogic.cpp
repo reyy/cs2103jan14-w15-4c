@@ -26,7 +26,7 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
-bool MariaLogic::processCommand(string inputText){
+bool MariaLogic::processCommand(QString inputText){
 	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
 	mariaUI->setUserInput("");
 
@@ -48,10 +48,23 @@ bool MariaLogic::processCommand(string inputText){
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			if(mariaTaskManager->addTask(inputText, NULL, NULL)){
 				mariaUI->setBaseText(QString::fromStdString("Task "+ inputText +" has been added!"));
-			}
-		} else{
+
+		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
+			mariaUI->setQuestionText("Sure, here's a calendar for demo purposes.");
+			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
+
+			//Generating some existing crappy task.
+			for(int i=0;i<5;i++) {
+				MariaTask task;
+				task.type=0;
+				task.title="Temporary Task "+ QString::number(i+1);
+				task.description="Very important";
+				task.start=time(NULL);
+				task.end=time(NULL);
+				mariaUI->getCalendar()->addTask(task);
+		} else {
 			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
-			mariaUI->setState(MariaUI::FOCUS);
+			mariaUI->setState(MariaUI::DEFAULT);
 		}
 	}
 

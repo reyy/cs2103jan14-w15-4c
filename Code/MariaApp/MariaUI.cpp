@@ -12,13 +12,14 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	initTextBox();
 	initStatusIcon();
 	initButtons();
-	initLoading();
+	initLayers();
 
 	show();
 }
 
 MariaUI::~MariaUI(void) {
 	delete _loading;
+	delete _calendar;
 	delete _statusAnimationTimer;
 	delete _statePreAnimationTimer;
 	delete _statePosAnimationTimer;
@@ -109,8 +110,9 @@ void MariaUI::initButtons() {
 	connect(_btClose, SIGNAL(clicked()),this , SLOT(quit()));
 }
 
-void MariaUI::initLoading() {
+void MariaUI::initLayers() {
 	_loading = new MariaUILoading(this);
+	_calendar = new MariaUICalendar(this);
 }
 
 void MariaUI::updateStatusAnimation() {
@@ -150,8 +152,8 @@ void MariaUI::updateStatePreAnimation() {
 	bool canstop=false;
 	switch(_currentState)
 	{
+	case FOCUS_CALENDAR:
 	case DEFAULT:
-	case FOCUS:
 		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
 			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
 			updateGUI();
@@ -180,8 +182,19 @@ void MariaUI::updateStatePosAnimation() {
 	bool canstop=false;
 	switch(_currentState)
 	{
+	case FOCUS_CALENDAR:
+		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
+			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
+			updateGUI();
+		} else {
+			if(_calendar->isEndRollingDone()) {
+				_calendar->clearActiveDisplay();
+				_toolBoxCoordinate.setY(_stateTargetY);
+				canstop=true;
+			}
+		}
+		break;
 	case DEFAULT:
-	case FOCUS:
 		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
 			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
 			updateGUI();
@@ -215,7 +228,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		_mariaLogic->processCommand(_inputBox->text().toStdString());
+		_mariaLogic->processCommand(_inputBox->text());
 	}else{
 		//todo: tick / question if keyword detected
 		_suggestText->setText("");
@@ -228,11 +241,13 @@ void MariaUI::beginNewState() {
 	_stateQueue.pop();
 
 	switch(_currentState) {
+	case FOCUS_CALENDAR:
+		_calendar->startRolling();
+	case FOCUS_SETTING:
+		_stateTargetY=25;
+		break;
 	case DEFAULT:
 		_stateTargetY=height()*0.5-10;
-		break;
-	case FOCUS:
-		_stateTargetY=25;
 		break;
 	case INTRO:
 		setStatus(NONE);
@@ -252,9 +267,12 @@ void MariaUI::endOldState() {
 		_processingState=true;
 
 		switch(_currentState) {
+		case FOCUS_CALENDAR:
+			_calendar->endRolling();
 		case DEFAULT:
-		case FOCUS:
-			if(_stateQueue.front()!=FOCUS&&_stateQueue.front()!=DEFAULT) {
+			if(_stateQueue.front()!=FOCUS_CALENDAR&&
+				_stateQueue.front()!=FOCUS_SETTING&&
+				_stateQueue.front()!=DEFAULT) {
 				_stateTargetY=-WINDOW_DEFAULT_SIZE_Y;
 			}
 			break;
@@ -347,4 +365,8 @@ void MariaUI::setBackgroundColor(const QString text) {
 
 MariaUILoading * MariaUI::getLoading() {
 	return _loading;
+}
+
+MariaUICalendar * MariaUI::getCalendar() {
+	return _calendar;
 }
