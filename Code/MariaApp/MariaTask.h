@@ -1,17 +1,15 @@
 #pragma once
 
-#include<string>
-using namespace std;
+#include <QtCore/QCoreApplication>
 
 class MariaTask{
 public:
 	MariaTask(void);
 	~MariaTask(void);
 
-private:
 	int		type;
-	string	title;
-	string	description;
+	QString	title;
+	QString	description;
 	time_t	start;
 	time_t	end;
 };
