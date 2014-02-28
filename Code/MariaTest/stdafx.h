@@ -12,3 +12,5 @@
 
 // TODO: reference additional headers your program requires here
 #include "../MariaApp/MariaInterpreter.h"
+#include "../MariaApp/MariaTask.h"
+#include "../MariaApp/MariaTaskManager.h"
