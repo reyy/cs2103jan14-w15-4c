@@ -9,13 +9,7 @@ MariaInterpreter::~MariaInterpreter(void){
 
 MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputString) {
 	CommandType command = Invalid;
-	vector<string> input;
-
-	if (inputString.size() > 0) {
-		input = tokenizeString(inputString);
-	} else {
-		return command;
-	}
+	vector<string> input = tokenizeString(inputString);
 
 	//TODO: Loop through all available keywords using map.
 
@@ -44,26 +38,26 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 MariaInterpreter::CommandType MariaInterpreter::getCommandTypeRegex(string &inputString) {
 	CommandType command = Invalid;
 
-	regex keywordExpression("create|show|delete|exit|quit");
+	regex keywordExpression("create|show|delete|exit");
 	smatch result;
 
 	if (!regex_search(inputString, result, keywordExpression)) {
 		return CommandType::Invalid;
 	}
 
-	if (result[0] == "create") {
+	if (inputString == "create") {
 		inputString = replaceText(inputString, "create", "");
 		command = AddFloatingTask;
-	} else if (result[0] == "show") {
+	} else if (inputString == "show") {
 		inputString = replaceText(inputString, "show", "");
 		command = ShowAllTask;
-	} else if (result[0] == "delete") {
+	} else if (inputString == "delete") {
 		inputString = replaceText(inputString, "delete", "");
 		command = DeleteTask;
-	} else if (result[0] == "exit") {
+	} else if (inputString == "exit") {
 		inputString = replaceText(inputString, "exit", "");
 		command = Exit;
-	} else if (result[0] == "quit") {
+	} else if (inputString == "quit") {
 		inputString = replaceText(inputString, "quit", "");
 		command = Quit;
 	}
