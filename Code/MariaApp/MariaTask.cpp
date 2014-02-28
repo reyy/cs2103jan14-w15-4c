@@ -15,3 +15,15 @@ MariaTask::MariaTask(string title, time_t start, time_t end){
 }
 MariaTask::~MariaTask(void){
 }
+
+string MariaTask::getTitle(){
+	return title;
+}
+
+time_t MariaTask::getStart(){
+	return start;
+}
+
+time_t MariaTask::getEnd(){
+	return end;
+}
