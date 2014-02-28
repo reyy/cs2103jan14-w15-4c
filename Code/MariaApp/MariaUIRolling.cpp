@@ -83,6 +83,7 @@ bool MariaUIRolling::startRolling() {
 	} else {
 		return false;
 	}
+	return true;
 }
 
 bool MariaUIRolling::isStartRollingDone() {

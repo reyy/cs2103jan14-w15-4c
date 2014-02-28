@@ -26,7 +26,7 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
-bool MariaLogic::processCommand(QString inputText){
+bool MariaLogic::processCommand(string inputText){
 	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
 	mariaUI->setUserInput("");
 

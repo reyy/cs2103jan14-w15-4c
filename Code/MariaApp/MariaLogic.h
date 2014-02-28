@@ -11,7 +11,7 @@ public:
 	MariaLogic(int argc, char *argv[]);
 	~MariaLogic(void);
 
-	bool processCommand(QString inputText);
+	bool processCommand(string inputText);
 
 private:
 	MariaUI				*mariaUI;

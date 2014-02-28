@@ -1,7 +1,9 @@
 #pragma once
-#include<QtCore\qstring.h>
+
 #include <string>
 #include <map>
+#include <sstream>
+#include <functional>
 #include <regex>
 using namespace std;
 
@@ -18,7 +20,7 @@ public:
 		Quit,
 	} CommandType;
 
-	MariaInterpreter(map<QString, CommandType>* inputCommandList = NULL);
+	MariaInterpreter(map<string, CommandType>* inputCommandList = NULL);
 	~MariaInterpreter(void);
 
 	// Returns a CommandType depending on the first word in the
@@ -27,10 +29,14 @@ public:
 	//
 	// If no valid keyword is detected, a Invalid CommandType is
 	// returned.
-	CommandType getCommandType(QString &inputString);
+	CommandType getCommandType(string &inputString);
+
+	// Same as above, but hoping it works better with regex.
+	// WARNING: Not working yet...
+	CommandType getCommandTypeRegex(string &inputString);
 
 private:
-	map<QString, CommandType> *userDefinedCommands;
+	map<string, CommandType> *userDefinedCommands;
 
 	// Returns a new string that has the oldText replaced with
 	// the newText from the inputString itself. Also, firstInstanceOnly
@@ -38,5 +44,12 @@ private:
 	// is replaced.
 	//
 	// By default, firstInstanceOnly is set to true.
-	QString replaceText(QString inputString, string oldText, string newText, bool firstInstanceOnly = true);
+	string replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly = true);
+
+	vector<string> tokenizeString(string inputString);
+
+	// To trim whitespace.
+	inline string trimWhiteSpaceLeft(string &text);
+	inline string trimWhiteSpaceRight(string &text);
+	inline string trimWhiteSpace(string &text);
 };

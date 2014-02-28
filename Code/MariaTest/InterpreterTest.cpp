@@ -10,6 +10,7 @@ namespace MariaTest {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "";
+
 			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::Invalid;
 			MariaInterpreter::CommandType actual;
 

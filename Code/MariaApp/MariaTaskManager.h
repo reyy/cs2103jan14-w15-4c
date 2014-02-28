@@ -18,5 +18,8 @@ public:
 	bool deleteArchive();
 
 private:
+#ifdef _DEBUG
+public:
+#endif
 	vector<MariaTask*> *taskList;
 };

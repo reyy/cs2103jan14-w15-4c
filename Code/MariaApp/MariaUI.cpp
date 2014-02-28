@@ -215,7 +215,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		_mariaLogic->processCommand(_inputBox->text());
+		_mariaLogic->processCommand(_inputBox->text().toStdString());
 	}else{
 		//todo: tick / question if keyword detected
 		_suggestText->setText("");
