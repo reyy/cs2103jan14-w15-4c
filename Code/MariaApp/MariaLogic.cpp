@@ -16,7 +16,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->setBackgroundColor("#ff88ff");
 	mariaUI->setQuestionText("What would you like to do?");
 	mariaUI->setStatus(MariaUI::WAIT);
-	mariaUI->setBaseText("add Meeting tomorrow for discussion");
+	mariaUI->setBaseText("create Meeting tomorrow for discussion");
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -43,9 +43,13 @@ bool MariaLogic::processCommand(string inputText){
 			//Do uploading to google etc.
 			//Save files operation etc.
 			mariaUI->setState(MariaUI::QUIT);
-		}else if(commandType == MariaInterpreter::CommandType::Quit){
+		} else if(commandType == MariaInterpreter::CommandType::Quit){
 			quit();
-		} else {
+		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
+			if(mariaTaskManager->addTask(inputText, NULL, NULL)){
+				mariaUI->setBaseText(QString::fromStdString("Task "+ inputText +" has been added!"));
+			}
+		} else{
 			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
 			mariaUI->setState(MariaUI::FOCUS);
 		}
