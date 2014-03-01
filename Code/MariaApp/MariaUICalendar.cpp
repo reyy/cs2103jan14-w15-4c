@@ -19,7 +19,7 @@ displayPack::displayPack(QMainWindow *parent, QString title,MariaTask::TaskType 
 	_parent=parent;
 
 	displayTitle = new QLabel(_parent);
-	displayTitle->setStyleSheet("color:#ffffff; border: 1px solid grey;");
+	displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid grey;");
 	displayTitle->setText(title);
 	displayTitle->hide();
 
@@ -83,11 +83,38 @@ void displayPack::hide() {
 
 MariaUICalendar::MariaUICalendar(QMainWindow *parent) : MariaUIRolling(parent) {
 	_parent=parent;
+	_displayUnit=_parent->width();
+	initImages();
 }
 
 MariaUICalendar::~MariaUICalendar() {
 	clearActiveDisplay();
 	clearQueueDisplay();
+	delete _currentTimeLineImage;
+}
+
+void MariaUICalendar::initImages() {
+	_currentTimeLineImage=new QPixmap("./Resources/ui_current_line.png");
+	_timeLineImage=new QPixmap("./Resources/ui_line.png");
+
+	_currentTimeLine = new QLabel(_parent);
+	_currentTimeLine->setPixmap(*_currentTimeLineImage);
+	_currentTimeLine->setGeometry(QRect(-1000,-1000,12,98));
+}
+
+void MariaUICalendar::addLine(int amount) {
+	for(int i=0;i<amount;i++) {
+		QLabel* temp = new QLabel(_parent);
+		temp->setPixmap(*_timeLineImage);
+		temp->setGeometry(QRect(-1000,-1000,2,90));
+		temp->show();
+		_lineStack.push_back(temp);
+
+		int denominator=_lineStack.size()-1;
+		if(denominator==0)
+			denominator++;
+		_displayUnit=(_parent->width()-60)/denominator;
+	}
 }
 
 void MariaUICalendar::updateStateMainAnimation() {
@@ -131,6 +158,27 @@ void MariaUICalendar::clearQueueDisplay() {
 	}
 }
 
+void MariaUICalendar::createUI(VIEW_TYPE type) {
+	switch(type) {
+	case DEFAULT:
+		addLine(13);
+		break;
+	case DAY:
+		addLine(25);
+		break;
+	case WEEK:
+		addLine(8);
+		break;
+	case MONTH:
+		addLine(31);
+		//To Do, update based on the month.
+		break;
+	case YEAR:
+		addLine(13);
+		break;
+	}
+}
+
 void MariaUICalendar::addDisplay(MariaTask task) {
 
 	displayPack* newDisplay=new displayPack(_parent,task.getTitle(),task.getType(),task.getStart(),task.getEnd());
@@ -149,9 +197,19 @@ void MariaUICalendar::clearActiveDisplay() {
 		delete _displayPackStack.back();
 		_displayPackStack.pop_back();
 	}
+
+	while(_lineStack.size()>0) {
+		delete _lineStack.back();
+		_lineStack.pop_back();
+	}
 }
 
 void MariaUICalendar::updateGUI() {
+
+	for(int i=0;i<_lineStack.size();i++) {
+		_lineStack.at(i)->setGeometry(QRect(30+_displayUnit*i+getRollingX()-_parent->width()*0.5,getRollingY()-20,2,90));
+	}
+
 	for(int i=0;i<_displayPackStack.size();i++) {
 		_displayPackStack.at(i)->updateGUI(getRollingX(),getRollingY());
 	}

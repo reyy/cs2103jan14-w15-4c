@@ -30,7 +30,7 @@ _parent->width()*DEFAULT_BEFORE_X;
  A value of 1 makes the layer on the right side of the window.
 */
 
-class MariaUIRolling : QWidget {
+class MariaUIRolling : public QWidget {
 	Q_OBJECT
 public:
 	enum STATE_TYPE {

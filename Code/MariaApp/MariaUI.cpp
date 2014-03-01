@@ -3,8 +3,9 @@
 #include "MariaLogic.h"
 #include "MariaInterpreter.h"
 
-MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
-	this->_mariaLogic = mariaLogic;
+MariaUI::MariaUI(MariaLogic *mariaLogic, MariaTaskManager *mariaTaskManager, QWidget *parent) : QMainWindow(parent) {
+	_mariaLogic = mariaLogic;
+	_mariaTaskManager = mariaTaskManager;
 
 	initState();
 	initImages();
@@ -90,7 +91,6 @@ void MariaUI::initStatusIcon(){
 	_statusImageIndex=0;
 	_statusIcon = new QLabel(this);
 	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
-	_statusIcon->setStyleSheet("");
 	_statusIcon->hide();
 
 	_statusAnimationTimer = new QTimer(this);
@@ -107,7 +107,7 @@ void MariaUI::initButtons() {
 	_btClose->setToolTip("Close Program");
 
 	//To fix the quick button.
-	connect(_btClose, SIGNAL(clicked()),this , SLOT(quit()));
+	connect(_btClose, SIGNAL(clicked()),this , SLOT(quitAction()));
 }
 
 void MariaUI::initLayers() {
@@ -219,6 +219,10 @@ void MariaUI::updateStatePosAnimation() {
 	}
 }
 
+void MariaUI::quitAction() {
+	_mariaLogic->processCommand("quit");
+}
+
 void MariaUI::resizeEvent(QResizeEvent* event) {
 	updateGUI();
 	QWidget::resizeEvent(event);
@@ -241,8 +245,16 @@ void MariaUI::beginNewState() {
 	_stateQueue.pop();
 
 	switch(_currentState) {
-	case FOCUS_CALENDAR:
-		_calendar->startRolling();
+	case FOCUS_CALENDAR: {
+			_calendar->createUI(MariaUICalendar::DEFAULT);
+				//TO DO - update to allow users to choose a view type.
+		
+			vector<MariaTask*> tempList = _mariaTaskManager->findTask("");
+				for(MariaTask* temp : tempList){
+					_calendar->addDisplay(*temp);
+				}
+			_calendar->startRolling();
+			}
 	case FOCUS_SETTING:
 		_stateTargetY=25;
 		break;

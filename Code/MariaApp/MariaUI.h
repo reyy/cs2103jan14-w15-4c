@@ -24,6 +24,7 @@
 #define AMOUNT_OF_IMAGES 7
 
 class MariaLogic;
+class MariaTaskManager;
 class MariaUI : QMainWindow {
 	 Q_OBJECT
 public:
@@ -35,6 +36,7 @@ public:
 	};
 private:
 	MariaLogic *_mariaLogic;
+	MariaTaskManager *_mariaTaskManager;
 
 	QTimer *_statusAnimationTimer;
 	QTimer *_statePreAnimationTimer;
@@ -74,6 +76,7 @@ private slots:
 	void updateStatusAnimation();
 	void updateStatePreAnimation();
 	void updateStatePosAnimation();
+	void quitAction();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
@@ -83,7 +86,7 @@ protected:
 
 public:
 
-	MariaUI(MariaLogic *mariaLogic, QWidget *parent=0);
+	MariaUI(MariaLogic *mariaLogic,MariaTaskManager *mariaTaskManager, QWidget *parent=0);
 	~MariaUI(void);
 
 	//Force UI Class to update values prematurelly.
