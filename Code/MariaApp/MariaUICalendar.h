@@ -20,6 +20,8 @@ public:
 
 	QLabel *displayTitle;
 	QString backgroundColor;
+	
+	float assignedWidth;
 
 	displayPack(QMainWindow *parent);
 	displayPack(QMainWindow *parent, QString title,MariaTask::TaskType type, time_t start,time_t end);
@@ -55,8 +57,9 @@ private:
 
 	std::vector<displayPack*> _displayPackStack;
 	std::queue<displayPack*> _queuedisplayQueue;
-
+	
 	std::vector<QLabel *> _lineStack;
+	std::vector<QLabel *> _lineTimerStack;
 
 	//The amount of pixel representing 1 unit.
 	float _displayUnit;
