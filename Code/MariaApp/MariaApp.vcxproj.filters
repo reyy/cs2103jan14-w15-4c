@@ -52,6 +52,9 @@
       <Filter>UI\UIElement</Filter>
     </ClCompile>
     <ClCompile Include="MariaTime.cpp" />
+    <ClCompile Include="MariaUICalendarDisplayPack.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -109,5 +112,8 @@
       <Filter>UI\UIElement</Filter>
     </ClInclude>
     <ClInclude Include="MariaTime.h" />
+    <ClInclude Include="MariaUICalendarDisplayPack.h">
+      <Filter>UI\UIRolling</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

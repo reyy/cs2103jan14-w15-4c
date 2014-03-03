@@ -1,107 +1,8 @@
-#include <time.h>
 #include "MariaUICalendar.h"
-
-displayPack::displayPack(QMainWindow *parent) {
-	_parent=parent;
-
-	displayTitle = new QLabel(_parent);
-	displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,255,128);border: 1px solid white;");
-	displayTitle->setAlignment(Qt::AlignCenter);
-	displayTitle->hide();
-	assignedWidth=100;
-
-	backgroundColor="#ff0000";
-
-	_destinationX=0;
-	_destinationY=0;
-	_x=0;
-	_y=0;
-}
-
-displayPack::displayPack(QMainWindow *parent, QString title,MariaTask::TaskType type, time_t start,time_t end) {
-	_parent=parent;
-
-	displayTitle = new QLabel(_parent);
-	switch(type) {
-	case MariaTask::FLOATING:
-		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid white;");
-		break;
-	case MariaTask::DEADLINE:
-		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,0,128);border: 1px solid white;");
-		break;
-	case MariaTask::TIMED:
-		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,128,128);border: 1px solid white;");
-		break;
-	default:
-		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,255,128);border: 1px solid white;");
-		break;
-	}
-	displayTitle->setText(title);
-	displayTitle->setAlignment(Qt::AlignCenter);
-	displayTitle->hide();
-	assignedWidth=100;
-
-	backgroundColor="#ff0000";
-
-	_destinationX=0;
-	_destinationY=0;
-	_x=0;
-	_y=0;
-}
-
-displayPack::~displayPack() {
-	delete displayTitle;
-}
-
-void displayPack::setDestinationX(float x) {
-	_destinationX=x;
-}
-
-void displayPack::setDestinationY(float y) {
-	_destinationY=y;
-}
-
-void displayPack::setRealX(float x) {
-	_x=x;
-}
-
-void displayPack::setRealY(float y) {
-	_y=y;
-}
-
-bool displayPack::isCoordinateMatch() {
-	if(abs(_x-_destinationX)<0.5&&abs(_y-_destinationY)<0.5) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool displayPack::updatePosition() {
-	if(!isCoordinateMatch()) {
-		_x+=(_destinationX-_x)*0.01;
-		_y+=(_destinationY-_y)*0.01;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-void displayPack::updateGUI(float layerX,float layerY) {
-	displayTitle->setGeometry(QRect(layerX+_x,layerY+_y,assignedWidth,14));
-}
-
-void displayPack::show() {
-	displayTitle->show();
-}
-
-void displayPack::hide() {
-	displayTitle->hide();
-}
 
 MariaUICalendar::MariaUICalendar(QMainWindow *parent) : MariaUIRolling(parent) {
 	_parent=parent;
-	_displayUnit=_parent->width();
+	_calendarUnit=_parent->width();
 	initImages();
 }
 
@@ -147,7 +48,7 @@ void MariaUICalendar::addLine(int amount) {
 		int denominator=_lineStack.size()-1;
 		if(denominator==0)
 			denominator++;
-		_displayUnit=(_parent->width()-60)/denominator;
+		_calendarUnit=(_parent->width()-60)/denominator;
 	}
 }
 
@@ -158,7 +59,7 @@ void MariaUICalendar::updateStateMainAnimation() {
 	//for display.
 	if(getCurrentState()==DURING) {
 		while(_queuedisplayQueue.size()>0) {
-			displayPack* temp=_queuedisplayQueue.front();
+			MariaUICalendarDisplayPack* temp=_queuedisplayQueue.front();
 			temp->show();
 			_displayPackStack.push_back(temp);
 			_queuedisplayQueue.pop();
@@ -215,17 +116,14 @@ void MariaUICalendar::createUI(VIEW_TYPE type) {
 
 void MariaUICalendar::addDisplay(MariaTask task) {
 
-	displayPack* newDisplay=new displayPack(_parent,QString::fromStdString(task.getTitle()),task.getType(),task.getStart().getUnixTime(),task.getEnd().getUnixTime());
-	newDisplay->setDestinationX(-_parent->width()*0.5+30);
-	newDisplay->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
-	newDisplay->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);
-	newDisplay->setRealY(-20+(int)_queuedisplayQueue.size()*14);
-	newDisplay->hide();
-	double timeDiff=1.0;
-	//double timeDiff = difftime(task.getEnd(),task.getStart());
-	newDisplay->assignedWidth=_displayUnit*timeDiff;
+	MariaUICalendarDisplayPack* displayPack=new MariaUICalendarDisplayPack(_parent,task,_calendarUnit);
+	displayPack->setDestinationX(-_parent->width()*0.5+30);
+	displayPack->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
+	displayPack->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);
+	displayPack->setRealY(-20+(int)_queuedisplayQueue.size()*14);
+	displayPack->hide();
 
-	_queuedisplayQueue.push(newDisplay);
+	_queuedisplayQueue.push(displayPack);
 	startMainAnimationTimer();
 }
 
@@ -247,13 +145,13 @@ void MariaUICalendar::clearActiveDisplay() {
 }
 
 void MariaUICalendar::updateGUI() {
-
+	_currentTimeLine->setGeometry(QRect(getRollingX()-6,getRollingY()-25,12,78));
 	for(int i=0;i<_lineStack.size();i++) {
-		_lineStack.at(i)->setGeometry(QRect(30+_displayUnit*i+getRollingX()-_parent->width()*0.5,getRollingY()-27,2,80));
+		_lineStack.at(i)->setGeometry(QRect(30+_calendarUnit*i+getRollingX()-_parent->width()*0.5-1,getRollingY()-12,2,60));
 	}
 
 	for(int i=0;i<_lineTimerStack.size();i++) {
-		_lineTimerStack.at(i)->setGeometry(QRect(30+_displayUnit*i+getRollingX()-_parent->width()*0.5-15,getRollingY()+53,30,16));
+		_lineTimerStack.at(i)->setGeometry(QRect(30+_calendarUnit*i+getRollingX()-_parent->width()*0.5-15,getRollingY()+53,30,16));
 	}
 
 	for(int i=0;i<_displayPackStack.size();i++) {
