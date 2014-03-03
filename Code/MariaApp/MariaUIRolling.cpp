@@ -52,8 +52,8 @@ void MariaUIRolling::updateStatePreAnimation() {
 	float targetY=_parent->height()*0.5+_parent->height()*DEFAULT_DURING_Y;
 	
 	if(abs(_rollingCoord.x()-targetX)>0.5) {
-		_rollingCoord.setX(_rollingCoord.x()-(targetX-_rollingCoord.x())*0.01);
-		_rollingCoord.setY((targetY-_rollingCoord.y())*0.01);
+		_rollingCoord.setX(_rollingCoord.x()+(targetX-_rollingCoord.x())*0.01);
+		_rollingCoord.setY(_rollingCoord.y()+(targetY-_rollingCoord.y())*0.01);
 	} else {
 		_preAnimationTimer->stop();
 		_currentState=DURING;
@@ -75,8 +75,8 @@ void MariaUIRolling::updateStatePosAnimation() {
 	float targetY=_parent->height()*0.5+_parent->height()*DEFAULT_AFTER_Y;
 	
 	if(abs(_rollingCoord.x()-targetX)>0.5) {
-		_rollingCoord.setX(_rollingCoord.x()-(targetX-_rollingCoord.x())*0.01);
-		_rollingCoord.setY((targetY-_rollingCoord.y())*0.01);
+		_rollingCoord.setX(_rollingCoord.x()+(targetX-_rollingCoord.x())*0.01);
+		_rollingCoord.setY(_rollingCoord.y()+(targetY-_rollingCoord.y())*0.01);
 	} else {
 		_currentState=DONE;
 		_posAnimationTimer->stop();
