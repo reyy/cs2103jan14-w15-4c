@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "MariaTask.h"
 using namespace std;
 
@@ -10,8 +11,8 @@ public:
 	~MariaTaskManager(void);
 
 	bool addTask(MariaTask);
-	bool addTask(string name, time_t start = NULL, time_t end = NULL);
-	vector<MariaTask*> findTask(string searchString);
+	bool addTask(std::string name, time_t start = NULL, time_t end = NULL);
+	vector<MariaTask*> findTask(std::string searchString);
 	vector<MariaTask*> findTask(time_t start, time_t end);
 
 	bool archiveTask(MariaTask);

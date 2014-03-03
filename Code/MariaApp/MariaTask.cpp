@@ -1,6 +1,6 @@
 #include "MariaTask.h"
 
-MariaTask::MariaTask(string title,time_t start, time_t end){
+MariaTask::MariaTask(std::string title,time_t start, time_t end){
 	this->title = title;
 	this->start = start;
 	this->end = end;
@@ -14,7 +14,7 @@ MariaTask::MariaTask(string title,time_t start, time_t end){
 	}
 }
 
-MariaTask::MariaTask(string title, string description,time_t start, time_t end){
+MariaTask::MariaTask(std::string title, std::string description,time_t start, time_t end){
 	this->title = title;
 	this->description=description;
 	this->start = start;
@@ -36,11 +36,11 @@ MariaTask::TaskType MariaTask::getType() {
 	return type;
 }
 
-string MariaTask::getTitle(){
+std::string MariaTask::getTitle(){
 	return title;
 }
 
-string MariaTask::getDescription(){
+std::string MariaTask::getDescription(){
 	return description;
 }
 

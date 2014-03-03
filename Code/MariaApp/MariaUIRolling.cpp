@@ -4,8 +4,8 @@
 MariaUIRolling::MariaUIRolling(QMainWindow *parent) {
 	_parent=parent;
 	_currentState=DEACTIVE;
-	_rollingXPos=_parent->width()*0.5+_parent->width()*DEFAULT_BEFORE_X;
-	_rollingYPos=_parent->height()*0.5+_parent->height()*DEFAULT_BEFORE_Y;
+	_rollingCoord.setX(_parent->width()*0.5+_parent->width()*DEFAULT_BEFORE_X);
+	_rollingCoord.setY(_parent->height()*0.5+_parent->height()*DEFAULT_BEFORE_Y);
 
 	_preAnimationTimer = new QTimer(this);
     connect(_preAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePreAnimation()));
@@ -25,11 +25,11 @@ MariaUIRolling::~MariaUIRolling() {
 }
 
 float MariaUIRolling::getRollingX() {
-	return _rollingXPos;
+	return _rollingCoord.x();
 }
 
 float MariaUIRolling::getRollingY() {
-	return _rollingYPos;
+	return _rollingCoord.y();
 }
 
 void MariaUIRolling::startMainAnimationTimer() {
@@ -51,9 +51,9 @@ void MariaUIRolling::updateStatePreAnimation() {
 	float targetX=_parent->width()*0.5+_parent->width()*DEFAULT_DURING_X;
 	float targetY=_parent->height()*0.5+_parent->height()*DEFAULT_DURING_Y;
 	
-	if(abs(_rollingXPos-targetX)>0.5) {
-		_rollingXPos+=(targetX-_rollingXPos)*0.01;
-		_rollingYPos+=(targetY-_rollingYPos)*0.01;
+	if(abs(_rollingCoord.x()-targetX)>0.5) {
+		_rollingCoord.setX(_rollingCoord.x()-(targetX-_rollingCoord.x())*0.01);
+		_rollingCoord.setY((targetY-_rollingCoord.y())*0.01);
 	} else {
 		_preAnimationTimer->stop();
 		_currentState=DURING;
@@ -74,9 +74,9 @@ void MariaUIRolling::updateStatePosAnimation() {
 	float targetX=_parent->width()*0.5+_parent->width()*DEFAULT_AFTER_X;
 	float targetY=_parent->height()*0.5+_parent->height()*DEFAULT_AFTER_Y;
 	
-	if(abs(_rollingXPos-targetX)>0.5) {
-		_rollingXPos+=(targetX-_rollingXPos)*0.01;
-		_rollingYPos+=(targetY-_rollingYPos)*0.01;
+	if(abs(_rollingCoord.x()-targetX)>0.5) {
+		_rollingCoord.setX(_rollingCoord.x()-(targetX-_rollingCoord.x())*0.01);
+		_rollingCoord.setY((targetY-_rollingCoord.y())*0.01);
 	} else {
 		_currentState=DONE;
 		_posAnimationTimer->stop();
@@ -92,8 +92,8 @@ bool MariaUIRolling::startRolling() {
 	if(_currentState==DONE||_currentState==DEACTIVE) {
 		_currentState=BEFORE;
 		
-		_rollingXPos=_parent->width()*0.5+_parent->width()*DEFAULT_BEFORE_X;
-		_rollingYPos=_parent->height()*0.5+_parent->height()*DEFAULT_BEFORE_Y;
+		_rollingCoord.setX(_parent->width()*0.5+_parent->width()*DEFAULT_BEFORE_X);
+		_rollingCoord.setY(_parent->height()*0.5+_parent->height()*DEFAULT_BEFORE_Y);
 
 		if(!_preAnimationTimer->isActive()) {
 			_preAnimationTimer->start(1);

@@ -1,4 +1,5 @@
 #include "MariaLogic.h"
+#include "MariaUIStatus.h"
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	
@@ -15,9 +16,9 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 
 	//Below are things that you can edit.
 	//mariaUI->setBackgroundColor("#ff88ff");
-	mariaUI->setQuestionText("What would you like to do?");
-	mariaUI->setStatus(MariaUI::WAIT);
-	mariaUI->setBaseText("create Meeting tomorrow for discussion");
+	mariaUI->getTextbox()->setQuestionText("What would you like to do?");
+	mariaUI->getStatus()->setStatus(MariaUIStatus::WAIT);
+	mariaUI->getTextbox()->setSuggestText("create Meeting tomorrow for discussion");
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -27,16 +28,16 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
-bool MariaLogic::processCommand(string inputText) {
+bool MariaLogic::processCommand(std::string inputText) {
 	MariaInterpreter::CommandType commandType = mariaIntepreter->getCommandType(inputText);
-	mariaUI->setUserInput("");
+	mariaUI->getTextbox()->setUserInput("");
 
 	if(commandType == MariaInterpreter::CommandType::Invalid) {
-		mariaUI->setQuestionText("I don't understand. Please try again.");
-		mariaUI->setStatus(MariaUI::UNKNOWN);
+		mariaUI->getTextbox()->setQuestionText("I don't understand. Please try again.");
+		mariaUI->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
 		return false;
 	} else {
-		mariaUI->setStatus(MariaUI::OK);
+		mariaUI->getStatus()->setStatus(MariaUIStatus::OK);
 
 		if(commandType == MariaInterpreter::CommandType::Exit){
 			mariaUI->setState(MariaUI::INTRO);
@@ -48,15 +49,15 @@ bool MariaLogic::processCommand(string inputText) {
 			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			if(mariaTaskManager->addTask(inputText, NULL, NULL)){
-				mariaUI->setQuestionText("Task '"+ inputText +"' has been added!");
+				mariaUI->getTextbox()->setQuestionText("Task '"+ inputText +"' has been added!");
 			} else {
-				mariaUI->setQuestionText("There is problem adding '"+ inputText + "'");
+				mariaUI->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
-			mariaUI->setQuestionText("Sure, here's a calendar for demo purposes.");
+			mariaUI->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
 		} else {
-			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
+			mariaUI->getTextbox()->setQuestionText("Its a valid command, but I'm limited.");
 			mariaUI->setState(MariaUI::DEFAULT);
 		}
 	}
