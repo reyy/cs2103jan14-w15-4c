@@ -5,7 +5,7 @@ displayPack::displayPack(QMainWindow *parent) {
 	_parent=parent;
 
 	displayTitle = new QLabel(_parent);
-	displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid white;");
+	displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,255,128);border: 1px solid white;");
 	displayTitle->setAlignment(Qt::AlignCenter);
 	displayTitle->hide();
 	assignedWidth=100;
@@ -22,7 +22,20 @@ displayPack::displayPack(QMainWindow *parent, QString title,MariaTask::TaskType 
 	_parent=parent;
 
 	displayTitle = new QLabel(_parent);
-	displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid white;");
+	switch(type) {
+	case MariaTask::FLOATING:
+		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid white;");
+		break;
+	case MariaTask::DEADLINE:
+		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,0,128);border: 1px solid white;");
+		break;
+	case MariaTask::TIMED:
+		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,128,128);border: 1px solid white;");
+		break;
+	default:
+		displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,255,128);border: 1px solid white;");
+		break;
+	}
 	displayTitle->setText(title);
 	displayTitle->setAlignment(Qt::AlignCenter);
 	displayTitle->hide();
@@ -156,7 +169,7 @@ void MariaUICalendar::updateStateMainAnimation() {
 
 	for(int i=0;i<_displayPackStack.size();i++) {
 		bool result=_displayPackStack.at(i)->updatePosition();
-		
+
 		//Checks if there is something to update.
 		//Forces the animation loop to continue running.
 		if(canEnd) {
@@ -202,7 +215,7 @@ void MariaUICalendar::createUI(VIEW_TYPE type) {
 
 void MariaUICalendar::addDisplay(MariaTask task) {
 
-	displayPack* newDisplay=new displayPack(_parent,task.getTitle(),task.getType(),task.getStart(),task.getEnd());
+	displayPack* newDisplay=new displayPack(_parent,QString::fromStdString(task.getTitle()),task.getType(),task.getStart(),task.getEnd());
 	newDisplay->setDestinationX(-_parent->width()*0.5+30);
 	newDisplay->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
 	newDisplay->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);

@@ -43,8 +43,7 @@ private:
 	QTimer *_mainAnimationTimer;
 	QTimer *_posAnimationTimer;
 
-	float _rollingXPos;
-	float _rollingYPos;
+	QPointF _rollingCoord;
 
 	bool _toEndAnimation;					//Flag to queue for animation end.
 
