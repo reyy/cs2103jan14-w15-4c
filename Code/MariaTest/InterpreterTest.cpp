@@ -4,9 +4,9 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace MariaTest {
-	TEST_CLASS(IntepreterTest) {
+	TEST_CLASS(Intepreter_CommandTypeTest) {
 	public:
-		TEST_METHOD(Interpreter_EmptyInput) {
+		TEST_METHOD(Interpreter_CommandType_EmptyInput) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "";
@@ -17,12 +17,14 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_AddFloatingTask) {
+		TEST_METHOD(Interpreter_CommandType_AddFloatingTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create";
@@ -32,12 +34,14 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_ShowAllTask) {
+		TEST_METHOD(Interpreter_CommandType_ShowAllTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "show";
@@ -47,12 +51,14 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_DeleteTask) {
+		TEST_METHOD(Interpreter_CommandType_DeleteTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "delete";
@@ -62,12 +68,14 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Exit) {
+		TEST_METHOD(Interpreter_CommandType_Exit) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "exit";
@@ -77,15 +85,17 @@ namespace MariaTest {
 			actual = program->getCommandType(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 	};
 
-	TEST_CLASS(IntepreterRegexTest) {
+	TEST_CLASS(Intepreter_CommandTypeRegexTest) {
 	public:
-		TEST_METHOD(InterpreterR_EmptyInput) {
+		TEST_METHOD(InterpreterR_CommandType_EmptyInput) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "";
@@ -96,12 +106,14 @@ namespace MariaTest {
 			actual = program->getCommandTypeRegex(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(InterpreterR_AddFloatingTask) {
+		TEST_METHOD(InterpreterR_CommandType_AddFloatingTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create";
@@ -111,12 +123,14 @@ namespace MariaTest {
 			actual = program->getCommandTypeRegex(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(InterpreterR_ShowAllTask) {
+		TEST_METHOD(InterpreterR_CommandType_ShowAllTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "show";
@@ -126,12 +140,14 @@ namespace MariaTest {
 			actual = program->getCommandTypeRegex(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(InterpreterR_DeleteTask) {
+		TEST_METHOD(InterpreterR_CommandType_DeleteTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "delete";
@@ -141,12 +157,14 @@ namespace MariaTest {
 			actual = program->getCommandTypeRegex(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;
 		}
 
-		TEST_METHOD(InterpreterR_Exit) {
+		TEST_METHOD(InterpreterR_CommandType_Exit) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "exit";
@@ -156,6 +174,45 @@ namespace MariaTest {
 			actual = program->getCommandTypeRegex(input);
 
 			Assert::AreEqual((int)actual, (int)expected);
+
+			// Check to see if the keyword has been removed from the inputString
+			Assert::IsTrue(input == "");
+
+			delete program;
+		}
+	};
+
+	TEST_CLASS(Intepreter_TitleTest) {
+	public:
+		TEST_METHOD(Interpreter_Title_EmptyInput) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "";
+
+			string expected = "";
+			string actual;
+
+			actual = program->getTitle(input);
+			Assert::IsTrue(actual == expected);
+
+			// Check to see if the title has been removed from the inputString
+			Assert::IsTrue(input == "");
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Title_OneWord) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "meeting";
+
+			string expected = "meeting";
+			string actual;
+
+			actual = program->getTitle(input);
+			Assert::IsTrue(actual == expected);
+
+			// Check to see if the title has been removed from the inputString
 			Assert::IsTrue(input == "");
 
 			delete program;

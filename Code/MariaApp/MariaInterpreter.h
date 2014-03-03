@@ -34,6 +34,8 @@ public:
 	// Same as above, but hoping it works better with regex.
 	CommandType getCommandTypeRegex(string &inputString);
 
+	string getTitle(string &inputString);
+
 private:
 	map<string, CommandType> *userDefinedCommands;
 

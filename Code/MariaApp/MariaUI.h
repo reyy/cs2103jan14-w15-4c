@@ -95,11 +95,11 @@ public:
 	void setState(STATE_TYPE type);
 	STATE_TYPE getState();
 
-	void setBaseText(const QString text);
-	void setQuestionText(const QString text);
+	void setBaseText(const string text);
+	void setQuestionText(const string text);
 	
-	QString getUserInput();
-	void setUserInput(const QString text);
+	string getUserInput();
+	void setUserInput(const string text);
 
 	void setExpand(bool value);
 	bool getExpand();

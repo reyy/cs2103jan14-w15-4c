@@ -228,7 +228,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		_mariaLogic->processCommand(_inputBox->text());
+		_mariaLogic->processCommand(this->getUserInput());
 	}else{
 		//todo: tick / question if keyword detected
 		_suggestText->setText("");
@@ -328,20 +328,20 @@ MariaUI::STATE_TYPE MariaUI::getState() {
 	return _currentState;
 }
 
-void MariaUI::setBaseText(const QString text) {
-	_suggestText->setText(text);
+void MariaUI::setBaseText(const string text) {
+	_suggestText->setText(QString(text.c_str()));
 }
 
-void MariaUI::setQuestionText(const QString text) {
-	_questionText->setText(text);
+void MariaUI::setQuestionText(const string text) {
+	_questionText->setText(QString(text.c_str()));
 }
 
-QString MariaUI::getUserInput() {
-	return _inputBox->text();
+string MariaUI::getUserInput() {
+	return _inputBox->text().toStdString();
 }
 
-void MariaUI::setUserInput(const QString text) {
-	_inputBox->setText(text);
+void MariaUI::setUserInput(const string text) {
+	_inputBox->setText(QString(text.c_str()));
 }
 
 void MariaUI::setExpand(bool value) {

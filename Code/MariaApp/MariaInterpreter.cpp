@@ -73,6 +73,15 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandTypeRegex(string &inpu
 	return command;
 }
 
+string MariaInterpreter::getTitle(string &inputString) {
+	string title = inputString;
+
+	inputString = replaceText(inputString, title, "");
+	inputString = trimWhiteSpace(inputString);
+
+	return title;
+}
+
 string MariaInterpreter::replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly) {
 	regex term(oldText);
 
