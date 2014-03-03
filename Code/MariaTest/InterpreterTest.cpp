@@ -16,7 +16,7 @@ namespace MariaTest {
 
 			actual = program->getCommandType(input);
 
-			Assert::AreEqual((int)actual, (int)expected);
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -33,7 +33,7 @@ namespace MariaTest {
 
 			actual = program->getCommandType(input);
 
-			Assert::AreEqual((int)actual, (int)expected);
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -49,8 +49,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandType(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -66,8 +66,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandType(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -83,8 +83,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandType(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -104,8 +104,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandTypeRegex(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -121,8 +121,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandTypeRegex(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -138,8 +138,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandTypeRegex(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -155,8 +155,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandTypeRegex(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -172,8 +172,8 @@ namespace MariaTest {
 			MariaInterpreter::CommandType actual;
 
 			actual = program->getCommandTypeRegex(input);
-
-			Assert::AreEqual((int)actual, (int)expected);
+			
+			Assert::AreEqual((int)expected, (int)actual);
 
 			// Check to see if the keyword has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -193,7 +193,7 @@ namespace MariaTest {
 			string actual;
 
 			actual = program->getTitle(input);
-			Assert::IsTrue(actual == expected);
+			Assert::AreEqual(expected, actual);
 
 			// Check to see if the title has been removed from the inputString
 			Assert::IsTrue(input == "");
@@ -210,10 +210,61 @@ namespace MariaTest {
 			string actual;
 
 			actual = program->getTitle(input);
-			Assert::IsTrue(actual == expected);
+			Assert::AreEqual(expected, actual);
 
 			// Check to see if the title has been removed from the inputString
 			Assert::IsTrue(input == "");
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Title_TwoWords) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "family lunch";
+
+			string expected = "family lunch";
+			string actual;
+
+			actual = program->getTitle(input);
+			Assert::AreEqual(expected, actual);
+
+			// Check to see if the title has been removed from the inputString
+			Assert::IsTrue(input == "");
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Title_ThreeWords) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "dinner with girlfriend";
+
+			string expected = "dinner with girlfriend";
+			string actual;
+
+			actual = program->getTitle(input);
+			Assert::AreEqual(expected, actual);
+
+			// Check to see if the title has been removed from the inputString
+			Assert::IsTrue(input == "");
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Title_DeadlineTask) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "do homework by Thursday";
+
+			string expected = "do homework";
+			string actual;
+
+			actual = program->getTitle(input);
+			Assert::AreEqual(expected, actual);
+
+			// Check to see if the title and endOfTitle keyword has been removed from the inputString
+			Assert::IsTrue(input == "Thursday");
 
 			delete program;
 		}

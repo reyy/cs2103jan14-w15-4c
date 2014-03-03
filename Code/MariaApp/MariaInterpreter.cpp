@@ -74,10 +74,29 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandTypeRegex(string &inpu
 }
 
 string MariaInterpreter::getTitle(string &inputString) {
-	string title = inputString;
+	string title;
+
+	int endOfTitlePos[2];
+
+	endOfTitlePos[0] = inputString.find(" by ");
+	endOfTitlePos[1] = inputString.find(" from ");
+
+	if (endOfTitlePos[0] != string::npos) {
+		title = inputString.substr(0, endOfTitlePos[0]);
+		inputString = replaceText(inputString, " by ", "");
+	} else if (endOfTitlePos[1] != string::npos) {
+		title = inputString.substr(0, endOfTitlePos[1]);
+		inputString = replaceText(inputString, " from ", "");
+	} else {
+		title = inputString;
+		inputString = replaceText(inputString, title, "");
+	}
+	//TODO: Loop through keyword bank to check for other definitions of endOfTitle keywords.
 
 	inputString = replaceText(inputString, title, "");
 	inputString = trimWhiteSpace(inputString);
+
+	title = trimWhiteSpace(title);
 
 	return title;
 }

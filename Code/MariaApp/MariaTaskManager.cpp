@@ -17,7 +17,7 @@ bool MariaTaskManager::addTask(string name, MariaTime start, MariaTime end){
 	return true;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(string searchString){
+vector<MariaTask*> MariaTaskManager::findTask(std::string searchString){
 	vector<MariaTask*> returnList;
 
 	for(MariaTask* temp : *taskList){

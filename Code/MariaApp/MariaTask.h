@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <QtCore/QCoreApplication>
 #include "MariaTime.h"
 using namespace std;
 
@@ -19,8 +18,8 @@ public:
 	
 	
 	TaskType getType();
-	string getTitle();
-	string getDescription();
+	std::string getTitle();
+	std::string getDescription();
 	MariaTime getStart();
 	MariaTime getEnd();
 	double getDuration();
@@ -28,8 +27,8 @@ public:
 
 private:
 	TaskType	type;
-	string		title;
-	string		description;
+	std::string		title;
+	std::string		description;
 	MariaTime		start;
 	MariaTime		end;
 };

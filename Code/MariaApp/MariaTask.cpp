@@ -36,11 +36,11 @@ MariaTask::TaskType MariaTask::getType() {
 	return type;
 }
 
-string MariaTask::getTitle(){
+std::string MariaTask::getTitle(){
 	return title;
 }
 
-string MariaTask::getDescription(){
+std::string MariaTask::getDescription(){
 	return description;
 }
 
