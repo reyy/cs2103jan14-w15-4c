@@ -51,6 +51,7 @@
     <ClCompile Include="MariaUITextbox.cpp">
       <Filter>UI\UIElement</Filter>
     </ClCompile>
+    <ClCompile Include="MariaTime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -107,5 +108,6 @@
     <ClInclude Include="MariaUITextbox.h">
       <Filter>UI\UIElement</Filter>
     </ClInclude>
+    <ClInclude Include="MariaTime.h" />
   </ItemGroup>
 </Project>
