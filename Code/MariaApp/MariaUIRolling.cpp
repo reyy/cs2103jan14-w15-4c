@@ -2,7 +2,6 @@
 
 
 MariaUIRolling::MariaUIRolling(QMainWindow *parent) {
-	
 	_parent=parent;
 	_currentState=DEACTIVE;
 	_rollingXPos=_parent->width()*0.5+_parent->width()*DEFAULT_BEFORE_X;
@@ -64,7 +63,6 @@ void MariaUIRolling::updateStatePreAnimation() {
 			}
 		}
 	}
-
 	updateGUI();
 }
 

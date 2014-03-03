@@ -1,13 +1,14 @@
 #include "MariaLogic.h"
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
-	mariaUI = new MariaUI(this);
-
-	mariaUI->setState(MariaUI::INTRO);
-	mariaUI->getLoading()->setDisplayText("Loading");
+	
 	mariaIntepreter = new MariaInterpreter();
 	mariaTaskManager = new MariaTaskManager();
 	mariaFileWriter = new MariaFileWriter();
+	mariaUI = new MariaUI(this,mariaTaskManager);
+
+	mariaUI->setState(MariaUI::INTRO);
+	mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
 	mariaUI->setState(MariaUI::DEFAULT);
 
@@ -47,17 +48,13 @@ bool MariaLogic::processCommand(string inputText) {
 			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			if(mariaTaskManager->addTask(inputText, NULL, NULL)){
-				mariaUI->setBaseText("Task "+ inputText +" has been added!");
+				mariaUI->setQuestionText("Task '"+ inputText +"' has been added!");
+			} else {
+				mariaUI->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
-
-			//todo : move into UI code for change state calendar
-			vector<MariaTask*> tempList = mariaTaskManager->findTask("");
-			for(MariaTask* temp : tempList){
-				mariaUI->getCalendar()->addDisplay(*temp);
-			}
 		} else {
 			mariaUI->setQuestionText("Its a valid command, but I'm limited.");
 			mariaUI->setState(MariaUI::DEFAULT);

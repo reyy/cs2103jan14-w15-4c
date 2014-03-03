@@ -20,6 +20,8 @@ public:
 
 	QLabel *displayTitle;
 	QString backgroundColor;
+	
+	float assignedWidth;
 
 	displayPack(QMainWindow *parent);
 	displayPack(QMainWindow *parent, QString title,MariaTask::TaskType type, time_t start,time_t end);
@@ -44,13 +46,27 @@ public:
 class MariaUICalendar : public MariaUIRolling {
 public:
 	enum VIEW_TYPE {
-		DAY, WEEK, MONTH, YEAR
+		DEFAULT, DAY, WEEK, MONTH, YEAR
 	};
 private:
 	QMainWindow *_parent;
+	QLabel *_currentTimeLine;
+
+	QPixmap *_currentTimeLineImage;
+	QPixmap *_timeLineImage;
+
 	std::vector<displayPack*> _displayPackStack;
 	std::queue<displayPack*> _queuedisplayQueue;
+	
+	std::vector<QLabel *> _lineStack;
+	std::vector<QLabel *> _lineTimerStack;
 
+	//The amount of pixel representing 1 unit.
+	float _displayUnit;
+
+	
+	void initImages();
+	void addLine(int amount);
 	void updateStateMainAnimation();
 	void clearQueueDisplay();
 
@@ -58,6 +74,7 @@ public:
 	MariaUICalendar(QMainWindow *parent);
 	~MariaUICalendar();
 
+	void createUI(VIEW_TYPE type);
 	void addDisplay(MariaTask task);
 	void clearActiveDisplay();
 	void updateGUI();
