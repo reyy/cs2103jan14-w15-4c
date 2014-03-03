@@ -6,14 +6,11 @@
 MariaUI::MariaUI(MariaLogic *mariaLogic, MariaTaskManager *mariaTaskManager, QWidget *parent) : QMainWindow(parent) {
 	_mariaLogic = mariaLogic;
 	_mariaTaskManager = mariaTaskManager;
-
-	initState();
-	initImages();
+	
 	initWindow();
-	initTextBox();
-	initStatusIcon();
+	initState();
+	initSubclasses();
 	initButtons();
-	initLayers();
 
 	show();
 }
@@ -21,26 +18,21 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, MariaTaskManager *mariaTaskManager, QWi
 MariaUI::~MariaUI(void) {
 	delete _loading;
 	delete _calendar;
-	delete _statusAnimationTimer;
+	delete _status;
+	delete _textbox;
 	delete _statePreAnimationTimer;
 	delete _statePosAnimationTimer;
-	delete _statusIcon;
-	delete _suggestText;
-	delete _questionText;
-	delete _btClose;
-
-	for(int i=0;i<AMOUNT_OF_IMAGES;i++) {
-		delete _imageHandle[i];
-	}
-	delete _imageHandle;
-	delete _inputBox;
+	delete _btClose;	
 }
 
 void MariaUI::initState() {
-	_stateTargetY=-WINDOW_DEFAULT_SIZE_Y*0.5;
+	_currentState=DEFAULT;
+	_destCoord.setX(WINDOW_DEFAULT_SIZE_X*0.5);
+	_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
+	_rollingCoord.setX(30.0);
+	_rollingCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
+	
 	_processingState=false;
-	_toolBoxCoordinate.setX(30.0);
-	_toolBoxCoordinate.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
 
 	_statePreAnimationTimer = new QTimer(this);
     connect(_statePreAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePreAnimation()));
@@ -48,19 +40,6 @@ void MariaUI::initState() {
 	_statePosAnimationTimer = new QTimer(this);
     connect(_statePosAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePosAnimation()));
 }
-
-void MariaUI::initImages() {
-	
-	_imageHandle = new QPixmap*[AMOUNT_OF_IMAGES];
-	_imageHandle[0] = new QPixmap("./Resources/ui_status_recognise.png");
-	_imageHandle[1] = new QPixmap("./Resources/ui_status_unknown.png");
-	_imageHandle[2] = new QPixmap("./Resources/ui_status_wait_0.png");
-	_imageHandle[3] = new QPixmap("./Resources/ui_status_wait_1.png");
-	_imageHandle[4] = new QPixmap("./Resources/ui_status_wait_2.png");
-	_imageHandle[5] = new QPixmap("./Resources/ui_status_wait_3.png");
-	_imageHandle[6] = new QPixmap("./Resources/ui_bt_close.png");
-}
-
 void MariaUI::initWindow() {
 	_expandView=false;
 
@@ -75,91 +54,39 @@ void MariaUI::initWindow() {
 	resize(WINDOW_DEFAULT_SIZE_X, WINDOW_DEFAULT_SIZE_Y);
 }
 
-void MariaUI::initTextBox() {
-	_inputBox = new QLineEdit(this);
-	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;");
-	_inputBox->installEventFilter(this);
-
-	_suggestText = new QLabel(this);
-	_suggestText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;");	
-
-	_questionText = new QLabel(this);
-	_questionText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;color:#ffffff;font-weight:bold;");	
-}
-
-void MariaUI::initStatusIcon(){
-	_statusImageIndex=0;
-	_statusIcon = new QLabel(this);
-	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
-	_statusIcon->hide();
-
-	_statusAnimationTimer = new QTimer(this);
-    connect(_statusAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatusAnimation()));
-}
-
 void MariaUI::initButtons() {
+	QPixmap imageHandleCloseButton("./Resources/ui_bt_close.png");
 	_btClose = new QToolButton(this);
 	_btClose->setAutoFillBackground(true);;
-	_btClose->setIcon(QIcon(*_imageHandle[6]));
+	_btClose->setIcon(QIcon(imageHandleCloseButton));
 	_btClose->setIconSize(QSize(20,20));
 	_btClose->setFixedSize(QSize(20,20));
 	_btClose->setStyleSheet("border:0px;");	
 	_btClose->setToolTip("Close Program");
+	_btClose->setGeometry(QRect(width()-10-10, 10-10, 20, 20));	
 
-	//To fix the quick button.
 	connect(_btClose, SIGNAL(clicked()),this , SLOT(quitAction()));
 }
 
-void MariaUI::initLayers() {
+void MariaUI::initSubclasses() {
 	_loading = new MariaUILoading(this);
-	_calendar = new MariaUICalendar(this);
-}
-
-void MariaUI::updateStatusAnimation() {
-	_statusIcon->show();
-	switch(_currentStatus) {
-	case OK:
-		_statusAnimationTimer->stop();
-		_statusImageIndex=0;
-		break;
-	case INVALID:
-		_statusAnimationTimer->stop();
-		break;
-	case WAIT:
-		if(_statusImageIndex<2||_statusImageIndex>5)
-			_statusImageIndex=2;
-		if(_statusImageIndex<5)
-			_statusImageIndex++;
-		else
-			_statusImageIndex=2;
-		break;
-	case UNKNOWN:
-		_statusAnimationTimer->stop();
-		_statusImageIndex=1;
-		break;
-	case NONE:
-		_statusAnimationTimer->stop();
-		_statusIcon->hide();
-		break;
-	default:
-		break;
-	}
-	
-	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
+	_calendar = new MariaUICalendar(this);	
+	_status = new MariaUIStatus(this);
+	_textbox = new MariaUITextbox(this);
 }
 
 void MariaUI::updateStatePreAnimation() {
 	bool canstop=false;
-	switch(_currentState)
-	{
+
+	switch(_currentState) {
 	case FOCUS_CALENDAR:
 	case DEFAULT:
-		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
-			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
+		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
+			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
 		} else {
 			canstop=true;
-			_toolBoxCoordinate.setY(_stateTargetY);
+			_rollingCoord.setY(_destCoord.y());
 		}
 		break;
 	case INTRO:
@@ -178,29 +105,29 @@ void MariaUI::updateStatePreAnimation() {
 		}
 	}
 }
+
 void MariaUI::updateStatePosAnimation() {
 	bool canstop=false;
-	switch(_currentState)
-	{
+	switch(_currentState) {
 	case FOCUS_CALENDAR:
-		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
-			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
+		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
+			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
 		} else {
 			if(_calendar->isEndRollingDone()) {
 				_calendar->clearActiveDisplay();
-				_toolBoxCoordinate.setY(_stateTargetY);
+				_rollingCoord.setY(_destCoord.y());
 				canstop=true;
 			}
 		}
 		break;
 	case DEFAULT:
-		if(abs(_toolBoxCoordinate.y()-_stateTargetY)>0.5) {
-			_toolBoxCoordinate.setY(_toolBoxCoordinate.y()+(_stateTargetY-_toolBoxCoordinate.y())*0.01);
+		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
+			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
 		} else {
 			canstop=true;
-			_toolBoxCoordinate.setY(_stateTargetY);
+			_rollingCoord.setY(_destCoord.y());
 		}
 		break;
 	case INTRO:
@@ -232,11 +159,11 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		_mariaLogic->processCommand(this->getUserInput());
+		_mariaLogic->processCommand(_textbox->getUserInput());
 	}else{
 		//todo: tick / question if keyword detected
-		_suggestText->setText("");
-		setStatus(WAIT);
+		_status->setStatus(MariaUIStatus::WAIT);
+		_textbox->setSuggestText("");
 	}
 }
 
@@ -256,13 +183,13 @@ void MariaUI::beginNewState() {
 			_calendar->startRolling();
 			}
 	case FOCUS_SETTING:
-		_stateTargetY=25;
+		_destCoord.setY(25);
 		break;
 	case DEFAULT:
-		_stateTargetY=height()*0.5-10;
+		_destCoord.setY(height()*0.5-10);
 		break;
 	case INTRO:
-		setStatus(NONE);
+		_status->setStatus(MariaUIStatus::NONE);
 		_loading->startLoadingAnimation();
 		break;
 	case QUIT:
@@ -285,15 +212,15 @@ void MariaUI::endOldState() {
 			if(_stateQueue.front()!=FOCUS_CALENDAR&&
 				_stateQueue.front()!=FOCUS_SETTING&&
 				_stateQueue.front()!=DEFAULT) {
-				_stateTargetY=-WINDOW_DEFAULT_SIZE_Y;
+				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
 			}
 			break;
 		case INTRO:
-			_stateTargetY=-WINDOW_DEFAULT_SIZE_Y;
+			_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
 			_loading->endLoadingAnimation();
 			break;
 		default:
-			_stateTargetY=-WINDOW_DEFAULT_SIZE_Y;
+			_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
 			break;
 		}
 		if(!_statePosAnimationTimer->isActive())
@@ -302,24 +229,8 @@ void MariaUI::endOldState() {
 }
 
 void MariaUI::updateGUI() {
-	_statusIcon->setGeometry(QRect(_toolBoxCoordinate.x(), _toolBoxCoordinate.y(), 20, 20));
-	_inputBox->setGeometry(QRect(_toolBoxCoordinate.x()+30, _toolBoxCoordinate.y(), width()-_toolBoxCoordinate.x()-70, 20));
-	_suggestText->setGeometry(QRect(_toolBoxCoordinate.x()+33, _toolBoxCoordinate.y(), width()-_toolBoxCoordinate.x()-70, 20));
-	_questionText->setGeometry(QRect(_toolBoxCoordinate.x()+33, _toolBoxCoordinate.y()-20, width()-_toolBoxCoordinate.x()-75, 20));
-	_btClose->setGeometry(QRect(width()-10-10, 10-10, 20, 20));	
-}
-
-void MariaUI::setStatus(STATUS_TYPE type) {
-	if(_currentStatus!=type) {
-		_currentStatus=type;
-		updateStatusAnimation();
-		if(!_statusAnimationTimer->isActive())
-			_statusAnimationTimer->start(500);
-	}
-}
-
-MariaUI::STATUS_TYPE MariaUI::getStatus() {
-	return _currentStatus;
+	_status->updateGUI(_rollingCoord.x(),_rollingCoord.y());
+	_textbox->updateGUI(_rollingCoord.x(),_rollingCoord.y());
 }
 
 void MariaUI::setState(STATE_TYPE state) {
@@ -333,27 +244,10 @@ void MariaUI::setState(STATE_TYPE state) {
 		_stateQueue.push(state);
 		endOldState();
 	}
-
 }
 
 MariaUI::STATE_TYPE MariaUI::getState() {
 	return _currentState;
-}
-
-void MariaUI::setBaseText(const string text) {
-	_suggestText->setText(QString(text.c_str()));
-}
-
-void MariaUI::setQuestionText(const string text) {
-	_questionText->setText(QString(text.c_str()));
-}
-
-string MariaUI::getUserInput() {
-	return _inputBox->text().toStdString();
-}
-
-void MariaUI::setUserInput(const string text) {
-	_inputBox->setText(QString(text.c_str()));
 }
 
 void MariaUI::setExpand(bool value) {
@@ -381,4 +275,12 @@ MariaUILoading * MariaUI::getLoading() {
 
 MariaUICalendar * MariaUI::getCalendar() {
 	return _calendar;
+}
+
+MariaUIStatus * MariaUI::getStatus() {
+	return _status;
+}
+
+MariaUITextbox * MariaUI::getTextbox() {
+	return _textbox;
 }
