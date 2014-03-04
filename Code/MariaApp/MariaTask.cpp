@@ -51,3 +51,7 @@ MariaTime MariaTask::getStart(){
 MariaTime MariaTask::getEnd(){
 	return end;
 }
+
+double MariaTask::getDuration() {
+	return difftime(end.getUnixTime(),start.getUnixTime());
+}

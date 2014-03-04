@@ -5,7 +5,7 @@ using namespace std;
 
 class MariaTime {
 public:
-	MariaTime(int year = 0, int month = 0, int day = 0, int hour = 0, int min = 0, int sec = 0);
+	MariaTime(int year = 1901, int month = 1, int day = 1, int hour = 0, int min = 0, int sec = 0);
 	MariaTime(string value, string format);
 
 	void set(string value, string format);

@@ -2,16 +2,20 @@
 
 
 MariaTime::MariaTime(int year , int month , int day , int hour , int min , int sec ){
-	timeStruct.tm_year = year;
-	timeStruct.tm_mon = month;
+	timeStruct.tm_year = year-1900;
+	timeStruct.tm_mon = month-1;
 	timeStruct.tm_mday = day;
 	timeStruct.tm_hour = hour;
 	timeStruct.tm_min = min;
 	timeStruct.tm_sec = sec;
 
-	time_t timeStamp = mktime(&timeStruct);
+	timeStamp = mktime(&timeStruct);
 }
 
+MariaTime::MariaTime(string value, string format){
+	strftime(strdup(value.c_str()), value.length(), format.c_str(), &timeStruct);
+	timeStamp = mktime(&timeStruct);
+}
 
 void MariaTime::set(string value, string format){
 	strftime(strdup(value.c_str()), value.length(), format.c_str(), &timeStruct);
