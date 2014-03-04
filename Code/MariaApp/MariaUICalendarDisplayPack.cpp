@@ -24,7 +24,7 @@ MariaUICalendarDisplayPack::MariaUICalendarDisplayPack(QMainWindow *parent, Mari
 	_displayTitle->hide();
 
 
-	_calendarUnit=tt.getDuration()/60/60*calendarUnit;
+	_calendarUnit=task.getDuration()/60/60*calendarUnit;
 
 	_destinationX=0;
 	_destinationY=0;
