@@ -47,7 +47,7 @@ void MariaUI::initWindow() {
 		setObjectName(QStringLiteral("MariaUI"));
 	}
 
-	this->setStyleSheet("QMainWindow  {background-color: #a3d635;min-width:400px;min-height:120px;}");
+	this->setStyleSheet("QMainWindow  {background-color: rgb(186,199,22);min-width:400px;min-height:120px;}");
 	setWindowFlags( Qt::FramelessWindowHint );
 	setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
 

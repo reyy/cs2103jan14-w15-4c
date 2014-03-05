@@ -1,7 +1,7 @@
-#include "MariaUICalendarDisplayPack.h"
+#include "MariaUIDisplayPack.h"
 #include "MariaTime.h"
 
-MariaUICalendarDisplayPack::MariaUICalendarDisplayPack(QMainWindow *parent, MariaTask task, float calendarUnit) {
+MariaUIDisplayPack::MariaUIDisplayPack(QMainWindow *parent, MariaTask task, float calendarUnit) {
 	_parent=parent;
 
 	_displayTitle = new QLabel(_parent);
@@ -24,7 +24,7 @@ MariaUICalendarDisplayPack::MariaUICalendarDisplayPack(QMainWindow *parent, Mari
 	_displayTitle->hide();
 
 
-	_calendarUnit=task.getDuration()/60/60*calendarUnit;
+	_calendarUnit=5*3600/60/60*calendarUnit;
 
 	_destinationX=0;
 	_destinationY=0;
@@ -32,27 +32,27 @@ MariaUICalendarDisplayPack::MariaUICalendarDisplayPack(QMainWindow *parent, Mari
 	_y=0;
 }
 
-MariaUICalendarDisplayPack::~MariaUICalendarDisplayPack() {
+MariaUIDisplayPack::~MariaUIDisplayPack() {
 	delete _displayTitle;
 }
 
-void MariaUICalendarDisplayPack::setDestinationX(float x) {
+void MariaUIDisplayPack::setDestinationX(float x) {
 	_destinationX=x;
 }
 
-void MariaUICalendarDisplayPack::setDestinationY(float y) {
+void MariaUIDisplayPack::setDestinationY(float y) {
 	_destinationY=y;
 }
 
-void MariaUICalendarDisplayPack::setRealX(float x) {
+void MariaUIDisplayPack::setRealX(float x) {
 	_x=x;
 }
 
-void MariaUICalendarDisplayPack::setRealY(float y) {
+void MariaUIDisplayPack::setRealY(float y) {
 	_y=y;
 }
 
-bool MariaUICalendarDisplayPack::isCoordinateMatch() {
+bool MariaUIDisplayPack::isCoordinateMatch() {
 	if(abs(_x-_destinationX)<0.5&&abs(_y-_destinationY)<0.5) {
 		return true;
 	} else {
@@ -60,7 +60,7 @@ bool MariaUICalendarDisplayPack::isCoordinateMatch() {
 	}
 }
 
-bool MariaUICalendarDisplayPack::updatePosition() {
+bool MariaUIDisplayPack::updatePosition() {
 	if(!isCoordinateMatch()) {
 		_x+=(_destinationX-_x)*0.01;
 		_y+=(_destinationY-_y)*0.01;
@@ -70,14 +70,14 @@ bool MariaUICalendarDisplayPack::updatePosition() {
 	}
 }
 
-void MariaUICalendarDisplayPack::updateGUI(float layerX,float layerY) {
+void MariaUIDisplayPack::updateGUI(float layerX,float layerY) {
 	_displayTitle->setGeometry(QRect(layerX+_x,layerY+_y,_calendarUnit,14));
 }
 
-void MariaUICalendarDisplayPack::show() {
+void MariaUIDisplayPack::show() {
 	_displayTitle->show();
 }
 
-void MariaUICalendarDisplayPack::hide() {
+void MariaUIDisplayPack::hide() {
 	_displayTitle->hide();
 }

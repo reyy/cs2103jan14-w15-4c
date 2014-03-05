@@ -10,7 +10,7 @@
 #include "MariaTime.h"
 #include "MariaUIDisplayPack.h"
 
-class MariaUICalendar : public MariaUIRolling {
+class MariaUIDefault : public MariaUIRolling {
 public:
 	enum VIEW_TYPE {
 		DEFAULT, DAY, WEEK, MONTH, YEAR
@@ -32,13 +32,12 @@ private:
 	float _calendarUnit;
 	
 	void initImages();
-	void addLine(int amount);
 	void updateStateMainAnimation();
 	void clearQueueDisplay();
 
 public:
-	MariaUICalendar(QMainWindow *parent);
-	~MariaUICalendar();
+	MariaUIDefault(QMainWindow *parent);
+	~MariaUIDefault();
 
 	void createUI(VIEW_TYPE type);
 	void addDisplay(MariaTask task);
