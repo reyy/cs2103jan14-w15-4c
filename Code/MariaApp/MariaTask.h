@@ -12,23 +12,27 @@ public:
 		TIMED
 	} TaskType;
 	
-	MariaTask(string title, MariaTime start, MariaTime end);
-	MariaTask(string title, string description,MariaTime start, MariaTime end);
+	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
+	MariaTask(string title, string description,MariaTime* start, MariaTime* end);
 	~MariaTask();
 	
 	
 	TaskType getType();
-	std::string getTitle();
-	std::string getDescription();
+	string getTitle();
+	string getDescription();
 	MariaTime getStart();
 	MariaTime getEnd();
 	double getDuration();
 	
+	void setTitle(string);
+	void setDescription(string);
+	void setStart(MariaTime*);
+	void setEnd(MariaTime*);
 
 private:
 	TaskType	type;
-	std::string		title;
-	std::string		description;
-	MariaTime		start;
-	MariaTime		end;
+	string		title;
+	string		description;
+	MariaTime*	start;
+	MariaTime*	end;
 };
