@@ -5,7 +5,7 @@
 #include "MariaUI.h"
 #include "MariaInterpreter.h"
 #include "MariaTaskManager.h"
-#include "MariaFileWriter.h"
+#include "MariaFileManager.h"
 
 class MariaLogic : QApplication {
 public:
@@ -18,6 +18,6 @@ private:
 	MariaUI				*mariaUI;
 	MariaInterpreter	*mariaInterpreter;
 	MariaTaskManager	*mariaTaskManager;
-	MariaFileWriter		*mariaFileWriter;
+	MariaFileManager	*mariaFileManager;
 
 };

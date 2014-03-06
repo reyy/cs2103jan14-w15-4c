@@ -4,7 +4,7 @@
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaInterpreter = new MariaInterpreter();
 	mariaTaskManager = new MariaTaskManager();
-	mariaFileWriter = new MariaFileWriter();
+	mariaFileManager = new MariaFileManager();
 	mariaUI = new MariaUI(this,mariaTaskManager);
 
 	mariaUI->setState(MariaUI::INTRO);
@@ -21,7 +21,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 }
 
 MariaLogic::~MariaLogic(void) {
-	delete mariaFileWriter;
+	delete mariaFileManager;
 	delete mariaTaskManager;
 	delete mariaInterpreter;
 	delete mariaUI;

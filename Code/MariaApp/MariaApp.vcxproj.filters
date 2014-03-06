@@ -30,7 +30,6 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="MariaTaskManager.cpp" />
-    <ClCompile Include="MariaFileWriter.cpp" />
     <ClCompile Include="MariaInterpreter.cpp" />
     <ClCompile Include="MariaTask.cpp" />
     <ClCompile Include="MariaUISetting.cpp">
@@ -58,6 +57,7 @@
     <ClCompile Include="MariaUIDisplayPack.cpp">
       <Filter>UI\UIRolling</Filter>
     </ClCompile>
+    <ClCompile Include="MariaFileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -104,7 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaTaskManager.h" />
-    <ClInclude Include="MariaFileWriter.h" />
     <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaTask.h" />
@@ -121,5 +120,6 @@
     <ClInclude Include="MariaUIDisplayPack.h">
       <Filter>UI\UIRolling</Filter>
     </ClInclude>
+    <ClInclude Include="MariaFileManager.h" />
   </ItemGroup>
 </Project>
