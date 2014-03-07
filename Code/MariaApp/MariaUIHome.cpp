@@ -20,9 +20,14 @@ void MariaUIHome::initImages() {
 
 	//Set Time and Date
 	if(currentTime.getHour()%12==0) {
-		tempString=QString::number(12)+":"+QString::number(currentTime.getMin());
+		tempString=QString::number(12);
 	} else {
-		tempString=QString::number(currentTime.getHour()%12)+":"+QString::number(currentTime.getMin());
+		tempString=QString::number(currentTime.getHour()%12);
+	}
+	if(currentTime.getMin()<10) {
+		tempString+=":0"+QString::number(currentTime.getMin());
+	} else  {
+		tempString+=":"+QString::number(currentTime.getMin());
 	}
 
 	if(currentTime.getHour()<12) {
@@ -39,8 +44,6 @@ void MariaUIHome::initImages() {
 	_currentDate->setStyleSheet("color:#ffffff; font-size:10px;");
 	_currentTime->setGeometry(QRect(-1000,-1000,100,25));
 	_currentDate->setGeometry(QRect(-1000,-1000,100,15));
-
-	
 }
 
 void MariaUIHome::updateStateMainAnimation() {

@@ -59,5 +59,6 @@ MariaTime MariaTime::getCurrentTime() {
 	time_t rawtime;
 	time ( &rawtime );
     toReturn.timeStruct = *localtime ( &rawtime );
+	toReturn.timeStruct.tm_year+=1900;
 	return toReturn;
 }
