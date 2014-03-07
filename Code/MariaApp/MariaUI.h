@@ -29,7 +29,7 @@ class MariaUI : QMainWindow {
 	 Q_OBJECT
 public:
 	enum STATE_TYPE {
-		DEFAULT, HOME, FOCUS_CALENDAR,FOCUS_SETTING, INTRO, QUIT
+		DEFAULT, HOME, CALENDAR, SETTING, INTRO, QUIT
 	};
 private:
 	MariaLogic *_mariaLogic;

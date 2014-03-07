@@ -37,7 +37,7 @@ std::string MariaUITextbox::getUserInput() {
 }
 
 void MariaUITextbox::updateGUI(float rollingX, float rollingY) {
-	_inputBox->setGeometry(QRect(rollingX+30,rollingY, _parent->width()-rollingX-70, 20));
-	_suggestText->setGeometry(QRect(rollingX+33, rollingY, _parent->width()-rollingX-70, 20));
-	_questionText->setGeometry(QRect(rollingX+33, rollingY-20, _parent->width()-rollingX-75, 20));
+	_inputBox->setGeometry(QRect(rollingX+30,rollingY, _parent->width()-rollingX-60, 20));
+	_suggestText->setGeometry(QRect(rollingX+33, rollingY, _parent->width()-rollingX-60, 20));
+	_questionText->setGeometry(QRect(rollingX+33, rollingY-20, _parent->width()-rollingX-60, 20));
 }

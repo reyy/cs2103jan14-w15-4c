@@ -27,7 +27,7 @@ MariaUI::~MariaUI(void) {
 }
 
 void MariaUI::initState() {
-	_currentState=HOME;
+	_currentState=DEFAULT;
 	_destCoord.setX(WINDOW_DEFAULT_SIZE_X*0.5);
 	_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
 	_rollingCoord.setX(30.0);
@@ -81,7 +81,7 @@ void MariaUI::updateStatePreAnimation() {
 	bool canstop=false;
 
 	switch(_currentState) {
-	case FOCUS_CALENDAR:
+	case CALENDAR:
 	case HOME:
 		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
 			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
@@ -111,7 +111,7 @@ void MariaUI::updateStatePreAnimation() {
 void MariaUI::updateStatePosAnimation() {
 	bool canstop=false;
 	switch(_currentState) {
-	case FOCUS_CALENDAR:
+	case CALENDAR:
 		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
 			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
@@ -128,8 +128,11 @@ void MariaUI::updateStatePosAnimation() {
 			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
 		} else {
-			canstop=true;
-			_rollingCoord.setY(_destCoord.y());
+			if(_home->isEndRollingDone()) {
+				_home->clearActiveDisplay();
+				_rollingCoord.setY(_destCoord.y());
+				canstop=true;
+			}
 		}
 		break;
 	case INTRO:
@@ -174,7 +177,7 @@ void MariaUI::beginNewState() {
 	_stateQueue.pop();
 
 	switch(_currentState) {
-	case FOCUS_CALENDAR: {
+	case CALENDAR: {
 			_calendar->createUI(MariaUICalendar::DEFAULT);
 				//TO DO - update to allow users to choose a view type.
 		
@@ -184,11 +187,14 @@ void MariaUI::beginNewState() {
 				}
 			_calendar->startRolling();
 			}
-	case FOCUS_SETTING:
-		_destCoord.setY(25);
+	case SETTING:
+		_destCoord.setY(30);
 		break;
-	case HOME:
-		_destCoord.setY(height()*0.5-10);
+	case HOME:{
+			_home->createUI();
+			_home->startRolling();
+			_destCoord.setY(height()*0.5-10);
+		}
 		break;
 	case INTRO:
 		_status->setStatus(MariaUIStatus::NONE);
@@ -208,11 +214,20 @@ void MariaUI::endOldState() {
 		_processingState=true;
 
 		switch(_currentState) {
-		case FOCUS_CALENDAR:
+		case CALENDAR:
 			_calendar->endRolling();
+			//Checks if the state you are going to is within the environment itself.
+			if(_stateQueue.front()!=CALENDAR&&
+				_stateQueue.front()!=SETTING&&
+				_stateQueue.front()!=HOME) {
+				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
+			}
+			break;
 		case HOME:
-			if(_stateQueue.front()!=FOCUS_CALENDAR&&
-				_stateQueue.front()!=FOCUS_SETTING&&
+			_home->endRolling();
+			//Checks if the state you are going to is within the environment itself.
+			if(_stateQueue.front()!=CALENDAR&&
+				_stateQueue.front()!=SETTING&&
 				_stateQueue.front()!=HOME) {
 				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
 			}

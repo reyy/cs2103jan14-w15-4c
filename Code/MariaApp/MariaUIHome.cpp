@@ -12,6 +12,35 @@ MariaUIHome::~MariaUIHome() {
 }
 
 void MariaUIHome::initImages() {
+	_currentTime = new QLabel(_parent);
+	_currentDate = new QLabel(_parent);
+	
+	MariaTime currentTime=MariaTime::getCurrentTime();
+	QString tempString;
+
+	//Set Time and Date
+	if(currentTime.getHour()%12==0) {
+		tempString=QString::number(12)+":"+QString::number(currentTime.getMin());
+	} else {
+		tempString=QString::number(currentTime.getHour()%12)+":"+QString::number(currentTime.getMin());
+	}
+
+	if(currentTime.getHour()<12) {
+		tempString+="AM";
+	} else {
+		tempString+="PM";
+	}
+	_currentTime->setText(tempString);
+	_currentDate->setText(QString::number(currentTime.getDay())+"/"+QString::number(currentTime.getMonth())+"/"+QString::number(currentTime.getYear()));
+
+	_currentTime->setAlignment(Qt::AlignRight);
+	_currentDate->setAlignment(Qt::AlignRight);
+	_currentTime->setStyleSheet("color:#ffffff; font-size:20px;");
+	_currentDate->setStyleSheet("color:#ffffff; font-size:10px;");
+	_currentTime->setGeometry(QRect(-1000,-1000,100,25));
+	_currentDate->setGeometry(QRect(-1000,-1000,100,15));
+
+	
 }
 
 void MariaUIHome::updateStateMainAnimation() {
@@ -89,6 +118,8 @@ void MariaUIHome::clearActiveDisplay() {
 }
 
 void MariaUIHome::updateGUI() {
+	_currentTime->setGeometry(QRect(getRollingX()+_parent->width()*0.5-30-100,getRollingY()-_parent->height()*0.5+20,100,25));
+	_currentDate->setGeometry(QRect(getRollingX()+_parent->width()*0.5-30-100,getRollingY()-_parent->height()*0.5+40,100,15));
 	for(int i=0;i<_displayPackStack.size();i++) {
 		_displayPackStack.at(i)->updateGUI(getRollingX(),getRollingY());
 	}

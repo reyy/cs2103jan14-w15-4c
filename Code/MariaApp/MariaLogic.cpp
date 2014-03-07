@@ -55,10 +55,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
-			mariaUI->setState(MariaUI::FOCUS_CALENDAR);
+			mariaUI->setState(MariaUI::CALENDAR);
 		} else {
 			mariaUI->getTextbox()->setQuestionText("Its a valid command, but I'm limited.");
-			mariaUI->setState(MariaUI::DEFAULT);
+			mariaUI->setState(MariaUI::HOME);
 		}
 	}
 

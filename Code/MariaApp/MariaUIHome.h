@@ -14,6 +14,7 @@ class MariaUIHome : public MariaUIRolling {
 private:
 	QMainWindow *_parent;
 	QLabel *_currentTime;
+	QLabel *_currentDate;
 
 	std::vector<MariaUIDisplayPack*> _displayPackStack;
 	std::queue<MariaUIDisplayPack*> _queuedisplayQueue;
