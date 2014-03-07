@@ -53,3 +53,11 @@ int MariaTime::getMin(){
 int MariaTime::getSec(){
 	return timeStruct.tm_sec;
 }
+
+MariaTime MariaTime::getCurrentTime() {
+	MariaTime toReturn;
+	time_t rawtime;
+	time ( &rawtime );
+    toReturn.timeStruct = *localtime ( &rawtime );
+	return toReturn;
+}

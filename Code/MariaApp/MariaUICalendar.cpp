@@ -10,6 +10,8 @@ MariaUICalendar::~MariaUICalendar() {
 	clearActiveDisplay();
 	clearQueueDisplay();
 	delete _currentTimeLineImage;
+	delete _timeLineImage;
+	delete _currentTimeLine;
 }
 
 void MariaUICalendar::initImages() {

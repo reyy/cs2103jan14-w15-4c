@@ -16,7 +16,7 @@ MariaUIDisplayPack::MariaUIDisplayPack(QMainWindow *parent, MariaTask task, floa
 		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,128,128);border: 1px solid white;");
 		break;
 	default:
-		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,255,128);border: 1px solid white;");
+		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(0,0,255,128);border: 1px solid white;");
 		break;
 	}
 	_displayTitle->setText(QString::fromStdString(task.getTitle()));

@@ -12,6 +12,7 @@
 #include <queue>
 #include "MariaUILoading.h"
 #include "MariaUICalendar.h"
+#include "MariaUIHome.h"
 #include "MariaUIStatus.h"
 #include "MariaUITextbox.h"
 
@@ -28,7 +29,7 @@ class MariaUI : QMainWindow {
 	 Q_OBJECT
 public:
 	enum STATE_TYPE {
-		DEFAULT, FOCUS_CALENDAR,FOCUS_SETTING, INTRO, QUIT
+		DEFAULT, HOME, FOCUS_CALENDAR,FOCUS_SETTING, INTRO, QUIT
 	};
 private:
 	MariaLogic *_mariaLogic;
@@ -36,6 +37,7 @@ private:
 
 	MariaUILoading *_loading;
 	MariaUICalendar *_calendar;
+	MariaUIHome *_home;
 	MariaUIStatus *_status;
 	MariaUITextbox *_textbox;
 	
@@ -84,6 +86,7 @@ public:
 	
 	MariaUILoading* getLoading();
 	MariaUICalendar* getCalendar();
+	MariaUIHome* getHome();
 	MariaUIStatus* getStatus();
 	MariaUITextbox* getTextbox();
 };

@@ -1,21 +1,20 @@
-#include "MariaUIDefault.h"
+#include "MariaUIHome.h"
 
-MariaUIDefault::MariaUIDefault(QMainWindow *parent) : MariaUIRolling(parent) {
+MariaUIHome::MariaUIHome(QMainWindow *parent) : MariaUIRolling(parent) {
 	_parent=parent;
-	_calendarUnit=_parent->width();
 	initImages();
 }
 
-MariaUIDefault::~MariaUIDefault() {
+MariaUIHome::~MariaUIHome() {
 	clearActiveDisplay();
 	clearQueueDisplay();
-	delete _currentTimeLineImage;
+	delete _currentTime;
 }
 
-void MariaUIDefault::initImages() {
+void MariaUIHome::initImages() {
 }
 
-void MariaUIDefault::updateStateMainAnimation() {
+void MariaUIHome::updateStateMainAnimation() {
 	bool canEnd=true;
 
 	//Pop all queued task from addTask into the actual stack
@@ -49,19 +48,19 @@ void MariaUIDefault::updateStateMainAnimation() {
 	}
 }
 
-void MariaUIDefault::clearQueueDisplay() {
+void MariaUIHome::clearQueueDisplay() {
 	while(_queuedisplayQueue.size()>0) {
 		delete _queuedisplayQueue.front();
 		_queuedisplayQueue.pop();
 	}
 }
 
-void MariaUIDefault::createUI(VIEW_TYPE type) {
+void MariaUIHome::createUI() {
 }
 
-void MariaUIDefault::addDisplay(MariaTask task) {
+void MariaUIHome::addDisplay(MariaTask task) {
 
-	MariaUIDisplayPack* displayPack=new MariaUIDisplayPack(_parent,task,_calendarUnit);
+	MariaUIDisplayPack* displayPack=new MariaUIDisplayPack(_parent,task,100);
 	displayPack->setDestinationX(-_parent->width()*0.5+30);
 	displayPack->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
 	displayPack->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);
@@ -72,7 +71,7 @@ void MariaUIDefault::addDisplay(MariaTask task) {
 	startMainAnimationTimer();
 }
 
-void MariaUIDefault::clearActiveDisplay() {
+void MariaUIHome::clearActiveDisplay() {
 	while(_displayPackStack.size()>0) {
 		delete _displayPackStack.back();
 		_displayPackStack.pop_back();
@@ -89,16 +88,7 @@ void MariaUIDefault::clearActiveDisplay() {
 	}
 }
 
-void MariaUIDefault::updateGUI() {
-	_currentTimeLine->setGeometry(QRect(getRollingX()-6,getRollingY()-25,12,78));
-	for(int i=0;i<_lineStack.size();i++) {
-		_lineStack.at(i)->setGeometry(QRect(30+_calendarUnit*i+getRollingX()-_parent->width()*0.5-1,getRollingY()-12,2,60));
-	}
-
-	for(int i=0;i<_lineTimerStack.size();i++) {
-		_lineTimerStack.at(i)->setGeometry(QRect(30+_calendarUnit*i+getRollingX()-_parent->width()*0.5-15,getRollingY()+53,30,16));
-	}
-
+void MariaUIHome::updateGUI() {
 	for(int i=0;i<_displayPackStack.size();i++) {
 		_displayPackStack.at(i)->updateGUI(getRollingX(),getRollingY());
 	}

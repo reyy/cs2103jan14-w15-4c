@@ -19,6 +19,9 @@ public:
 	int getMin();
 	int getSec();
 
+
+	static MariaTime getCurrentTime();
+
 private:
 	time_t timeStamp;
 	struct tm timeStruct;

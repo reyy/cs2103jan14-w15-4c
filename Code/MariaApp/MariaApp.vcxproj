@@ -178,8 +178,8 @@
     <ClCompile Include="MariaTime.cpp" />
     <ClCompile Include="MariaUI.cpp" />
     <ClCompile Include="MariaUICalendar.cpp" />
-    <ClCompile Include="MariaUIDefault.cpp" />
     <ClCompile Include="MariaUIDisplayPack.cpp" />
+    <ClCompile Include="MariaUIHome.cpp" />
     <ClCompile Include="MariaUILoading.cpp" />
     <ClCompile Include="MariaUIRolling.cpp" />
     <ClCompile Include="MariaUISetting.cpp" />
@@ -230,8 +230,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
-    <ClInclude Include="MariaUIDefault.h" />
     <ClInclude Include="MariaUIDisplayPack.h" />
+    <ClInclude Include="MariaUIHome.h" />
     <ClInclude Include="MariaUITextbox.h" />
     <CustomBuild Include="MariaUICalendar.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

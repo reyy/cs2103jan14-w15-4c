@@ -10,7 +10,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaUI->setState(MariaUI::INTRO);
 	mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
-	mariaUI->setState(MariaUI::DEFAULT);
+	mariaUI->setState(MariaUI::HOME);
 
 
 	//Below are things that you can edit.

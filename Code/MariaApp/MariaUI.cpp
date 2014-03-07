@@ -18,6 +18,7 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, MariaTaskManager *mariaTaskManager, QWi
 MariaUI::~MariaUI(void) {
 	delete _loading;
 	delete _calendar;
+	delete _home;
 	delete _status;
 	delete _textbox;
 	delete _statePreAnimationTimer;
@@ -26,7 +27,7 @@ MariaUI::~MariaUI(void) {
 }
 
 void MariaUI::initState() {
-	_currentState=DEFAULT;
+	_currentState=HOME;
 	_destCoord.setX(WINDOW_DEFAULT_SIZE_X*0.5);
 	_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
 	_rollingCoord.setX(30.0);
@@ -71,6 +72,7 @@ void MariaUI::initButtons() {
 void MariaUI::initSubclasses() {
 	_loading = new MariaUILoading(this);
 	_calendar = new MariaUICalendar(this);	
+	_home = new MariaUIHome(this);
 	_status = new MariaUIStatus(this);
 	_textbox = new MariaUITextbox(this);
 }
@@ -80,7 +82,7 @@ void MariaUI::updateStatePreAnimation() {
 
 	switch(_currentState) {
 	case FOCUS_CALENDAR:
-	case DEFAULT:
+	case HOME:
 		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
 			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
@@ -121,7 +123,7 @@ void MariaUI::updateStatePosAnimation() {
 			}
 		}
 		break;
-	case DEFAULT:
+	case HOME:
 		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
 			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
 			updateGUI();
@@ -185,7 +187,7 @@ void MariaUI::beginNewState() {
 	case FOCUS_SETTING:
 		_destCoord.setY(25);
 		break;
-	case DEFAULT:
+	case HOME:
 		_destCoord.setY(height()*0.5-10);
 		break;
 	case INTRO:
@@ -208,10 +210,10 @@ void MariaUI::endOldState() {
 		switch(_currentState) {
 		case FOCUS_CALENDAR:
 			_calendar->endRolling();
-		case DEFAULT:
+		case HOME:
 			if(_stateQueue.front()!=FOCUS_CALENDAR&&
 				_stateQueue.front()!=FOCUS_SETTING&&
-				_stateQueue.front()!=DEFAULT) {
+				_stateQueue.front()!=HOME) {
 				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
 			}
 			break;
@@ -275,6 +277,10 @@ MariaUILoading * MariaUI::getLoading() {
 
 MariaUICalendar * MariaUI::getCalendar() {
 	return _calendar;
+}
+
+MariaUIHome * MariaUI::getHome() {
+	return _home;
 }
 
 MariaUIStatus * MariaUI::getStatus() {

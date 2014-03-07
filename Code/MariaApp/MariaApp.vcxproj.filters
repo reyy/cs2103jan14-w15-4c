@@ -51,13 +51,13 @@
       <Filter>UI\UIElement</Filter>
     </ClCompile>
     <ClCompile Include="MariaTime.cpp" />
-    <ClCompile Include="MariaUIDefault.cpp">
-      <Filter>UI\UIRolling</Filter>
-    </ClCompile>
     <ClCompile Include="MariaUIDisplayPack.cpp">
       <Filter>UI\UIRolling</Filter>
     </ClCompile>
     <ClCompile Include="MariaFileManager.cpp" />
+    <ClCompile Include="MariaUIHome.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -114,12 +114,12 @@
       <Filter>UI\UIElement</Filter>
     </ClInclude>
     <ClInclude Include="MariaTime.h" />
-    <ClInclude Include="MariaUIDefault.h">
-      <Filter>UI\UIRolling</Filter>
-    </ClInclude>
     <ClInclude Include="MariaUIDisplayPack.h">
       <Filter>UI\UIRolling</Filter>
     </ClInclude>
     <ClInclude Include="MariaFileManager.h" />
+    <ClInclude Include="MariaUIHome.h">
+      <Filter>UI\UIRolling</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
