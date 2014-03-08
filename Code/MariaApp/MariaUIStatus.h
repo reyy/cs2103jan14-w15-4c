@@ -4,17 +4,30 @@
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
 
-#define AMOUNT_OF_IMAGES 6
-
 class MariaUIStatus : QWidget {
 	Q_OBJECT
+
+	static const int TEXTBOX_X_OFFSET=30;
+	static const int AMOUNT_OF_IMAGES=6;
+	static const int IMAGE_INDEX_OK=0;
+	static const int IMAGE_INDEX_UNKNOWN=1;
+
+	//Image index assigned for animation must be consequtive.
+	static const int IMAGE_INDEX_WAIT_0=2;
+	static const int IMAGE_INDEX_WAIT_1=3;
+	static const int IMAGE_INDEX_WAIT_2=4;
+	static const int IMAGE_INDEX_WAIT_3=5;
+
+	//Animation speed in milliseconds.
+	static const int ANIMATION_SPEED=500;
+
 public:
 	enum STATUS_TYPE {
 		OK, INVALID, WAIT, UNKNOWN, NONE
 	};
 
 private:
-	QMainWindow *_parent;
+	QMainWindow *_qmainWindow;
 	
 	STATUS_TYPE _currentStatus;
 	int _statusImageIndex;
@@ -28,9 +41,10 @@ protected slots:
 	void updateStatusAnimation();
 
 public:
-	MariaUIStatus(QMainWindow *parent);
+	MariaUIStatus(QMainWindow *qmainWindow);
 	~MariaUIStatus();
+
 	void setStatus(STATUS_TYPE type);
 	STATUS_TYPE getStatus();
-	void updateGUI(float rollingX, float rollingY);
+	void updateGUI(QPointF statePosition);
 };

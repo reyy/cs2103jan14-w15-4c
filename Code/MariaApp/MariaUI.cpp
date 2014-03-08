@@ -3,44 +3,24 @@
 #include "MariaLogic.h"
 #include "MariaInterpreter.h"
 
-MariaUI::MariaUI(MariaLogic *mariaLogic, MariaTaskManager *mariaTaskManager, QWidget *parent) : QMainWindow(parent) {
-	_mariaLogic = mariaLogic;
-	_mariaTaskManager = mariaTaskManager;
-	
-	initWindow();
-	initState();
-	initSubclasses();
-	initButtons();
+const float MariaUI::CLOSE_BUTTON_X_OFFSET=0.0;
+const float MariaUI::CLOSE_BUTTON_Y_OFFSET=0.0;
 
+MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
+	_mariaLogic = mariaLogic;
+
+	initWindow();
+	initButtons();
+	_commandBar = new MariaUICommandBar(this);
+	_commandBar->getTextbox()->setFocus();
 	show();
 }
 
-MariaUI::~MariaUI(void) {
-	delete _loading;
-	delete _calendar;
-	delete _home;
-	delete _status;
-	delete _textbox;
-	delete _statePreAnimationTimer;
-	delete _statePosAnimationTimer;
+MariaUI::~MariaUI() {
 	delete _btClose;	
+	delete _commandBar;
 }
 
-void MariaUI::initState() {
-	_currentState=DEFAULT;
-	_destCoord.setX(WINDOW_DEFAULT_SIZE_X*0.5);
-	_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
-	_rollingCoord.setX(30.0);
-	_rollingCoord.setY(-WINDOW_DEFAULT_SIZE_Y*0.5);
-	
-	_processingState=false;
-
-	_statePreAnimationTimer = new QTimer(this);
-    connect(_statePreAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePreAnimation()));
-
-	_statePosAnimationTimer = new QTimer(this);
-    connect(_statePosAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatePosAnimation()));
-}
 void MariaUI::initWindow() {
 	_expandView=false;
 
@@ -60,23 +40,16 @@ void MariaUI::initButtons() {
 	_btClose = new QToolButton(this);
 	_btClose->setAutoFillBackground(true);;
 	_btClose->setIcon(QIcon(imageHandleCloseButton));
-	_btClose->setIconSize(QSize(20,20));
-	_btClose->setFixedSize(QSize(20,20));
-	_btClose->setStyleSheet("border:0px;");	
+	_btClose->setIconSize(QSize(imageHandleCloseButton.width(),imageHandleCloseButton.height()));
+	_btClose->setFixedSize(QSize(imageHandleCloseButton.width(),imageHandleCloseButton.height()));
 	_btClose->setToolTip("Close Program");
-	_btClose->setGeometry(QRect(width()-10-10, 10-10, 20, 20));	
+	_btClose->setStyleSheet("border:0px;");
+	_btClose->setGeometry(QRect(width()-imageHandleCloseButton.width()+CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
 
 	connect(_btClose, SIGNAL(clicked()),this , SLOT(quitAction()));
 }
 
-void MariaUI::initSubclasses() {
-	_loading = new MariaUILoading(this);
-	_calendar = new MariaUICalendar(this);	
-	_home = new MariaUIHome(this);
-	_status = new MariaUIStatus(this);
-	_textbox = new MariaUITextbox(this);
-}
-
+/*
 void MariaUI::updateStatePreAnimation() {
 	bool canstop=false;
 
@@ -150,13 +123,12 @@ void MariaUI::updateStatePosAnimation() {
 		beginNewState();
 	}
 }
-
+*/
 void MariaUI::quitAction() {
 	_mariaLogic->processCommand("quit");
 }
 
 void MariaUI::resizeEvent(QResizeEvent* event) {
-	updateGUI();
 	QWidget::resizeEvent(event);
 }
 
@@ -164,14 +136,14 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
-		_mariaLogic->processCommand(_textbox->getUserInput());
+		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
 	}else{
 		//todo: tick / question if keyword detected
-		_status->setStatus(MariaUIStatus::WAIT);
-		_textbox->setSuggestText("");
+		_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
+		_commandBar->getTextbox()->setSuggestText("");
 	}
 }
-
+/*
 void MariaUI::beginNewState() {
 	_currentState=_stateQueue.front();
 	_stateQueue.pop();
@@ -244,28 +216,7 @@ void MariaUI::endOldState() {
 			_statePosAnimationTimer->start(1);
 	}
 }
-
-void MariaUI::updateGUI() {
-	_status->updateGUI(_rollingCoord.x(),_rollingCoord.y());
-	_textbox->updateGUI(_rollingCoord.x(),_rollingCoord.y());
-}
-
-void MariaUI::setState(STATE_TYPE state) {
-	if(_stateQueue.size()>0) {
-		//Ignore duplicate state change.
-		if(_stateQueue.back()!=state) {
-			_stateQueue.push(state);
-			endOldState();
-		}
-	} else {
-		_stateQueue.push(state);
-		endOldState();
-	}
-}
-
-MariaUI::STATE_TYPE MariaUI::getState() {
-	return _currentState;
-}
+*/
 
 void MariaUI::setExpand(bool value) {
 	_expandView=value;
@@ -286,22 +237,6 @@ void MariaUI::setBackgroundColor(const QString text) {
 	this->setStyleSheet("QMainWindow  {background-color: "+text+";min-width:400px;min-height:120px;}");
 }
 
-MariaUILoading * MariaUI::getLoading() {
-	return _loading;
-}
-
-MariaUICalendar * MariaUI::getCalendar() {
-	return _calendar;
-}
-
-MariaUIHome * MariaUI::getHome() {
-	return _home;
-}
-
-MariaUIStatus * MariaUI::getStatus() {
-	return _status;
-}
-
-MariaUITextbox * MariaUI::getTextbox() {
-	return _textbox;
+MariaUICommandBar * MariaUI::getCommandBar() {
+	return _commandBar;
 }

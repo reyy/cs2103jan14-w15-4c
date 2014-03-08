@@ -1,22 +1,22 @@
 #include "MariaUITextbox.h"
 
 
-MariaUITextbox::MariaUITextbox(QMainWindow *parent) {
-	_parent = parent;
+MariaUITextbox::MariaUITextbox(QMainWindow *qmainWindow) {
+	_qmainWindow = qmainWindow;
 
-	_inputBox = new QLineEdit(_parent);
-	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;");
+	_inputBox = new QLineEdit(_qmainWindow);
+	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;color:#000000;");
 
-	_suggestText = new QLabel(_parent);
-	_suggestText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;");	
+	_suggestText = new QLabel(_qmainWindow);
+	_suggestText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;color:#111111;");	
 
-	_questionText = new QLabel(_parent);
+	_questionText = new QLabel(_qmainWindow);
 	_questionText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;color:#ffffff;font-weight:bold;");	
 }
 
 MariaUITextbox::~MariaUITextbox() {
-	delete _inputBox;
 	delete _suggestText;
+	delete _inputBox;
 	delete _questionText;
 }
 
@@ -36,8 +36,12 @@ std::string MariaUITextbox::getUserInput() {
 	return _inputBox->text().toStdString();
 }
 
-void MariaUITextbox::updateGUI(float rollingX, float rollingY) {
-	_inputBox->setGeometry(QRect(rollingX+30,rollingY, _parent->width()-rollingX-60, 20));
-	_suggestText->setGeometry(QRect(rollingX+33, rollingY, _parent->width()-rollingX-60, 20));
-	_questionText->setGeometry(QRect(rollingX+33, rollingY-20, _parent->width()-rollingX-60, 20));
+void MariaUITextbox::updateGUI(QPointF statePosition) {
+	_inputBox->setGeometry(QRect(statePosition.x()+RESERVED_STATUS_SPACE+TEXTBOX_X_OFFSET,statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_suggestText->setGeometry(QRect(statePosition.x()+RESERVED_STATUS_SPACE+TEXTBOX_X_OFFSET+QUESTION_TEXT_X_OFFSET,statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_questionText->setGeometry(QRect(statePosition.x()+RESERVED_STATUS_SPACE+TEXTBOX_X_OFFSET+QUESTION_TEXT_X_OFFSET,statePosition.y()+QUESTION_TEXT_Y_OFFSET, _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+}
+
+void MariaUITextbox::setFocus() {
+	_inputBox->setFocus();
 }
