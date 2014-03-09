@@ -37,18 +37,14 @@ private:
 	QToolButton *_btClose;
 	bool _expandView;
 	QTimer *_bkgColorUpdateTimer;
-	float _colorR;
-	float _colorG;
-	float _colorB;
-	float _colorTargetR;
-	float _colorTargetG;
-	float _colorTargetB;
+	QColor _bkgColor;
+	QColor _targetBkgColor;
 
 
 	//Load images used in application.
 	void initWindow();
 	void initButtons();
-	void initBackgroundColor(float r, float g, float b);
+	void initBackgroundColor(int r, int g, int b);
 
 public slots:
 	void quitAction();
@@ -66,7 +62,7 @@ public:
 
 	void setExpand(bool value);
 	bool getExpand();
-	void setBackgroundColor(float r, float g, float b);
+	void setBackgroundColor(int r, int g, int b);
 
 	MariaUICommandBar* getCommandBar();
 };

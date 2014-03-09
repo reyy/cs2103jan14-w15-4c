@@ -4,7 +4,7 @@
 #include "MariaInterpreter.h"
 
 const float MariaUI::FLOW_FACTOR=0.1;
-const float MariaUI::VALUE_THRESHOLD=0.5;
+const float MariaUI::VALUE_THRESHOLD=1.0;
 const float MariaUI::CLOSE_BUTTON_X_OFFSET=0.0;
 const float MariaUI::CLOSE_BUTTON_Y_OFFSET=0.0;
 const float MariaUI::WINDOW_DEFAULT_COLOR_R=186;
@@ -53,10 +53,13 @@ void MariaUI::initButtons() {
 	connect(_btClose, SIGNAL(clicked()),this , SLOT(quitAction()));
 }
 
-void MariaUI::initBackgroundColor(float r, float g, float b) {
-	_colorR=_colorTargetR=r;
-	_colorG=_colorTargetG=g;
-	_colorB=_colorTargetB=b;
+void MariaUI::initBackgroundColor(int r, int g, int b) {
+	_bkgColor.setRed(r);
+	_bkgColor.setGreen(g);
+	_bkgColor.setBlue(b);
+	_targetBkgColor.setRed(r);
+	_targetBkgColor.setGreen(g);
+	_targetBkgColor.setBlue(b);
 
 	_bkgColorUpdateTimer = new QTimer(this);
     connect(_bkgColorUpdateTimer, SIGNAL(timeout()), this, SLOT(updateBackgroundColor()));
@@ -143,18 +146,19 @@ void MariaUI::quitAction() {
 }
 
 void MariaUI::updateBackgroundColor() {
-	if(abs(_colorR-_colorTargetR)>VALUE_THRESHOLD ||
-	   abs(_colorG-_colorTargetG)>VALUE_THRESHOLD ||
-	   abs(_colorB-_colorTargetB)>VALUE_THRESHOLD) {
-		_colorR+=(_colorTargetR-_colorR)*FLOW_FACTOR;
-		_colorG+=(_colorTargetG-_colorG)*FLOW_FACTOR;
-		_colorB+=(_colorTargetB-_colorB)*FLOW_FACTOR;
+
+	if(abs(_bkgColor.red()-_targetBkgColor.red())>VALUE_THRESHOLD ||
+	   abs(_bkgColor.green()-_targetBkgColor.green())>VALUE_THRESHOLD ||
+	   abs(_bkgColor.blue()-_targetBkgColor.blue())>VALUE_THRESHOLD) {
+			_bkgColor.setRed(_bkgColor.red()+(_targetBkgColor.red()-_bkgColor.red())*FLOW_FACTOR);
+			_bkgColor.setGreen(_bkgColor.green()+(_targetBkgColor.green()-_bkgColor.green())*FLOW_FACTOR);
+			_bkgColor.setBlue(_bkgColor.blue()+(_targetBkgColor.blue()-_bkgColor.blue())*FLOW_FACTOR);
 	} else {
 		if(_bkgColorUpdateTimer->isActive()) {
 			_bkgColorUpdateTimer->stop();
 		}
 	}
-	QString backgroundcolor=QString::number(_colorR)+","+QString::number(_colorG)+","+QString::number(_colorB);
+	QString backgroundcolor=QString::number(_bkgColor.red())+","+QString::number(_bkgColor.green())+","+QString::number(_bkgColor.blue());
 		this->setStyleSheet("QMainWindow  {background-color: rgb("+backgroundcolor+");min-width:400px;min-height:120px;}");
 }
 
@@ -262,10 +266,10 @@ bool MariaUI::getExpand() {
 	return _expandView;
 }
 
-void MariaUI::setBackgroundColor(float r, float g, float b) {
-	_colorTargetR=r;
-	_colorTargetG=g;
-	_colorTargetB=b;
+void MariaUI::setBackgroundColor(int r, int g, int b) {
+	_targetBkgColor.setRed(r);
+	_targetBkgColor.setGreen(g);
+	_targetBkgColor.setBlue(b);
 
 	if(!_bkgColorUpdateTimer->isActive()) {
 		_bkgColorUpdateTimer->start(50);
