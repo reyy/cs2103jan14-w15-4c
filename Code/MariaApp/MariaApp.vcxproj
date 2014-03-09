@@ -201,9 +201,11 @@
     <ClCompile Include="MariaUIDisplayPack.cpp" />
     <ClCompile Include="MariaUIHome.cpp" />
     <ClCompile Include="MariaUIRolling.cpp" />
-    <ClCompile Include="MariaUISetting.cpp" />
+    <ClCompile Include="MariaUIStateEdit.cpp" />
     <ClCompile Include="MariaUIStateHome.cpp" />
     <ClCompile Include="MariaUIStateLoading.cpp" />
+    <ClCompile Include="MariaUIStateSetting.cpp" />
+    <ClCompile Include="MariaUIStateShow.cpp" />
     <ClCompile Include="MariaUIStatus.cpp" />
     <ClCompile Include="MariaUITextbox.cpp" />
   </ItemGroup>
@@ -308,8 +310,11 @@
     </CustomBuild>
     <ClInclude Include="MariaUIDisplayPack.h" />
     <ClInclude Include="MariaUIHome.h" />
+    <ClInclude Include="MariaUIStateEdit.h" />
     <ClInclude Include="MariaUIStateHome.h" />
     <ClInclude Include="MariaUIStateLoading.h" />
+    <ClInclude Include="MariaUIStateSetting.h" />
+    <ClInclude Include="MariaUIStateShow.h" />
     <ClInclude Include="MariaUITextbox.h" />
     <CustomBuild Include="MariaUICalendar.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -338,7 +343,6 @@
       </Command>
     </CustomBuild>
     <ClInclude Include="MariaTime.h" />
-    <ClInclude Include="MariaUISetting.h" />
     <CustomBuild Include="MariaUIRolling.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing MariaUIRolling.h...</Message>

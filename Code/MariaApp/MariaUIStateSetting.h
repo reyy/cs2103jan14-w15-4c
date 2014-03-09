@@ -3,14 +3,11 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include "MariaStateObject.h"
-#include "MariaUIClock.h"
 
-class MariaUIStateHome : public MariaStateObject {
+class MariaUIStateSetting : public MariaStateObject {
 	
 	QMainWindow *_qmainWindow;
 
-	MariaUIClock *_clock;
-	
 	void initBeginState();
 	void initActiveState();
 	void initEndState();
@@ -18,7 +15,7 @@ class MariaUIStateHome : public MariaStateObject {
 	bool timerActiveState();
 	bool timerEndState();
 public:
-	MariaUIStateHome(QMainWindow* qmainWindow);
-	~MariaUIStateHome();
+	MariaUIStateSetting(QMainWindow* qmainWindow);
+	~MariaUIStateSetting();
 };
 

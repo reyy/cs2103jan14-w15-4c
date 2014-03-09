@@ -20,9 +20,6 @@
     <ClCompile Include="MariaTaskManager.cpp" />
     <ClCompile Include="MariaInterpreter.cpp" />
     <ClCompile Include="MariaTask.cpp" />
-    <ClCompile Include="MariaUISetting.cpp">
-      <Filter>UI\UIRolling</Filter>
-    </ClCompile>
     <ClCompile Include="MariaUICalendar.cpp">
       <Filter>UI\UIRolling</Filter>
     </ClCompile>
@@ -81,6 +78,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUICommandBar.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="MariaUIStateEdit.cpp">
+      <Filter>UI\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateShow.cpp">
+      <Filter>UI\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateSetting.cpp">
+      <Filter>UI\States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -137,9 +143,6 @@
     <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaTask.h" />
-    <ClInclude Include="MariaUISetting.h">
-      <Filter>UI\UIRolling</Filter>
-    </ClInclude>
     <ClInclude Include="MariaUITextbox.h">
       <Filter>UI\UIElement</Filter>
     </ClInclude>
@@ -156,6 +159,15 @@
       <Filter>UI\States</Filter>
     </ClInclude>
     <ClInclude Include="MariaUIStateHome.h">
+      <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateEdit.h">
+      <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateShow.h">
+      <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateSetting.h">
       <Filter>UI\States</Filter>
     </ClInclude>
   </ItemGroup>
