@@ -39,6 +39,8 @@ MariaUIStateLoading::~MariaUIStateLoading() {
 }
 
 void MariaUIStateLoading::initBeginState() {
+	((MariaUI*)_qmainWindow)->setBackgroundColor(MariaUI::WINDOW_DEFAULT_COLOR_R,MariaUI::WINDOW_DEFAULT_COLOR_G,MariaUI::WINDOW_DEFAULT_COLOR_B);
+
 	_displayText->setStyleSheet("color:#ffffff;");
 	_displayText->setAlignment(Qt::AlignCenter);
 	_displayText->setGeometry(QRect(_qmainWindow->width()*0.5-DISPLAY_TEXT_WIDTH*0.5, _qmainWindow->height()*TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH,DISPLAY_TEXT_HEIGHT));

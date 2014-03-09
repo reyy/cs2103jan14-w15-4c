@@ -13,6 +13,7 @@ MariaUIStateHome::~MariaUIStateHome() {
 void MariaUIStateHome::initBeginState() {
 	_clock->startUpdating();
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*0.5);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(255,127,39);
 }
 
 void MariaUIStateHome::initActiveState() {

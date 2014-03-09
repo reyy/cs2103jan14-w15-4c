@@ -41,7 +41,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 
 	if(commandType == MariaInterpreter::CommandType::Invalid) {
-		//mariaUI->getCommandBar()->getTextbox()->setQuestionText("I don't understand. Please try again.");
+		mariaUI->getCommandBar()->getTextbox()->setQuestionText("I don't understand. Please try again.");
 		mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
 		return false;
 	} else {

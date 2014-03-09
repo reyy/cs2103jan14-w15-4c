@@ -7,6 +7,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
+#include <QtCore/QTimer>
 #include <QtWidgets/qtoolbutton.h>
 #include "MariaUICommandBar.h"
 #include "MariaUITextbox.h"
@@ -15,12 +16,18 @@ class MariaLogic;
 class MariaUI : QMainWindow {
 	 Q_OBJECT
 
+public:
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
 	static const int WINDOW_DEFAULT_SIZE_X=480;
 	static const int WINDOW_DEFAULT_SIZE_Y=160;
 	static const int WINDOW_DEFAULT_EXPAND_SIZE_X=480;
 	static const int WINDOW_DEFAULT_EXPAND_SIZE_Y=360;
 	static const float CLOSE_BUTTON_X_OFFSET;
 	static const float CLOSE_BUTTON_Y_OFFSET;
+	static const float WINDOW_DEFAULT_COLOR_R;
+	static const float WINDOW_DEFAULT_COLOR_G;
+	static const float WINDOW_DEFAULT_COLOR_B;
 
 private:
 	MariaLogic *_mariaLogic;
@@ -28,15 +35,26 @@ private:
 	MariaUICommandBar* _commandBar;
 
 	QToolButton *_btClose;
-	QString _backgroundColor;
 	bool _expandView;
+	QTimer *_bkgColorUpdateTimer;
+	float _colorR;
+	float _colorG;
+	float _colorB;
+	float _colorTargetR;
+	float _colorTargetG;
+	float _colorTargetB;
+
 
 	//Load images used in application.
 	void initWindow();
 	void initButtons();
+	void initBackgroundColor(float r, float g, float b);
 
 public slots:
 	void quitAction();
+
+protected slots:
+	void updateBackgroundColor();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
@@ -48,7 +66,7 @@ public:
 
 	void setExpand(bool value);
 	bool getExpand();
-	void setBackgroundColor(const QString text);
+	void setBackgroundColor(float r, float g, float b);
 
 	MariaUICommandBar* getCommandBar();
 };

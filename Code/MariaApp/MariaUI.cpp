@@ -3,14 +3,20 @@
 #include "MariaLogic.h"
 #include "MariaInterpreter.h"
 
+const float MariaUI::FLOW_FACTOR=0.1;
+const float MariaUI::VALUE_THRESHOLD=0.5;
 const float MariaUI::CLOSE_BUTTON_X_OFFSET=0.0;
 const float MariaUI::CLOSE_BUTTON_Y_OFFSET=0.0;
+const float MariaUI::WINDOW_DEFAULT_COLOR_R=186;
+const float MariaUI::WINDOW_DEFAULT_COLOR_G=199;
+const float MariaUI::WINDOW_DEFAULT_COLOR_B=22;
 
 MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
 	_mariaLogic = mariaLogic;
 
 	initWindow();
 	initButtons();
+	initBackgroundColor(WINDOW_DEFAULT_COLOR_R,WINDOW_DEFAULT_COLOR_G,WINDOW_DEFAULT_COLOR_B);
 	_commandBar = new MariaUICommandBar(this);
 	_commandBar->getTextbox()->setFocus();
 	show();
@@ -27,8 +33,6 @@ void MariaUI::initWindow() {
 	if (objectName().isEmpty()) {
 		setObjectName(QStringLiteral("MariaUI"));
 	}
-
-	this->setStyleSheet("QMainWindow  {background-color: rgb(186,199,22);min-width:400px;min-height:120px;}");
 	setWindowFlags( Qt::FramelessWindowHint );
 	setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
 
@@ -47,6 +51,16 @@ void MariaUI::initButtons() {
 	_btClose->setGeometry(QRect(width()-imageHandleCloseButton.width()+CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
 
 	connect(_btClose, SIGNAL(clicked()),this , SLOT(quitAction()));
+}
+
+void MariaUI::initBackgroundColor(float r, float g, float b) {
+	_colorR=_colorTargetR=r;
+	_colorG=_colorTargetG=g;
+	_colorB=_colorTargetB=b;
+
+	_bkgColorUpdateTimer = new QTimer(this);
+    connect(_bkgColorUpdateTimer, SIGNAL(timeout()), this, SLOT(updateBackgroundColor()));
+	updateBackgroundColor();
 }
 
 /*
@@ -126,6 +140,22 @@ void MariaUI::updateStatePosAnimation() {
 */
 void MariaUI::quitAction() {
 	_mariaLogic->processCommand("quit");
+}
+
+void MariaUI::updateBackgroundColor() {
+	if(abs(_colorR-_colorTargetR)>VALUE_THRESHOLD ||
+	   abs(_colorG-_colorTargetG)>VALUE_THRESHOLD ||
+	   abs(_colorB-_colorTargetB)>VALUE_THRESHOLD) {
+		_colorR+=(_colorTargetR-_colorR)*FLOW_FACTOR;
+		_colorG+=(_colorTargetG-_colorG)*FLOW_FACTOR;
+		_colorB+=(_colorTargetB-_colorB)*FLOW_FACTOR;
+	} else {
+		if(_bkgColorUpdateTimer->isActive()) {
+			_bkgColorUpdateTimer->stop();
+		}
+	}
+	QString backgroundcolor=QString::number(_colorR)+","+QString::number(_colorG)+","+QString::number(_colorB);
+		this->setStyleSheet("QMainWindow  {background-color: rgb("+backgroundcolor+");min-width:400px;min-height:120px;}");
 }
 
 void MariaUI::resizeEvent(QResizeEvent* event) {
@@ -232,9 +262,14 @@ bool MariaUI::getExpand() {
 	return _expandView;
 }
 
-void MariaUI::setBackgroundColor(const QString text) {
-	_backgroundColor=text;
-	this->setStyleSheet("QMainWindow  {background-color: "+text+";min-width:400px;min-height:120px;}");
+void MariaUI::setBackgroundColor(float r, float g, float b) {
+	_colorTargetR=r;
+	_colorTargetG=g;
+	_colorTargetB=b;
+
+	if(!_bkgColorUpdateTimer->isActive()) {
+		_bkgColorUpdateTimer->start(50);
+	}
 }
 
 MariaUICommandBar * MariaUI::getCommandBar() {
