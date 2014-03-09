@@ -3,7 +3,7 @@
 #include <QtWidgets/qlabel.h>
 #include "MariaTask.h"
 
-class MariaUIDisplayPack{
+class MariaUITask{
 private:
 	float _destinationX;
 	float _destinationY;
@@ -15,8 +15,8 @@ private:
 	float _calendarUnit;
 
 public:
-	MariaUIDisplayPack(QMainWindow *parent, MariaTask task, float calendarUnit);
-	~MariaUIDisplayPack();
+	MariaUITask(QMainWindow *parent, MariaTask task, float calendarUnit);
+	~MariaUITask();
 
 	void setDestinationX(float x);
 	void setDestinationY(float y);

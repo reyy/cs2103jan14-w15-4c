@@ -36,9 +36,6 @@
       <Filter>UI\UIElement</Filter>
     </ClCompile>
     <ClCompile Include="MariaTime.cpp" />
-    <ClCompile Include="MariaUIDisplayPack.cpp">
-      <Filter>UI\UIRolling</Filter>
-    </ClCompile>
     <ClCompile Include="MariaFileManager.cpp" />
     <ClCompile Include="MariaUIHome.cpp">
       <Filter>UI\UIRolling</Filter>
@@ -86,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="MariaUIStateSetting.cpp">
       <Filter>UI\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUITask.cpp">
+      <Filter>UI\UIElement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,9 +147,6 @@
       <Filter>UI\UIElement</Filter>
     </ClInclude>
     <ClInclude Include="MariaTime.h" />
-    <ClInclude Include="MariaUIDisplayPack.h">
-      <Filter>UI\UIRolling</Filter>
-    </ClInclude>
     <ClInclude Include="MariaFileManager.h" />
     <ClInclude Include="MariaUIHome.h">
       <Filter>UI\UIRolling</Filter>
@@ -169,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="MariaUIStateSetting.h">
       <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUITask.h">
+      <Filter>UI\UIElement</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
-#include "MariaUIDisplayPack.h"
+#include "MariaUITask.h"
 #include "MariaTime.h"
 
-MariaUIDisplayPack::MariaUIDisplayPack(QMainWindow *parent, MariaTask task, float calendarUnit) {
+MariaUITask::MariaUITask(QMainWindow *parent, MariaTask task, float calendarUnit) {
 	_parent=parent;
 
 	_displayTitle = new QLabel(_parent);
@@ -32,27 +32,27 @@ MariaUIDisplayPack::MariaUIDisplayPack(QMainWindow *parent, MariaTask task, floa
 	_y=0;
 }
 
-MariaUIDisplayPack::~MariaUIDisplayPack() {
+MariaUITask::~MariaUITask() {
 	delete _displayTitle;
 }
 
-void MariaUIDisplayPack::setDestinationX(float x) {
+void MariaUITask::setDestinationX(float x) {
 	_destinationX=x;
 }
 
-void MariaUIDisplayPack::setDestinationY(float y) {
+void MariaUITask::setDestinationY(float y) {
 	_destinationY=y;
 }
 
-void MariaUIDisplayPack::setRealX(float x) {
+void MariaUITask::setRealX(float x) {
 	_x=x;
 }
 
-void MariaUIDisplayPack::setRealY(float y) {
+void MariaUITask::setRealY(float y) {
 	_y=y;
 }
 
-bool MariaUIDisplayPack::isCoordinateMatch() {
+bool MariaUITask::isCoordinateMatch() {
 	if(abs(_x-_destinationX)<0.5&&abs(_y-_destinationY)<0.5) {
 		return true;
 	} else {
@@ -60,7 +60,7 @@ bool MariaUIDisplayPack::isCoordinateMatch() {
 	}
 }
 
-bool MariaUIDisplayPack::updatePosition() {
+bool MariaUITask::updatePosition() {
 	if(!isCoordinateMatch()) {
 		_x+=(_destinationX-_x)*0.01;
 		_y+=(_destinationY-_y)*0.01;
@@ -70,14 +70,14 @@ bool MariaUIDisplayPack::updatePosition() {
 	}
 }
 
-void MariaUIDisplayPack::updateGUI(float layerX,float layerY) {
+void MariaUITask::updateGUI(float layerX,float layerY) {
 	_displayTitle->setGeometry(QRect(layerX+_x,layerY+_y,_calendarUnit,14));
 }
 
-void MariaUIDisplayPack::show() {
+void MariaUITask::show() {
 	_displayTitle->show();
 }
 
-void MariaUIDisplayPack::hide() {
+void MariaUITask::hide() {
 	_displayTitle->hide();
 }

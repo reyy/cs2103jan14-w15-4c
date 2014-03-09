@@ -61,7 +61,7 @@ void MariaUICalendar::updateStateMainAnimation() {
 	//for display.
 	if(getCurrentState()==DURING) {
 		while(_queuedisplayQueue.size()>0) {
-			MariaUIDisplayPack* temp=_queuedisplayQueue.front();
+			MariaUITask* temp=_queuedisplayQueue.front();
 			temp->show();
 			_displayPackStack.push_back(temp);
 			_queuedisplayQueue.pop();
@@ -118,7 +118,7 @@ void MariaUICalendar::createUI(VIEW_TYPE type) {
 
 void MariaUICalendar::addDisplay(MariaTask task) {
 
-	MariaUIDisplayPack* displayPack=new MariaUIDisplayPack(_parent,task,_calendarUnit);
+	MariaUITask* displayPack=new MariaUITask(_parent,task,_calendarUnit);
 	displayPack->setDestinationX(-_parent->width()*0.5+30);
 	displayPack->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
 	displayPack->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);
