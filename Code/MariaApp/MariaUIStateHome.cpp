@@ -1,8 +1,14 @@
 #include "MariaUIStateHome.h"
 #include "MariaUI.h"
+#include "MariaTaskManager.h"
 
-MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE=0.6;
+const float MariaUIStateHome::TASK_STARTHEIGHT_DIFFERENCE=22.0;
+
+MariaUIStateHome::MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
 	_qmainWindow=qmainWindow;
+	_taskManager=taskManager;
+
 	_clock=new MariaUIClock(_qmainWindow);
 }
 
@@ -17,7 +23,10 @@ void MariaUIStateHome::initBeginState() {
 }
 
 void MariaUIStateHome::initActiveState() {
-	
+	vector<MariaTask*> tempList = _taskManager->findTask("");
+	for(MariaTask* temp : tempList){
+		addTask(*temp);
+	}
 }
 
 void MariaUIStateHome::initEndState() {
@@ -36,4 +45,28 @@ bool MariaUIStateHome::timerActiveState() {
 bool MariaUIStateHome::timerEndState() {
 	_clock->updateGUI(getPosition());
 	return false;
+}
+
+void MariaUIStateHome::addTask(MariaTask task) {
+	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width()-TEXTBOX_X_OFFSET*2);
+
+	temp->setPosition(QPointF(_qmainWindow->width(),_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
+	temp->setDestination(QPointF(TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
+	temp->show();
+
+	_taskStack.push_back(temp);
+}
+
+void MariaUIStateHome::eraseTask(int index) {
+
+}
+
+void MariaUIStateHome::clearTask() {
+	for(int i=0;i<_taskStack.size();i++) {
+		delete _taskStack.at(i);
+	}
+
+	while(_taskStack.size()>0) {
+		_taskStack.pop_back();
+	}
 }

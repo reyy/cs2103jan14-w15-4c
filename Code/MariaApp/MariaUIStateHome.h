@@ -7,19 +7,19 @@
 #include "MariaUITask.h"
 #include "MariaTask.h"
 
+class MariaTaskManager;
 class MariaUIStateHome : public MariaStateObject {
 public:
-	typedef enum {
-		FLOATING,
-		DEADLINE,
-		TIMED
-	} TYPE_OF_TASK;
+	static const int TEXTBOX_X_OFFSET=30;
+	static const float TASK_STARTHEIGHT_SCALE;
+	static const float TASK_STARTHEIGHT_DIFFERENCE;
+
 private:
 	QMainWindow *_qmainWindow;
+	MariaTaskManager* _taskManager;
 
 	MariaUIClock *_clock;
-	std::vector<MariaUITask*> _floatingStack;
-	std::vector<MariaUITask*> _deadlineStack;
+	std::vector<MariaUITask*> _taskStack;
 
 	void initBeginState();
 	void initActiveState();
@@ -28,11 +28,11 @@ private:
 	bool timerActiveState();
 	bool timerEndState();
 public:
-	MariaUIStateHome(QMainWindow* qmainWindow);
+	MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow);
 	~MariaUIStateHome();
 
 	void addTask(MariaTask task);
-	void eraseTask(TYPE_OF_TASK,int index);
-	void clearTask(TYPE_OF_TASK);
+	void eraseTask(int index);
+	void clearTask();
 };
 

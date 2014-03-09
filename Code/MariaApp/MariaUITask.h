@@ -1,34 +1,48 @@
 #pragma once
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+#include <string>
 #include "MariaTask.h"
 
-class MariaUITask{
-private:
-	float _destinationX;
-	float _destinationY;
-	float _x;
-	float _y;
+class MariaUITask : QWidget{
+	Q_OBJECT
+public:
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const float TASK_HEIGHT;
+	static const string MESSAGE_DEADLINETASK_DUE;
+	static const string MESSAGE_DEADLINETASK_OVERDUE;
+	static const string MESSAGE_TIMEDTASK_BEFORE;
+	static const string MESSAGE_TIMEDTASK_AFTER;
 
-	QMainWindow *_parent;
+private:
+	QMainWindow * _qmainWindow;
+	QPointF _destination;
+	QPointF _position;
+	
 	QLabel *_displayTitle;
-	float _calendarUnit;
+	MariaTask::TaskType _taskType;
+	MariaTime _deadline;
+
+	QLabel *_timeText;
+	float _width;
+	
+	QTimer *_updatePositionTimer;
+	QTimer *_updateTimeTextTimer;
+
+protected slots:
+	bool updatePosition();
+	void updateTimeText();
 
 public:
-	MariaUITask(QMainWindow *parent, MariaTask task, float calendarUnit);
+	MariaUITask(QMainWindow *qmainWindow, MariaTask task, float width);
 	~MariaUITask();
 
-	void setDestinationX(float x);
-	void setDestinationY(float y);
-	void setRealX(float x);
-	void setRealY(float y);
-
-	bool isCoordinateMatch();
-
-	//Updates the position of x and y to the destination x and y.
-	//@returns false if there is nothing to update.
-	bool updatePosition();
-	void updateGUI(float layerX,float layerY);
+	void setPosition(QPointF position);
+	QPointF getPosition();
+	void setDestination(QPointF destination);
+	QPointF getDestination();
 
 	void show();
 	void hide();

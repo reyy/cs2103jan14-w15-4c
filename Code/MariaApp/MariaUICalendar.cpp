@@ -55,7 +55,7 @@ void MariaUICalendar::addLine(int amount) {
 }
 
 void MariaUICalendar::updateStateMainAnimation() {
-	bool canEnd=true;
+	/*bool canEnd=true;
 
 	//Pop all queued task from addTask into the actual stack
 	//for display.
@@ -85,14 +85,14 @@ void MariaUICalendar::updateStateMainAnimation() {
 
 	if(canEnd) {
 		stopMainAnimationTimer();
-	}
+	}*/
 }
 
 void MariaUICalendar::clearQueueDisplay() {
-	while(_queuedisplayQueue.size()>0) {
+	/*while(_queuedisplayQueue.size()>0) {
 		delete _queuedisplayQueue.front();
 		_queuedisplayQueue.pop();
-	}
+	}*/
 }
 
 void MariaUICalendar::createUI(VIEW_TYPE type) {
@@ -117,7 +117,7 @@ void MariaUICalendar::createUI(VIEW_TYPE type) {
 }
 
 void MariaUICalendar::addDisplay(MariaTask task) {
-
+	/*
 	MariaUITask* displayPack=new MariaUITask(_parent,task,_calendarUnit);
 	displayPack->setDestinationX(-_parent->width()*0.5+30);
 	displayPack->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
@@ -126,7 +126,7 @@ void MariaUICalendar::addDisplay(MariaTask task) {
 	displayPack->hide();
 
 	_queuedisplayQueue.push(displayPack);
-	startMainAnimationTimer();
+	startMainAnimationTimer();*/
 }
 
 void MariaUICalendar::clearActiveDisplay() {
@@ -147,7 +147,7 @@ void MariaUICalendar::clearActiveDisplay() {
 }
 
 void MariaUICalendar::updateGUI() {
-	_currentTimeLine->setGeometry(QRect(getRollingX()-6,getRollingY()-25,12,78));
+	/*_currentTimeLine->setGeometry(QRect(getRollingX()-6,getRollingY()-25,12,78));
 	for(int i=0;i<_lineStack.size();i++) {
 		_lineStack.at(i)->setGeometry(QRect(30+_calendarUnit*i+getRollingX()-_parent->width()*0.5-1,getRollingY()-12,2,60));
 	}
@@ -158,5 +158,5 @@ void MariaUICalendar::updateGUI() {
 
 	for(int i=0;i<_displayPackStack.size();i++) {
 		_displayPackStack.at(i)->updateGUI(getRollingX(),getRollingY());
-	}
+	}*/
 }

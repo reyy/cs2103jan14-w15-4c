@@ -7,7 +7,7 @@
 class MariaUIStatus : QWidget {
 	Q_OBJECT
 
-	static const int TEXTBOX_X_OFFSET=30;
+		static const int TEXTBOX_X_OFFSET=30;
 	static const int AMOUNT_OF_IMAGES=6;
 	static const int IMAGE_INDEX_OK=0;
 	static const int IMAGE_INDEX_UNKNOWN=1;
@@ -28,7 +28,7 @@ public:
 
 private:
 	QMainWindow *_qmainWindow;
-	
+
 	STATUS_TYPE _currentStatus;
 	int _statusImageIndex;
 	QPixmap *_imageHandle[AMOUNT_OF_IMAGES];
@@ -37,8 +37,8 @@ private:
 
 	void loadImages();
 
-protected slots:
-	void updateStatusAnimation();
+	protected slots:
+		void updateStatusAnimation();
 
 public:
 	MariaUIStatus(QMainWindow *qmainWindow);

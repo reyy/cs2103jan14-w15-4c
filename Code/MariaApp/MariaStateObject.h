@@ -2,10 +2,11 @@
 #include <QtWidgets/QMainWindow>
 
 class MariaStateObject {
-private:
+public:
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 
+private:
 	QMainWindow* _qmainWindow;
 
 	QPointF _position;

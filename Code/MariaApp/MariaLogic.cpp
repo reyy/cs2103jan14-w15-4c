@@ -14,7 +14,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaStateManager->queueState(MariaStateManager::LOADING,temp);
 	temp->setDisplayText("Loading");
 	temp->setLoadingDone();
-	mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome((QMainWindow*)mariaUI));
+	mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
 	//mariaUI->setState(MariaUI::INTRO);
 	//mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
@@ -58,11 +58,19 @@ bool MariaLogic::processCommand(std::string inputText) {
 			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			std::string taskTitle = mariaInterpreter->getTitle(inputText);
-			if(mariaTaskManager->addTask(taskTitle, NULL, NULL)){
+
+			MariaTask *toAdd=mariaTaskManager->addTask(taskTitle, NULL, NULL);
+			if(toAdd!=NULL){
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '"+ taskTitle +"' has been added!");
+				
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
+				}
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
+
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			//mariaStateManager->queueState(MariaStateManager::CALENDAR);
