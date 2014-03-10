@@ -5,8 +5,8 @@
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaInterpreter = new MariaInterpreter();
-	mariaTaskManager = new MariaTaskManager();
 	mariaFileManager = new MariaFileManager();
+	mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
 	mariaUI = new MariaUI(this);
 	mariaStateManager = new MariaStateManager();
 	
@@ -18,6 +18,14 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->setState(MariaUI::INTRO);
 	//mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
+
+	try{
+		//mariaTaskManager = new MariaTaskManager(/*mariaFileManager->openFile()*/);
+	}catch(exception& e){
+		//todo: prompt user, file cannot be written!
+		//mariaTaskManager = new MariaTaskManager();
+	}
+	
 	//mariaUI->setState(MariaUI::HOME);
 
 
@@ -66,6 +74,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				//Check if the current state is the home state, do a live add.
 				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
 					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
+					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
 				}
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");

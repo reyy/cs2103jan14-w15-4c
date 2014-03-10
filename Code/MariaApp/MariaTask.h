@@ -20,8 +20,8 @@ public:
 	TaskType getType();
 	string getTitle();
 	string getDescription();
-	MariaTime getStart();
-	MariaTime getEnd();
+	MariaTime* getStart();
+	MariaTime* getEnd();
 	double getDuration();
 	
 	void setTitle(string);

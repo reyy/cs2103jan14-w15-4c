@@ -44,12 +44,12 @@ std::string MariaTask::getDescription(){
 	return description;
 }
 
-MariaTime MariaTask::getStart(){
-	return *start;
+MariaTime* MariaTask::getStart(){
+	return start;
 }
 
-MariaTime MariaTask::getEnd(){
-	return *end;
+MariaTime* MariaTask::getEnd(){
+	return end;
 }
 
 double MariaTask::getDuration() {
