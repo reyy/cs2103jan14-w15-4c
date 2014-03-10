@@ -16,5 +16,20 @@ namespace MariaTest {
 
 			delete program;
 		}
+
+		TEST_METHOD(Task_DeleteTask) {
+			MariaTaskManager* program = new MariaTaskManager();
+			
+			MariaTask * temp = program->addTask("new task");
+			MariaTask * temp2 = new MariaTask();
+			
+			Assert::IsFalse(program->taskList->empty());
+			Assert::IsFalse(program->archiveTask(temp2));
+			Assert::IsTrue(program->archiveTask(temp));
+			Assert::IsTrue(program->taskList->empty());
+
+			delete temp2;
+			delete program;
+		}
 	};
 }

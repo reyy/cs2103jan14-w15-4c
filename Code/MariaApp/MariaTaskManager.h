@@ -14,7 +14,7 @@ public:
 	vector<MariaTask*> findTask(string searchString);
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end);
 
-	bool archiveTask(MariaTask);
+	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!
 	bool deleteArchive();
 
 private:

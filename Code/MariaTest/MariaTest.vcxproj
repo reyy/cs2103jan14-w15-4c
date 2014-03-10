@@ -62,7 +62,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(QTDIR)\lib;..\MariaApp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\MariaApp\Debug\MariaInterpreter.obj;..\MariaApp\Debug\MariaTask.obj;..\MariaApp\Debug\MariaTaskManager.obj;..\MariaApp\Debug\MariaTime.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\MariaApp\Debug\MariaInterpreter.obj;..\MariaApp\Debug\MariaTask.obj;..\MariaApp\Debug\MariaTaskManager.obj;..\MariaApp\Debug\MariaTime.obj;..\MariaApp\Debug\MariaFileManager.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,6 +89,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileManagerTest.cpp" />
     <ClCompile Include="InterpreterTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

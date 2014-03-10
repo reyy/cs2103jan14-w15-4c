@@ -32,12 +32,24 @@ vector<MariaTask*> MariaTaskManager::findTask(std::string searchString){
 vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end){
 	vector<MariaTask*> returnList;
 
-	//for(MariaTask* temp : *taskList){
-	//	if(start == NULL && temp->getEnd() == end ||			 //Handle deadline tasks
-	//		temp->getStart() >= start && temp->getEnd() <= end){ //Handle timed
-	//			returnList.push_back(temp);
-	//	}
-	//}
+	for(MariaTask* temp : *taskList){
+		if(start == NULL && temp->getEnd() == end ||			 //Handle deadline tasks
+			temp->getStart() >= start && temp->getEnd() <= end){ //Handle timed
+				returnList.push_back(temp);
+		}
+	}
 
 	return returnList;
+}
+
+bool MariaTaskManager::archiveTask(MariaTask* task){
+	auto it = std::find(taskList->begin(), taskList->end(), task);
+
+	if(it != taskList->end()){
+		taskList->erase(it);
+		return true;
+	}else{
+		return false;
+	}
+	
 }
