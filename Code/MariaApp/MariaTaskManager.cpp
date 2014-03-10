@@ -11,10 +11,10 @@ MariaTaskManager::~MariaTaskManager(void){
 	delete taskList;
 }
 
-bool MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end){
+MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end){
 	MariaTask *tempTask = new MariaTask(name, start, end);
 	taskList->push_back(tempTask);
-	return true;
+	return tempTask;
 }
 
 vector<MariaTask*> MariaTaskManager::findTask(std::string searchString){

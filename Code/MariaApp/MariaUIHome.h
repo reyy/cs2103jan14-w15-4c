@@ -8,7 +8,7 @@
 #include "MariaUIRolling.h"
 #include "MariaTask.h"
 #include "MariaTime.h"
-#include "MariaUIDisplayPack.h"
+#include "MariaUITask.h"
 
 class MariaUIHome : public MariaUIRolling {
 private:
@@ -16,8 +16,8 @@ private:
 	QLabel *_currentTime;
 	QLabel *_currentDate;
 
-	std::vector<MariaUIDisplayPack*> _displayPackStack;
-	std::queue<MariaUIDisplayPack*> _queuedisplayQueue;
+	std::vector<MariaUITask*> _displayPackStack;
+	std::queue<MariaUITask*> _queuedisplayQueue;
 	
 	std::vector<QLabel *> _lineStack;
 	std::vector<QLabel *> _lineTimerStack;

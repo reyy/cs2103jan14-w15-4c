@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication>
 #include <string>
 #include "MariaUI.h"
+#include "MariaStateManager.h"
 #include "MariaInterpreter.h"
 #include "MariaTaskManager.h"
 #include "MariaFileManager.h"
@@ -16,6 +17,7 @@ public:
 
 private:
 	MariaUI				*mariaUI;
+	MariaStateManager	*mariaStateManager;
 	MariaInterpreter	*mariaInterpreter;
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;

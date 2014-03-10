@@ -47,13 +47,13 @@ void MariaUIHome::initImages() {
 }
 
 void MariaUIHome::updateStateMainAnimation() {
-	bool canEnd=true;
+	/*bool canEnd=true;
 
 	//Pop all queued task from addTask into the actual stack
 	//for display.
 	if(getCurrentState()==DURING) {
 		while(_queuedisplayQueue.size()>0) {
-			MariaUIDisplayPack* temp=_queuedisplayQueue.front();
+			MariaUITask* temp=_queuedisplayQueue.front();
 			temp->show();
 			_displayPackStack.push_back(temp);
 			_queuedisplayQueue.pop();
@@ -77,7 +77,7 @@ void MariaUIHome::updateStateMainAnimation() {
 
 	if(canEnd) {
 		stopMainAnimationTimer();
-	}
+	}*/
 }
 
 void MariaUIHome::clearQueueDisplay() {
@@ -92,7 +92,7 @@ void MariaUIHome::createUI() {
 
 void MariaUIHome::addDisplay(MariaTask task) {
 
-	MariaUIDisplayPack* displayPack=new MariaUIDisplayPack(_parent,task,100);
+	/*MariaUITask* displayPack=new MariaUITask(_parent,task,100);
 	displayPack->setDestinationX(-_parent->width()*0.5+30);
 	displayPack->setDestinationY(-20+(int)_queuedisplayQueue.size()*14);
 	displayPack->setRealX(_parent->width()*0.5+10+(int)_queuedisplayQueue.size()*10);
@@ -100,7 +100,7 @@ void MariaUIHome::addDisplay(MariaTask task) {
 	displayPack->hide();
 
 	_queuedisplayQueue.push(displayPack);
-	startMainAnimationTimer();
+	startMainAnimationTimer();*/
 }
 
 void MariaUIHome::clearActiveDisplay() {
@@ -121,9 +121,9 @@ void MariaUIHome::clearActiveDisplay() {
 }
 
 void MariaUIHome::updateGUI() {
-	_currentTime->setGeometry(QRect(getRollingX()+_parent->width()*0.5-30-100,getRollingY()-_parent->height()*0.5+20,100,25));
+	/*_currentTime->setGeometry(QRect(getRollingX()+_parent->width()*0.5-30-100,getRollingY()-_parent->height()*0.5+20,100,25));
 	_currentDate->setGeometry(QRect(getRollingX()+_parent->width()*0.5-30-100,getRollingY()-_parent->height()*0.5+40,100,15));
 	for(int i=0;i<_displayPackStack.size();i++) {
 		_displayPackStack.at(i)->updateGUI(getRollingX(),getRollingY());
-	}
+	}*/
 }

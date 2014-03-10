@@ -12,6 +12,12 @@ MariaTime::MariaTime(int year , int month , int day , int hour , int min , int s
 	timeStamp = mktime(&timeStruct);
 }
 
+MariaTime::MariaTime(time_t unixTime) {
+	timeStamp = unixTime;
+	time(&unixTime);
+	timeStruct	=*(localtime(&unixTime));
+}
+
 MariaTime::MariaTime(string value, string format){
 	strftime(strdup(value.c_str()), value.length(), format.c_str(), &timeStruct);
 	timeStamp = mktime(&timeStruct);
@@ -26,7 +32,13 @@ string MariaTime::get(string format){
 	return "";
 }
 
-time_t MariaTime::getUnixTime(){
+void MariaTime::set(time_t unixTime) {
+	timeStamp = unixTime;
+	time(&unixTime);
+	timeStruct	=*(localtime(&unixTime));
+}
+
+time_t MariaTime::get() {
 	return timeStamp;
 }
 

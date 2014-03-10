@@ -6,12 +6,15 @@ using namespace std;
 class MariaTime {
 public:
 	MariaTime(int year = 1901, int month = 1, int day = 1, int hour = 0, int min = 0, int sec = 0);
+	MariaTime(time_t unixTime);
 	MariaTime(string value, string format);
 
 	void set(string value, string format);
 	string get(string format);
 
-	time_t getUnixTime();
+	void set(time_t unixTime);
+	time_t get();
+
 	int getYear();
 	int getMonth();
 	int getDay();

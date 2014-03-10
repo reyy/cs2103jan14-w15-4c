@@ -9,84 +9,60 @@
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QTimer>
 #include <QtWidgets/qtoolbutton.h>
-#include <queue>
-#include "MariaUILoading.h"
-#include "MariaUICalendar.h"
-#include "MariaUIHome.h"
-#include "MariaUIStatus.h"
+#include "MariaUICommandBar.h"
 #include "MariaUITextbox.h"
 
-#define WINDOW_DEFAULT_SIZE_X 480
-#define WINDOW_DEFAULT_SIZE_Y 160
-
-#define WINDOW_DEFAULT_EXPAND_SIZE_X 480
-#define WINDOW_DEFAULT_EXPAND_SIZE_Y 360
-
-
 class MariaLogic;
-class MariaTaskManager;
 class MariaUI : QMainWindow {
 	 Q_OBJECT
+
 public:
-	enum STATE_TYPE {
-		DEFAULT, HOME, CALENDAR, SETTING, INTRO, QUIT
-	};
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const int WINDOW_DEFAULT_SIZE_X=480;
+	static const int WINDOW_DEFAULT_SIZE_Y=160;
+	static const int WINDOW_DEFAULT_EXPAND_SIZE_X=480;
+	static const int WINDOW_DEFAULT_EXPAND_SIZE_Y=360;
+	static const float CLOSE_BUTTON_X_OFFSET;
+	static const float CLOSE_BUTTON_Y_OFFSET;
+	static const float WINDOW_DEFAULT_COLOR_R;
+	static const float WINDOW_DEFAULT_COLOR_G;
+	static const float WINDOW_DEFAULT_COLOR_B;
+
 private:
 	MariaLogic *_mariaLogic;
-	MariaTaskManager *_mariaTaskManager;
+	
+	MariaUICommandBar* _commandBar;
 
-	MariaUILoading *_loading;
-	MariaUICalendar *_calendar;
-	MariaUIHome *_home;
-	MariaUIStatus *_status;
-	MariaUITextbox *_textbox;
-	
-	STATE_TYPE _currentState;
-	std::queue<STATE_TYPE> _stateQueue;		//The state to transit into.
-	QPointF _rollingCoord;
-	QPointF _destCoord;
-	bool _processingState;
-	QTimer *_statePreAnimationTimer;
-	QTimer *_statePosAnimationTimer;
-	
 	QToolButton *_btClose;
-	QString _backgroundColor;
 	bool _expandView;
+	QTimer *_bkgColorUpdateTimer;
+	QColor _bkgColor;
+	QColor _targetBkgColor;
+
 
 	//Load images used in application.
 	void initWindow();
-	void initState();
-	void initSubclasses();
 	void initButtons();
+	void initBackgroundColor(int r, int g, int b);
 
-private slots:
-	void updateStatePreAnimation();
-	void updateStatePosAnimation();
+public slots:
 	void quitAction();
+
+protected slots:
+	void updateBackgroundColor();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
 	void keyReleaseEvent(QKeyEvent* keyevent);
-	void beginNewState();
-	void endOldState();
 
 public:
-
-	MariaUI(MariaLogic *mariaLogic,MariaTaskManager *mariaTaskManager, QWidget *parent=0);
+	MariaUI(MariaLogic *mariaLogic, QWidget *parent = 0);
 	~MariaUI(void);
 
-	//Force UI Class to update values prematurelly.
-	void updateGUI();
-
-	void setState(STATE_TYPE type);
-	STATE_TYPE getState();
 	void setExpand(bool value);
 	bool getExpand();
-	void setBackgroundColor(const QString text);
-	
-	MariaUILoading* getLoading();
-	MariaUICalendar* getCalendar();
-	MariaUIHome* getHome();
-	MariaUIStatus* getStatus();
-	MariaUITextbox* getTextbox();
+	void setBackgroundColor(int r, int g, int b);
+
+	MariaUICommandBar* getCommandBar();
 };

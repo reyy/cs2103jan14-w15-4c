@@ -53,7 +53,7 @@ MariaTime* MariaTask::getEnd(){
 }
 
 double MariaTask::getDuration() {
-	return difftime(end->getUnixTime(),start->getUnixTime());
+	return difftime(end->get(),start->get());
 }
 
 void MariaTask::setTitle(string title){
