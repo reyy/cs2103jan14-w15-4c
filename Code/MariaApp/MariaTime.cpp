@@ -20,9 +20,10 @@ MariaTime::MariaTime(time_t unixTime) {
 
 MariaTime::MariaTime(string value){
 	int year;
-	sscanf (value.c_str(),"%d-%d-%d %d:%d:%d",&year,&timeStruct.tm_mon,&timeStruct.tm_mday,&timeStruct.tm_hour,&timeStruct.tm_min,&timeStruct.tm_sec);
+	int month;
+	sscanf (value.c_str(),"%d-%d-%d %d:%d:%d",&year,&month,&timeStruct.tm_mday,&timeStruct.tm_hour,&timeStruct.tm_min,&timeStruct.tm_sec);
 	timeStruct.tm_year = year - YEAR_OFFSET;
-
+	timeStruct.tm_mon = month - MONTH_OFFSET;
 	timeStamp = mktime(&timeStruct);
 	
 }
