@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="MariaLogic.cpp" />
+    <ClCompile Include="MariaUI.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUI.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUI.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUILoading.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUILoading.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUILoading.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIRolling.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIRolling.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIRolling.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaTaskManager.cpp" />
+    <ClCompile Include="MariaInterpreter.cpp" />
+    <ClCompile Include="MariaTask.cpp" />
+    <ClCompile Include="MariaUISetting.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUICalendar.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIStatus.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIStatus.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStatus.cpp">
+      <Filter>UI\UIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUITextbox.cpp">
+      <Filter>UI\UIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaTime.cpp" />
+    <ClCompile Include="MariaUIDisplayPack.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaFileManager.cpp" />
+    <ClCompile Include="MariaUIHome.cpp">
+      <Filter>UI\UIRolling</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="MariaUI.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUILoading.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUIRolling.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUICalendar.h">
+      <Filter>UI\UIRolling</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUIStatus.h">
+      <Filter>UI\UIElement</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{5b330d4f-a26b-4d4a-b09a-ead5c19551f6}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{da7c8907-9fde-4037-ba3a-0ae91b52d7a9}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{acfb5b7f-710a-49b3-8b2d-6adefe057b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\UIElement">
+      <UniqueIdentifier>{0e79132c-3e43-4d7c-8f68-4d97514f68c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\UIRolling">
+      <UniqueIdentifier>{4d6754ea-b654-46d2-a956-4b10a116a9c2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MariaTaskManager.h" />
+    <ClInclude Include="MariaInterpreter.h" />
+    <ClInclude Include="MariaLogic.h" />
+    <ClInclude Include="MariaTask.h" />
+    <ClInclude Include="MariaUISetting.h">
+      <Filter>UI\UIRolling</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUITextbox.h">
+      <Filter>UI\UIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaTime.h" />
+    <ClInclude Include="MariaUIDisplayPack.h">
+      <Filter>UI\UIRolling</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaFileManager.h" />
+    <ClInclude Include="MariaUIHome.h">
+      <Filter>UI\UIRolling</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
