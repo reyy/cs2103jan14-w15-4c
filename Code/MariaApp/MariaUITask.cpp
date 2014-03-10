@@ -1,7 +1,7 @@
 #include "MariaUITask.h"
 #include "MariaTime.h"
 
-const float MariaUITask::FLOW_FACTOR=0.01;
+const float MariaUITask::FLOW_FACTOR=0.1;
 const float MariaUITask::VALUE_THRESHOLD=1.0;
 const float MariaUITask::FONT_SIZE=10.0;
 const float MariaUITask::TASK_HEIGHT=14.0;
@@ -155,4 +155,8 @@ void MariaUITask::show() {
 void MariaUITask::hide() {
 	_displayTitle->hide();
 	_timeText->hide();
+}
+
+MariaTask * MariaUITask::getMariaTask() {
+	return _taskReference;
 }

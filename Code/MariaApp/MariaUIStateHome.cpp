@@ -29,6 +29,7 @@ void MariaUIStateHome::initActiveState() {
 	for(MariaTask* temp : tempList){
 		addTask(temp);
 	}
+	sortTask();
 }
 
 void MariaUIStateHome::initEndState() {
@@ -52,6 +53,21 @@ bool MariaUIStateHome::timerEndState() {
 	return false;
 }
 
+//Function determines which task shall be sorted as smaller.
+//Deadline task shall take precedence in the sort.
+//Followed by dateline task. Then floating task.
+bool MariaUIStateHome::sortTaskFunction(MariaUITask *i,MariaUITask *j) {
+
+	MariaTask *a=i->getMariaTask();
+	MariaTask *b=j->getMariaTask();
+	if(a->getType()==b->getType()) {
+
+		return false;
+	} else {
+		return (a->getType()<b->getType());
+	}
+}
+
 MariaUITask* MariaUIStateHome::addTask(MariaTask *task) {
 	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width()-TEXTBOX_X_OFFSET*2);
 
@@ -70,7 +86,8 @@ MariaUITask* MariaUIStateHome::eraseTask(int index) {
 	_taskStack.erase(_taskStack.begin()+index);
 
 	for(int i=0;i<_taskStack.size();i++) {
-		_taskStack.at(i)->setTitlePretext(std::to_string(i)+". ");
+		_taskStack.at(i)->setTitlePretext(std::to_string(i+1)+". ");
+		_taskStack.at(i)->setDestination(QPointF(TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*i));
 	}
 	return temp;
 }
@@ -82,5 +99,13 @@ void MariaUIStateHome::clearTask() {
 
 	while(_taskStack.size()>0) {
 		_taskStack.pop_back();
+	}
+}
+
+void MariaUIStateHome::sortTask() {
+	std::sort (_taskStack.begin(), _taskStack.end(), MariaUIStateHome::sortTaskFunction);
+	for(int i=0;i<_taskStack.size();i++) {
+		_taskStack.at(i)->setTitlePretext(std::to_string(i+1)+". ");
+		_taskStack.at(i)->setDestination(QPointF(TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*i));
 	}
 }

@@ -117,6 +117,9 @@
     <CustomBuild Include="MariaUITask.h">
       <Filter>UI\UIElement</Filter>
     </CustomBuild>
+    <CustomBuild Include="MariaUIStateHome.h">
+      <Filter>UI\States</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Generated Files">
@@ -162,9 +165,6 @@
     </ClInclude>
     <ClInclude Include="MariaStateObject.h" />
     <ClInclude Include="MariaUIStateLoading.h">
-      <Filter>UI\States</Filter>
-    </ClInclude>
-    <ClInclude Include="MariaUIStateHome.h">
       <Filter>UI\States</Filter>
     </ClInclude>
     <ClInclude Include="MariaUIStateEdit.h">
