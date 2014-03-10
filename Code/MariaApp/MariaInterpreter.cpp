@@ -11,13 +11,16 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 	CommandType command = Invalid;
 	vector<string> input;
 
+	if (!checkInputValidity(inputString)) {
+		return command;
+	}
+
 	if (inputString.size() > 0) {
+		inputString = trimWhiteSpace(inputString);
 		input = tokenizeString(inputString);
 	} else {
 		return command;
 	}
-
-	//TODO: Loop through all available keywords using map.
 
 	if (input[0] == "create") {
 		inputString = replaceText(inputString, "create", "");
@@ -35,6 +38,9 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 	} else if (input[0] == "show") {
 		inputString = replaceText(inputString, "show", "");
 		command = ShowAllTask;
+	} else if (input[0] == "edit") {
+		inputString = replaceText(inputString, "edit", "");
+		command = EditTask;
 	} else if (input[0] == "delete") {
 		inputString = replaceText(inputString, "delete", "");
 		command = DeleteTask;
@@ -51,59 +57,21 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 	return command;
 }
 
-MariaInterpreter::CommandType MariaInterpreter::getCommandTypeRegex(string &inputString) {
-	CommandType command = Invalid;
-
-	regex keywordExpression("create|show|delete|exit");
-	smatch result;
-
-	if (!regex_search(inputString, result, keywordExpression)) {
-		return CommandType::Invalid;
-	}
-
-	if (inputString == "create") {
-		inputString = replaceText(inputString, "create", "");
-		command = AddFloatingTask;
-	} else if (inputString == "show") {
-		inputString = replaceText(inputString, "show", "");
-		command = ShowAllTask;
-	} else if (inputString == "delete") {
-		inputString = replaceText(inputString, "delete", "");
-		command = DeleteTask;
-	} else if (inputString == "exit") {
-		inputString = replaceText(inputString, "exit", "");
-		command = Exit;
-	} else if (inputString == "quit") {
-		inputString = replaceText(inputString, "quit", "");
-		command = Quit;
-	}
-
-	inputString = trimWhiteSpace(inputString);
-
-	return command;
-}
-
 string MariaInterpreter::getTitle(string &inputString) {
 	string title;
 
 	int endOfTitlePos[2];
 
-	// Current endOfTitlePos keywords:
-	// 1. by
-	// 2. from
 	endOfTitlePos[0] = inputString.find(" by ");
 	endOfTitlePos[1] = inputString.find(" from ");
 
 	if (endOfTitlePos[0] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[0]);
-		//inputString = replaceText(inputString, " by ", "");
 	} else if (endOfTitlePos[1] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[1]);
-		//inputString = replaceText(inputString, " from ", "");
 	} else {
 		title = inputString;
 	}
-	//TODO: Loop through keyword bank to check for other definitions of endOfTitle keywords.
 
 	inputString = replaceText(inputString, title, "");
 	inputString = trimWhiteSpace(inputString);
@@ -169,6 +137,66 @@ MariaTime* MariaInterpreter::getEndTime(string &inputString) {
 	return endTime;
 }
 
+bool MariaInterpreter::checkInputValidity(string inputString) {
+	if (inputString.size() <= 0) {
+		return false;
+	}
+
+	// Let's get rid of any unnecessary spaces in the inputString.
+	inputString = trimWhiteSpace(inputString);
+
+	// Tokenize the inputString to help in the validation of the input.
+	vector<string> input = tokenizeString(inputString);
+
+	// Time to check the first word, which is supposed to be a keyword.
+	input[0] = lowercaseString(input[0]);
+	if (input[0] != "create" &&
+		input[0] != "edit" &&
+		input[0] != "show" &&
+		input[0] != "delete" &&
+		input[0] != "exit") {
+		return false;
+	}
+
+	// Now let's check if the input fulfils the minimum number of tokens.
+	if (input[0] == "create" && input.size() < 2) {
+		return false;
+	} else if (input[0] == "edit" && input.size() < 2) {
+		return false;
+	} else if (input[0] == "show" && input.size() < 1) {
+		return false;
+	} else if (input[0] == "delete" && input.size() < 2) {
+		return false;
+	} else if (input[0] == "exit" && input.size() < 1) {
+		return false;
+	}
+
+	// For our "create" command, we need to check if it is a floating,
+	// deadline or timed task. So we need to see if the respective
+	// keywords are present.
+	if (input[0] == "create") {
+		int keyword[3];
+
+		keyword[0] = inputString.find("from");
+		keyword[1] = inputString.find("to");
+		keyword[2] = inputString.find("by");
+
+		if (keyword[0] == string::npos && keyword[1] == string::npos && keyword[2] == string::npos) {
+			// Floating task.
+		} else if (keyword[0] == string::npos && keyword[1] == string::npos && keyword[2] != string::npos) {
+			// Deadline task.
+		} else if (keyword[0] != string::npos && keyword[1] != string::npos && keyword[2] == string::npos) {
+			// Timed task.
+		} else {
+			// Invalid format.
+			return false;
+		}
+	}
+
+	// Seems that all the requirements check out! Our input is valid!
+	return true;
+}
+
 string MariaInterpreter::replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly) {
 	regex term(oldText);
 
@@ -178,16 +206,6 @@ string MariaInterpreter::replaceText(string inputString, string oldText, string 
 		newText,
 		(firstInstanceOnly?regex_constants::format_first_only:regex_constants::match_default));
 }
-
-/*vector<string> MariaInterpreter::tokenizeString(string inputString) {
-	vector<string> token;
-	istringstream iss(inputString);
-	copy(istream_iterator<string>(iss),
-		istream_iterator<string>(),
-		back_inserter<vector<string>>(token));
-
-	return token;
-}*/
 
 vector<string> MariaInterpreter::tokenizeString(string inputString, char delimiter) {
 	vector<string> tokens;
@@ -199,6 +217,16 @@ vector<string> MariaInterpreter::tokenizeString(string inputString, char delimit
 	}
 
 	return tokens;
+}
+
+string MariaInterpreter::lowercaseString(string text) {
+	string toReturn = "";
+
+	for (int i = 0; i < text.size(); i++) {
+		toReturn += tolower(text[i]);
+	}
+
+	return toReturn;
 }
 
 string MariaInterpreter::trimWhiteSpaceLeft(string text) {

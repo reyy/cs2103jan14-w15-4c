@@ -4,267 +4,114 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace MariaTest {
-	TEST_CLASS(Intepreter_CommandTypeTest) {
+	TEST_CLASS(Interpreter_ValidityTest) {
 	public:
-		TEST_METHOD(Interpreter_CommandType_EmptyInput) {
+		TEST_METHOD(Interpreter_Valid_EmptyString_F) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "";
 
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::Invalid;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandType(input);
-
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
+			Assert::IsTrue(program->checkInputValidity(input));
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_CommandType_AddFloatingTask) {
+		TEST_METHOD(Interpreter_Valid_Create_F) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::AddFloatingTask;
-			MariaInterpreter::CommandType actual;
 
-			actual = program->getCommandType(input);
-
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
+			Assert::IsTrue(program->checkInputValidity(input));
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_CommandType_ShowAllTask) {
+		TEST_METHOD(Interpreter_Valid_CreateFloatingTask_T) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "create Meeting with John";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_CreateDeadlineTask_T) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "create Meeting with John by 14/02/14 13:00";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_CreateDeadlineTask_F) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "create Meeting with John by 14/02/14";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_CreateTimedTask_T) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "create Meeting with John from 14/02/14 13:00 to 14/02/14 14:00";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_Edit_F) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "edit";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_Show_T) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "show";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::ShowAllTask;
-			MariaInterpreter::CommandType actual;
 
-			actual = program->getCommandType(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
+			Assert::IsTrue(program->checkInputValidity(input));
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_CommandType_DeleteTask) {
+		TEST_METHOD(Interpreter_Valid_DeleteWithoutTitle_F) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "delete";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::DeleteTask;
-			MariaInterpreter::CommandType actual;
 
-			actual = program->getCommandType(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
+			Assert::IsTrue(program->checkInputValidity(input));
 
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_CommandType_Exit) {
+		TEST_METHOD(Interpreter_Valid_DeleteWithTask_T) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "delete Meeting with John";
+
+			Assert::IsTrue(program->checkInputValidity(input));
+
+			delete program;
+		}
+
+		TEST_METHOD(Interpreter_Valid_Exit_T) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "exit";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::Exit;
-			MariaInterpreter::CommandType actual;
 
-			actual = program->getCommandType(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-	};
-
-	TEST_CLASS(Intepreter_CommandTypeRegexTest) {
-	public:
-		TEST_METHOD(InterpreterR_CommandType_EmptyInput) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "";
-
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::Invalid;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandTypeRegex(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(InterpreterR_CommandType_AddFloatingTask) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "create";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::AddFloatingTask;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandTypeRegex(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(InterpreterR_CommandType_ShowAllTask) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "show";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::ShowAllTask;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandTypeRegex(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(InterpreterR_CommandType_DeleteTask) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "delete";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::DeleteTask;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandTypeRegex(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(InterpreterR_CommandType_Exit) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "exit";
-			MariaInterpreter::CommandType expected = MariaInterpreter::CommandType::Exit;
-			MariaInterpreter::CommandType actual;
-
-			actual = program->getCommandTypeRegex(input);
-			
-			Assert::AreEqual((int)expected, (int)actual);
-
-			// Check to see if the keyword has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-	};
-
-	TEST_CLASS(Intepreter_TitleTest) {
-	public:
-		TEST_METHOD(Interpreter_Title_EmptyInput) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "";
-
-			string expected = "";
-			string actual;
-
-			actual = program->getTitle(input);
-			Assert::AreEqual(expected, actual);
-
-			// Check to see if the title has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(Interpreter_Title_OneWord) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "meeting";
-
-			string expected = "meeting";
-			string actual;
-
-			actual = program->getTitle(input);
-			Assert::AreEqual(expected, actual);
-
-			// Check to see if the title has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(Interpreter_Title_TwoWords) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "family lunch";
-
-			string expected = "family lunch";
-			string actual;
-
-			actual = program->getTitle(input);
-			Assert::AreEqual(expected, actual);
-
-			// Check to see if the title has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(Interpreter_Title_ThreeWords) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "dinner with girlfriend";
-
-			string expected = "dinner with girlfriend";
-			string actual;
-
-			actual = program->getTitle(input);
-			Assert::AreEqual(expected, actual);
-
-			// Check to see if the title has been removed from the inputString
-			Assert::IsTrue(input == "");
-
-			delete program;
-		}
-
-		TEST_METHOD(Interpreter_Title_DeadlineTask) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "do homework by Thursday";
-
-			string expected = "do homework";
-			string actual;
-
-			actual = program->getTitle(input);
-			Assert::AreEqual(expected, actual);
-
-			// Check to see if the title and endOfTitle keyword has been removed from the inputString
-			Assert::IsTrue(input == "Thursday");
+			Assert::IsTrue(program->checkInputValidity(input));
 
 			delete program;
 		}
