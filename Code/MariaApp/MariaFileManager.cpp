@@ -96,6 +96,7 @@ MariaTask* MariaFileManager::stringToTask(string inputText[]){
 		}
 		
 	}
+	newTask->refreshTaskType();
 	return newTask;
 }
 
@@ -103,20 +104,28 @@ MariaTime* MariaFileManager::stringToTime(string inputText){
 	if(inputText == ""){
 		return NULL;
 	}else{
-		return new MariaTime(inputText,TIME_FORMAT);
+		return new MariaTime(inputText);
 	}
 }
 
 string MariaFileManager::taskToString(MariaTask *task){
 	
 	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE +
-							TASK_TITLE_FIELD	 + task->getTitle()			+ NEW_LINE +
-							TASK_DESC_FIELD		 + task->getDescription()	+ NEW_LINE +
-							TASK_STARTTIME_FIELD + task->getStart()->get(TIME_FORMAT)	+ NEW_LINE +
-							TASK_ENDTIME_FIELD	 + task->getEnd()->get(TIME_FORMAT)	+ NEW_LINE +
+							TASK_TITLE_FIELD	 + task->getTitle()					+ NEW_LINE +
+							TASK_DESC_FIELD		 + task->getDescription()			+ NEW_LINE +
+							TASK_STARTTIME_FIELD + timeToString(task->getStart())	+ NEW_LINE +
+							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		+ NEW_LINE +
 							TASK_CLOSE_FIELD    + NEW_LINE;
 
 	return returnString;
+}
+
+string MariaFileManager::timeToString(MariaTime* inputTime){
+	if(inputTime ==  NULL){
+		return "";
+	}else{
+		return inputTime->get(TIME_FORMAT);
+	}
 }
 
 // This method returns the first word from input string

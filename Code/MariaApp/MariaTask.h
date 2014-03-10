@@ -29,6 +29,8 @@ public:
 	void setStart(MariaTime*);
 	void setEnd(MariaTime*);
 
+	void refreshTaskType();
+
 private:
 	TaskType	type;
 	string		title;

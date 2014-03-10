@@ -5,13 +5,7 @@ MariaTask::MariaTask(string title,MariaTime* start, MariaTime* end){
 	this->start = start;
 	this->end = end;
 	
-	if(start == NULL && end == NULL){
-		type = TaskType::FLOATING;
-	}else if(start == NULL){
-		type = TaskType::DEADLINE;
-	}else{
-		type = TaskType::TIMED;
-	}
+	refreshTaskType();
 }
 
 MariaTask::MariaTask(string title, string description,MariaTime* start, MariaTime* end){
@@ -20,13 +14,7 @@ MariaTask::MariaTask(string title, string description,MariaTime* start, MariaTim
 	this->start = start;
 	this->end = end;
 	
-	if(start == NULL && end == NULL){
-		type = TaskType::FLOATING;
-	}else if(start == NULL){
-		type = TaskType::DEADLINE;
-	}else{
-		type = TaskType::TIMED;
-	}
+	refreshTaskType();
 }
 
 MariaTask::~MariaTask(void){
@@ -72,4 +60,14 @@ void MariaTask::setStart(MariaTime* start){
 void MariaTask::setEnd(MariaTime* end){
 	delete this->end;
 	this->end = end;
+}
+
+void MariaTask::refreshTaskType(){
+	if(start == NULL && end == NULL){
+		type = TaskType::FLOATING;
+	}else if(start == NULL){
+		type = TaskType::DEADLINE;
+	}else{
+		type = TaskType::TIMED;
+	}
 }

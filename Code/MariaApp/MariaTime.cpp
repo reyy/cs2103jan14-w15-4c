@@ -18,18 +18,20 @@ MariaTime::MariaTime(time_t unixTime) {
 	timeStruct	=*(localtime(&unixTime));
 }
 
-MariaTime::MariaTime(string value, string format){
-	strftime(strdup(value.c_str()), value.length(), format.c_str(), &timeStruct);
+MariaTime::MariaTime(string value){
+	int year;
+	sscanf (value.c_str(),"%d-%d-%d %d:%d:%d",&year,&timeStruct.tm_mon,&timeStruct.tm_mday,&timeStruct.tm_hour,&timeStruct.tm_min,&timeStruct.tm_sec);
+	timeStruct.tm_year = year-1900;
+
 	timeStamp = mktime(&timeStruct);
+	
 }
 
-void MariaTime::set(string value, string format){
-	strftime(strdup(value.c_str()), value.length(), format.c_str(), &timeStruct);
-	timeStamp = mktime(&timeStruct);
-}
 
 string MariaTime::get(string format){
-	return "";
+	char buff[20];
+	strftime(buff, 20, format.c_str() , localtime(&timeStamp));
+	return buff;
 }
 
 void MariaTime::set(time_t unixTime) {

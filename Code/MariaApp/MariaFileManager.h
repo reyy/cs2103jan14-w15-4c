@@ -31,6 +31,7 @@ private:
 	MariaTask* stringToTask(string inputText[]);
 	string taskToString(MariaTask *task);
 	MariaTime* stringToTime(string inputText);
+	string timeToString(MariaTime* inputTime);
 
 	string getFirstWord(string inputText);
 	string removeFirstWord(string inputText, string firstWord);
