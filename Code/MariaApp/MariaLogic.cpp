@@ -6,7 +6,7 @@
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
-	mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
+ 	mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
 	mariaUI = new MariaUI(this);
 	mariaStateManager = new MariaStateManager();
 	
@@ -18,14 +18,6 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->setState(MariaUI::INTRO);
 	//mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
-
-	try{
-		//mariaTaskManager = new MariaTaskManager(/*mariaFileManager->openFile()*/);
-	}catch(exception& e){
-		//todo: prompt user, file cannot be written!
-		//mariaTaskManager = new MariaTaskManager();
-	}
-	
 	//mariaUI->setState(MariaUI::HOME);
 
 
@@ -79,7 +71,39 @@ bool MariaLogic::processCommand(std::string inputText) {
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
+		} else if (commandType == MariaInterpreter::CommandType::AddDeadlineTask) {
+			std::string taskTitle = mariaInterpreter->getTitle(inputText);
+			MariaTime* endTime = mariaInterpreter->getEndTime(inputText);
 
+			MariaTask *toAdd=mariaTaskManager->addTask(taskTitle, NULL, endTime);
+			if(toAdd!=NULL){
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '"+ taskTitle +"' has been added!");
+				
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
+					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
+			}
+		} else if (commandType == MariaInterpreter::CommandType::AddTimedTask) {
+			std::string taskTitle = mariaInterpreter->getTitle(inputText);
+			MariaTime* startTime = mariaInterpreter->getStartTime(inputText);
+			MariaTime* endTime = mariaInterpreter->getEndTime(inputText);
+
+			MariaTask *toAdd=mariaTaskManager->addTask(taskTitle, startTime, endTime);
+			if(toAdd!=NULL){
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '"+ taskTitle +"' has been added!");
+				
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
+					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
+			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			//mariaStateManager->queueState(MariaStateManager::CALENDAR);
