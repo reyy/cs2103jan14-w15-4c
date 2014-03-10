@@ -87,30 +87,10 @@ bool MariaUITask::updatePosition() {
 }
 
 void MariaUITask::updateTimeText() {
-	MariaTime currentTime=MariaTime::getCurrentTime();
-	//MariaTime timeDifference=MariaTime::compareTime(_taskReference->getEnd(),&currentTime);
-	MariaTime timeDifference=currentTime;
-	
-	//Format time to string
-	string timeFormatted;
-	if(timeDifference.getYear()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getYear())+" years,";
+	if(_taskReference->getType() == MariaTask::FLOATING){
+		return;
 	}
-	if(timeDifference.getMonth()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getMonth())+" months,";
-	}
-	if(timeDifference.getDay()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getDay())+" days,";
-	}
-	if(timeDifference.getHour()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getHour())+" hours,";
-	}
-	if(timeDifference.getMin()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getMin())+" minutes,";
-	}
-	if(timeDifference.getSec()>0) {
-		timeFormatted+=" "+std::to_string(timeDifference.getSec())+" seconds";
-	}
+	string timeFormatted = _taskReference->getTimeFromNow();
 
 	switch(_taskReference->getType()) {
 	case MariaTask::DEADLINE:

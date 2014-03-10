@@ -23,6 +23,7 @@ public:
 	MariaTime* getStart();
 	MariaTime* getEnd();
 	double getDuration();
+	string getTimeFromNow();
 	
 	void setTitle(string);
 	void setDescription(string);

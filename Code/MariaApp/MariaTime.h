@@ -11,11 +11,12 @@ public:
 	MariaTime(int year = 1901, int month = 1, int day = 1, int hour = 0, int min = 0, int sec = 0);
 	MariaTime(time_t unixTime);
 	MariaTime(string value);
-
+	
+	string getTimeFromNow();
 	string get(string format);
+	time_t get();
 
 	void set(time_t unixTime);
-	time_t get();
 
 	int getYear();
 	int getMonth();
@@ -31,9 +32,8 @@ public:
 	void setMin(int);
 	void setSec(int);
 
-
 	static MariaTime getCurrentTime();
-	static MariaTime compareTime(MariaTime *a, MariaTime *b);
+	//static MariaTime compareTime(MariaTime *a, MariaTime *b);
 
 private:
 	time_t timeStamp;

@@ -44,6 +44,15 @@ double MariaTask::getDuration() {
 	return difftime(end->get(),start->get());
 }
 
+string MariaTask::getTimeFromNow(){
+	if(type == DEADLINE){
+		return getEnd()->getTimeFromNow();
+	}else if(type == TIMED){
+		return getStart()->getTimeFromNow();
+	}
+	else return "";
+}
+
 void MariaTask::setTitle(string title){
 	this->title = title;
 }

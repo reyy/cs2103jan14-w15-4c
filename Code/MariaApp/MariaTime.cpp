@@ -98,18 +98,50 @@ void MariaTime::setSec(int sec){
 	timeStamp = mktime(&timeStruct);
 }
 
+string MariaTime::getTimeFromNow(){
+	time_t currentTime;
+	time ( &currentTime );
+	double difference = difftime(timeStamp, currentTime);
+
+	if(difference < 0){
+		return "is overdue.";
+	}else if(difference > 60*60*24*30){
+		return  to_string((int)difference / ( 60*60*24*30)) +" Months";
+	}else if(difference > 60*60*24*7){
+		return to_string((int)difference / ( 60*60*24*7)) + " Weeks";
+	}else if(difference > 60*60*24){
+		return to_string((int)difference / ( 60*60*24)) + " Days";
+	}else{
+		string returnString;
+		if(((int)difference % 60) >0 ){
+			returnString += to_string((int)difference % 60) + " seconds";
+		}
+		difference /= 60;
+		if(((int)difference % 60) >0 ){
+			returnString = to_string((int)difference % 60) + " minutes" + returnString;
+		}
+		difference /= 60;
+		if(((int)difference % 24) >0 ){
+			returnString = to_string((int)difference % 24) + " hours" + returnString;
+		}
+		return returnString;
+	}
+	
+}
+
 MariaTime MariaTime::getCurrentTime() {
-	MariaTime toReturn;
+	
 	time_t rawtime;
 	time ( &rawtime );
-    toReturn.timeStruct = *localtime ( &rawtime );
-	toReturn.timeStruct.tm_year += YEAR_OFFSET;
+	MariaTime toReturn(rawtime);
+    //toReturn.timeStruct = *localtime ( &rawtime );
+	//toReturn.timeStruct.tm_year += YEAR_OFFSET;
 	return toReturn;
 }
 
-MariaTime MariaTime::compareTime(MariaTime *a, MariaTime *b){
+/*MariaTime MariaTime::compareTime(MariaTime *a, MariaTime *b){
 	double difference = difftime(a->get(), b->get());
-	MariaTime toReturn;
+	MariaTime toReturn(YEAR_OFFSET,MONTH_OFFSET,0,0,0,0);
 	toReturn.setSec((int)difference % 60);
 	difference /= 60;
 	toReturn.setMin((int)difference%(60));
@@ -118,4 +150,4 @@ MariaTime MariaTime::compareTime(MariaTime *a, MariaTime *b){
 	difference /= 24;
 	toReturn.setDay((int)difference);
 	return toReturn;
-}
+}*/
