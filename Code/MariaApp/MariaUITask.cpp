@@ -5,9 +5,10 @@ const float MariaUITask::FLOW_FACTOR=0.01;
 const float MariaUITask::VALUE_THRESHOLD=1.0;
 const float MariaUITask::FONT_SIZE=10.0;
 const float MariaUITask::TASK_HEIGHT=14.0;
-const string MariaUITask::MESSAGE_DEADLINETASK_DUE="Due in ";
-const string MariaUITask::MESSAGE_DEADLINETASK_OVERDUE="Overdue by ";
-const string MariaUITask::MESSAGE_TIMEDTASK_BEFORE="Starting in ";
+const float MariaUITask::TIMESTAMP_X_OFFSET=-3.0;
+const string MariaUITask::MESSAGE_DEADLINETASK_DUE="Due in";
+const string MariaUITask::MESSAGE_DEADLINETASK_OVERDUE="Overdue b ";
+const string MariaUITask::MESSAGE_TIMEDTASK_BEFORE="Starting in";
 const string MariaUITask::MESSAGE_TIMEDTASK_AFTER="Event started";
 
 MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width) {
@@ -37,6 +38,7 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 	_displayTitle->setAlignment(Qt::AlignLeft);
 	_timeText->setAlignment(Qt::AlignRight);
 	_displayTitle->hide();
+	_timeText->setStyleSheet("color:#ffffff;font-size:"+QString::number(FONT_SIZE)+"px;");
 	_timeText->hide();
 
 	_width=width;
@@ -47,6 +49,7 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 
 	_updateTimeTextTimer = new QTimer(this);
 	connect(_updateTimeTextTimer, SIGNAL(timeout()), this, SLOT(updateTimeText()));
+	updateTimeText();
 	_updateTimeTextTimer->start(1000);
 }
 
@@ -73,7 +76,7 @@ bool MariaUITask::updatePosition() {
 		_position.setX(_position.x()+(_destination.x()-_position.x())*FLOW_FACTOR);
 		_position.setY(_position.y()+(_destination.y()-_position.y())*FLOW_FACTOR);
 		_displayTitle->setGeometry(QRect(_position.x(),_position.y(),_width,TASK_HEIGHT));
-		_timeText->setGeometry(QRect(_position.x(),_position.y(),_width,TASK_HEIGHT));
+		_timeText->setGeometry(QRect(_position.x()+TIMESTAMP_X_OFFSET,_position.y(),_width,TASK_HEIGHT));
 		return true;
 	} else {
 		if(_updatePositionTimer->isActive()) {
@@ -85,19 +88,41 @@ bool MariaUITask::updatePosition() {
 
 void MariaUITask::updateTimeText() {
 	MariaTime currentTime=MariaTime::getCurrentTime();
-//	MariaTime timeDifference((time_t)difftime(_taskReference->getEnd()->get(),(time_t)currentTime.get()));
-	/*
-	switch(_taskType) {
+	//MariaTime timeDifference=MariaTime::compareTime(_taskReference->getEnd(),&currentTime);
+	MariaTime timeDifference=currentTime;
+	
+	//Format time to string
+	string timeFormatted;
+	if(timeDifference.getYear()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getYear())+" years,";
+	}
+	if(timeDifference.getMonth()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getMonth())+" months,";
+	}
+	if(timeDifference.getDay()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getDay())+" days,";
+	}
+	if(timeDifference.getHour()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getHour())+" hours,";
+	}
+	if(timeDifference.getMin()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getMin())+" minutes,";
+	}
+	if(timeDifference.getSec()>0) {
+		timeFormatted+=" "+std::to_string(timeDifference.getSec())+" seconds";
+	}
+
+	switch(_taskReference->getType()) {
 	case MariaTask::DEADLINE:
-		_timeText->setText(QString::fromStdString(MESSAGE_DEADLINETASK_DUE+));
+		_timeText->setText(QString::fromStdString(MESSAGE_DEADLINETASK_DUE+timeFormatted));
 		break;
 	case MariaTask::TIMED:
-		_timeText->setText(QString::fromStdString(MESSAGE_DEADLINETASK_DUE+));
+		_timeText->setText(QString::fromStdString(MESSAGE_TIMEDTASK_BEFORE+timeFormatted));
 		break;
 	default:
 		_timeText->setText("");
 		break;
-	}*/
+	}
 }
 
 void MariaUITask::setPosition(QPointF position) {
