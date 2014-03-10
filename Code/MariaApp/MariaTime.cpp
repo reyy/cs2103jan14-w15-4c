@@ -2,8 +2,8 @@
 
 
 MariaTime::MariaTime(int year , int month , int day , int hour , int min , int sec ){
-	timeStruct.tm_year = year-1900;
-	timeStruct.tm_mon = month-1;
+	timeStruct.tm_year = year - YEAR_OFFSET;
+	timeStruct.tm_mon = month - MONTH_OFFSET;
 	timeStruct.tm_mday = day;
 	timeStruct.tm_hour = hour;
 	timeStruct.tm_min = min;
@@ -21,7 +21,7 @@ MariaTime::MariaTime(time_t unixTime) {
 MariaTime::MariaTime(string value){
 	int year;
 	sscanf (value.c_str(),"%d-%d-%d %d:%d:%d",&year,&timeStruct.tm_mon,&timeStruct.tm_mday,&timeStruct.tm_hour,&timeStruct.tm_min,&timeStruct.tm_sec);
-	timeStruct.tm_year = year-1900;
+	timeStruct.tm_year = year - YEAR_OFFSET;
 
 	timeStamp = mktime(&timeStruct);
 	
@@ -49,7 +49,7 @@ int MariaTime::getYear(){
 }
 
 int MariaTime::getMonth(){
-	return timeStruct.tm_mon + 1; //todo: remove magic
+	return timeStruct.tm_mon + MONTH_OFFSET;
 }
 
 int MariaTime::getDay(){
@@ -73,6 +73,16 @@ MariaTime MariaTime::getCurrentTime() {
 	time_t rawtime;
 	time ( &rawtime );
     toReturn.timeStruct = *localtime ( &rawtime );
-	toReturn.timeStruct.tm_year+=1900;
+	toReturn.timeStruct.tm_year += YEAR_OFFSET;
+	return toReturn;
+}
+
+MariaTime MariaTime::compareTime(MariaTime *a, MariaTime *b){
+	MariaTime toReturn(a->getYear()-b->getYear() + YEAR_OFFSET,
+						a->getMonth() - b->getMonth() + MONTH_OFFSET,
+						a->getDay() - b->getDay(),
+						a->getHour() - b ->getHour(),
+						a->getMin() - b->getMin(),
+						a->getSec() - b->getSec() );
 	return toReturn;
 }
