@@ -41,3 +41,15 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end){
 
 	return returnList;
 }
+
+bool MariaTaskManager::archiveTask(MariaTask* task){
+	auto it = std::find(taskList->begin(), taskList->end(), task);
+
+	if(it != taskList->end()){
+		taskList->erase(it);
+		return true;
+	}else{
+		return false;
+	}
+	
+}
