@@ -24,11 +24,11 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask task, float width) 
 		break;
 	case MariaTask::DEADLINE:
 		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,0,128);border: 1px solid white;");
-		_deadline=task.getEnd();
+		_deadline=*task.getEnd();
 		break;
 	case MariaTask::TIMED:
 		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,128,128);border: 1px solid white;");
-		_deadline=task.getStart();
+		_deadline=*task.getStart();
 		break;
 	default:
 		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(0,0,255,128);border: 1px solid white;");

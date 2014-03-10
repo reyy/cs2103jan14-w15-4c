@@ -79,39 +79,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
-		} else if (commandType == MariaInterpreter::CommandType::AddDeadlineTask) {
-			std::string taskTitle = mariaInterpreter->getTitle(inputText);
-			MariaTime* endTime = mariaInterpreter->getEndTime(inputText);
 
-			MariaTask *toAdd = mariaTaskManager->addTask(taskTitle, NULL, endTime);
-
-			if(toAdd!=NULL){
-				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '"+ taskTitle +"' has been added!");
-				
-				//Check if the current state is the home state, do a live add.
-				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
-				}
-			} else {
-				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
-			}
-		} else if (commandType == MariaInterpreter::CommandType::AddTimedTask) {
-			std::string taskTitle = mariaInterpreter->getTitle(inputText);
-			MariaTime* startTime = mariaInterpreter->getStartTime(inputText);
-			MariaTime* endTime = mariaInterpreter->getEndTime(inputText);
-
-			MariaTask *toAdd = mariaTaskManager->addTask(taskTitle, startTime, endTime);
-
-			if(toAdd!=NULL){
-				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '"+ taskTitle +"' has been added!");
-				
-				//Check if the current state is the home state, do a live add.
-				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(*toAdd);
-				}
-			} else {
-				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
-			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			//mariaStateManager->queueState(MariaStateManager::CALENDAR);

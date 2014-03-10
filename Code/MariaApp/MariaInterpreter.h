@@ -5,7 +5,6 @@
 #include <sstream>
 #include <functional>
 #include <regex>
-#include "MariaTime.h"
 using namespace std;
 
 class MariaInterpreter{
@@ -37,9 +36,6 @@ public:
 
 	string getTitle(string &inputString);
 
-	MariaTime* getStartTime(string &inputString);
-	MariaTime* getEndTime(string &inputString);
-
 private:
 	map<string, CommandType> *userDefinedCommands;
 
@@ -51,8 +47,7 @@ private:
 	// By default, firstInstanceOnly is set to true.
 	string replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly = true);
 
-	//vector<string> tokenizeString(string inputString);
-	vector<string> tokenizeString(string inputString, char delimiter = ' ');
+	vector<string> tokenizeString(string inputString);
 
 	// To trim whitespace.
 	inline string trimWhiteSpaceLeft(string text);
