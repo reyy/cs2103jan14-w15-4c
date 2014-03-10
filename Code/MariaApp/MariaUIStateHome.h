@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm> 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include "MariaStateObject.h"
@@ -28,6 +29,8 @@ private:
 	bool timerBeginState();
 	bool timerActiveState();
 	bool timerEndState();
+
+	static bool sortTaskFunction(MariaUITask *i,MariaUITask *j);
 public:
 	MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow);
 	~MariaUIStateHome();
@@ -35,5 +38,6 @@ public:
 	MariaUITask* addTask(MariaTask *task);
 	MariaUITask* eraseTask(int index);
 	void clearTask();
+	void sortTask();
 };
 

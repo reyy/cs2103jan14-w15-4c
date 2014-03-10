@@ -10,6 +10,7 @@ MariaUIStateShow::~MariaUIStateShow() {
 
 void MariaUIStateShow::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*0.3);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(116,30,168);
 }
 
 void MariaUIStateShow::initActiveState() {

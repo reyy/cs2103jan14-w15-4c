@@ -26,7 +26,6 @@ private:
 	QLabel *_displayTitle;
 	MariaTask *_taskReference;
 
-
 	QLabel *_timeText;
 	float _width;
 	
@@ -50,4 +49,5 @@ public:
 	void show();
 	void hide();
 
+	MariaTask * getMariaTask();
 };
