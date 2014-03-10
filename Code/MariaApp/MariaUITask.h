@@ -12,6 +12,7 @@ public:
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE;
 	static const float TASK_HEIGHT;
+	static const float TIMESTAMP_X_OFFSET;
 	static const string MESSAGE_DEADLINETASK_DUE;
 	static const string MESSAGE_DEADLINETASK_OVERDUE;
 	static const string MESSAGE_TIMEDTASK_BEFORE;
