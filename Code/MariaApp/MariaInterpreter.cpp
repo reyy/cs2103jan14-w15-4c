@@ -21,7 +21,17 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 
 	if (input[0] == "create") {
 		inputString = replaceText(inputString, "create", "");
-		command = AddFloatingTask;
+
+		int fromKeywordPos = inputString.find("from");
+		int byKeywordPos = inputString.find("by");
+
+		if (fromKeywordPos == string::npos && byKeywordPos == string::npos) {
+			command = AddFloatingTask;
+		} else if (fromKeywordPos != string::npos && byKeywordPos == string::npos) {
+			command = AddTimedTask;
+		} else if (fromKeywordPos == string::npos && byKeywordPos != string::npos) {
+			command = AddDeadlineTask;
+		}
 	} else if (input[0] == "show") {
 		inputString = replaceText(inputString, "show", "");
 		command = ShowAllTask;
@@ -78,18 +88,20 @@ string MariaInterpreter::getTitle(string &inputString) {
 
 	int endOfTitlePos[2];
 
+	// Current endOfTitlePos keywords:
+	// 1. by
+	// 2. from
 	endOfTitlePos[0] = inputString.find(" by ");
 	endOfTitlePos[1] = inputString.find(" from ");
 
 	if (endOfTitlePos[0] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[0]);
-		inputString = replaceText(inputString, " by ", "");
+		//inputString = replaceText(inputString, " by ", "");
 	} else if (endOfTitlePos[1] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[1]);
-		inputString = replaceText(inputString, " from ", "");
+		//inputString = replaceText(inputString, " from ", "");
 	} else {
 		title = inputString;
-		inputString = replaceText(inputString, title, "");
 	}
 	//TODO: Loop through keyword bank to check for other definitions of endOfTitle keywords.
 
@@ -99,6 +111,62 @@ string MariaInterpreter::getTitle(string &inputString) {
 	title = trimWhiteSpace(title);
 
 	return title;
+}
+
+MariaTime* MariaInterpreter::getStartTime(string &inputString) {
+	MariaTime* startTime = NULL;
+	int endOfStartStringPos = inputString.find("to");
+	string startTimeString;
+
+	if (endOfStartStringPos == string::npos) {
+		startTimeString = inputString;
+	} else {
+		startTimeString = inputString.substr(0, endOfStartStringPos);
+	}
+
+	// Format: DD-MM-YY HH:MM
+	vector<string> firstPass = tokenizeString(startTimeString);
+	vector<string> date = tokenizeString(firstPass[1], '\/');
+	vector<string> time = tokenizeString(firstPass[2], ':');
+
+	int day = atoi(date[0].c_str());
+	int month = atoi(date[1].c_str());
+	// ASSUMPTION: date entered is in 2000s
+	int year = atoi(date[2].c_str()) + 2000;
+
+	int hour = atoi(time[0].c_str());
+	int min = atoi(time[1].c_str());
+
+	startTime = new MariaTime(year, month, day, hour, min);
+
+	inputString = replaceText(inputString, startTimeString, "");
+	inputString = trimWhiteSpace(inputString);
+
+	return startTime;
+}
+
+MariaTime* MariaInterpreter::getEndTime(string &inputString) {
+	MariaTime* endTime = NULL;
+
+	// Format: DD-MM-YY HH:MM
+	vector<string> firstPass = tokenizeString(inputString);
+	vector<string> date = tokenizeString(firstPass[1], '\/');
+	vector<string> time = tokenizeString(firstPass[2], ':');
+
+	int day = atoi(date[0].c_str());
+	int month = atoi(date[1].c_str());
+	// ASSUMPTION: date entered is in 2000s
+	int year = atoi(date[2].c_str()) + 2000;
+
+	int hour = atoi(time[0].c_str());
+	int min = atoi(time[1].c_str());
+
+	endTime = new MariaTime(year, month, day, hour, min);
+
+	inputString = replaceText(inputString, inputString, "");
+	inputString = trimWhiteSpace(inputString);
+
+	return endTime;
 }
 
 string MariaInterpreter::replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly) {
@@ -111,7 +179,7 @@ string MariaInterpreter::replaceText(string inputString, string oldText, string 
 		(firstInstanceOnly?regex_constants::format_first_only:regex_constants::match_default));
 }
 
-vector<string> MariaInterpreter::tokenizeString(string inputString) {
+/*vector<string> MariaInterpreter::tokenizeString(string inputString) {
 	vector<string> token;
 	istringstream iss(inputString);
 	copy(istream_iterator<string>(iss),
@@ -119,6 +187,18 @@ vector<string> MariaInterpreter::tokenizeString(string inputString) {
 		back_inserter<vector<string>>(token));
 
 	return token;
+}*/
+
+vector<string> MariaInterpreter::tokenizeString(string inputString, char delimiter) {
+	vector<string> tokens;
+	stringstream ss(inputString);
+	string token;
+
+	while (getline(ss, token, delimiter)) {
+		tokens.push_back(token);
+	}
+
+	return tokens;
 }
 
 string MariaInterpreter::trimWhiteSpaceLeft(string text) {
