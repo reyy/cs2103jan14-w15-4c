@@ -5,6 +5,9 @@ using namespace std;
 
 class MariaTime {
 public:
+	static const int YEAR_OFFSET = 1900;
+	static const int MONTH_OFFSET = 1;
+
 	MariaTime(int year = 1901, int month = 1, int day = 1, int hour = 0, int min = 0, int sec = 0);
 	MariaTime(time_t unixTime);
 	MariaTime(string value);
@@ -23,6 +26,7 @@ public:
 
 
 	static MariaTime getCurrentTime();
+	static MariaTime compareTime(MariaTime *a, MariaTime *b);
 
 private:
 	time_t timeStamp;
