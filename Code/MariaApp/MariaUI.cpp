@@ -33,6 +33,10 @@ MariaUI::~MariaUI() {
 void MariaUI::initWindow() {
 	_expandView=false;
 
+	QFont newFont("Century Gothic");
+	newFont.setStyleStrategy(QFont::PreferAntialias);
+	QApplication::setFont(newFont);
+
 	if (objectName().isEmpty()) {
 		setObjectName(QStringLiteral("MariaUI"));
 	}

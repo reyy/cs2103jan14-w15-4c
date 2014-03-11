@@ -24,6 +24,7 @@ public:
 	int getHour();
 	int getMin();
 	int getSec();
+	int getDayWeek();
 
 	void setYear(int);
 	void setMonth(int);
