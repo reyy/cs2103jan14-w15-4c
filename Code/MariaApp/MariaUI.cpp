@@ -256,13 +256,13 @@ void MariaUI::endOldState() {
 }
 */
 
-void MariaUI::showHideEvent(){
-	if(isVisible()){
-		hide();
-	}else{
-		show();
-	}
-}
+//void MariaUI::showHideEvent(){
+//	if(isVisible()){
+//		hide();
+//	}else{
+//		show();
+//	}
+//}
 
 void MariaUI::setExpand(bool value) {
 	_expandView=value;

@@ -28,7 +28,8 @@ public:
 	static const float WINDOW_DEFAULT_COLOR_R;
 	static const float WINDOW_DEFAULT_COLOR_G;
 	static const float WINDOW_DEFAULT_COLOR_B;
-
+signals:	
+	void hide();
 private:
 	MariaLogic *_mariaLogic;
 	
@@ -67,6 +68,5 @@ public:
 
 
 	MariaUICommandBar* getCommandBar();
-/*signals:*/	
-	void showHideEvent();
+
 };

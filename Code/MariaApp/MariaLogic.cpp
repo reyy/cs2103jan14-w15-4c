@@ -30,8 +30,8 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->getStatus()->setStatus(MariaUIStatus::WAIT);
 	mariaUI->getCommandBar()->getTextbox()->setSuggestText("create Meeting tomorrow for discussion");
 
-	/*QObject::connect((QObject)(this), &MariaUI::showHideEvent,
-                     (QObject)(this), &MariaLogic::doShowHide);*/
+	QObject::connect((this), SIGNAL (&MariaUI::hide),
+                     ((this), SLOT (&MariaLogic::doShowHide)));
 	_beginthread( &MariaLogic::doShowHideWrapper,0, this);
 	//CreateThread( NULL,0, (doShowHide), NULL,0,NULL);
 }
@@ -150,7 +150,7 @@ void MariaLogic::doShowHide(){
         TranslateMessage(&msg);
         DispatchMessage(&msg);
         if (msg.message == WM_HOTKEY){
-			emit mariaUI->showHideEvent();
+ 			emit mariaUI->hide();
 		}
     }
 }
