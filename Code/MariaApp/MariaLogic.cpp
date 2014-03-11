@@ -107,6 +107,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 			if (listOfTasks.size() == 1) {
 				listOfTasks[0]->setTitle(mariaInterpreter->getNewTitle(inputText));
+				if (mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->updateTask();
+				}
 			} else if (listOfTasks.size() == 0) {
 				// Task not found
 			} else {
