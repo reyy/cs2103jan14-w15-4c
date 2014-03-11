@@ -29,7 +29,7 @@ public:
 	static const float WINDOW_DEFAULT_COLOR_G;
 	static const float WINDOW_DEFAULT_COLOR_B;
 signals:	
-	void hide();
+	void triggerShowHideEvent();
 private:
 	MariaLogic *_mariaLogic;
 	
@@ -52,6 +52,7 @@ public slots:
 
 protected slots:
 	void updateBackgroundColor();
+	void showHideEvent();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
@@ -68,5 +69,5 @@ public:
 
 
 	MariaUICommandBar* getCommandBar();
-
+	
 };

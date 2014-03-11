@@ -20,6 +20,8 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	_commandBar = new MariaUICommandBar(this);
 	_commandBar->getTextbox()->setFocus();
 	show();
+
+	QObject::connect(this,SIGNAL(triggerShowHideEvent()),this, SLOT(showHideEvent()));
 }
 
 MariaUI::~MariaUI() {
@@ -256,13 +258,13 @@ void MariaUI::endOldState() {
 }
 */
 
-//void MariaUI::showHideEvent(){
-//	if(isVisible()){
-//		hide();
-//	}else{
-//		show();
-//	}
-//}
+void MariaUI::showHideEvent(){
+	if(isVisible()){
+		hide();
+	}else{
+		show();
+	}
+}
 
 void MariaUI::setExpand(bool value) {
 	_expandView=value;
