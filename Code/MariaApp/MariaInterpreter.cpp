@@ -50,9 +50,6 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 	} else if (input[0] == "exit") {
 		inputString = replaceText(inputString, "exit", "");
 		command = Exit;
-	} else if (input[0] == "quit") {
-		inputString = replaceText(inputString, "quit", "");
-		command = Quit;
 	}
 
 	inputString = trimWhiteSpace(inputString);
@@ -63,15 +60,18 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 string MariaInterpreter::getTitle(string &inputString) {
 	string title;
 
-	int endOfTitlePos[2];
+	int endOfTitlePos[3];
 
 	endOfTitlePos[0] = inputString.find(" by ");
 	endOfTitlePos[1] = inputString.find(" from ");
+	endOfTitlePos[2] = inputString.find(" change ");
 
 	if (endOfTitlePos[0] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[0]);
 	} else if (endOfTitlePos[1] != string::npos) {
 		title = inputString.substr(0, endOfTitlePos[1]);
+	} else if (endOfTitlePos[2] != string::npos) {
+		title = inputString.substr(0, endOfTitlePos[2]);
 	} else {
 		title = inputString;
 	}
@@ -82,6 +82,10 @@ string MariaInterpreter::getTitle(string &inputString) {
 	title = trimWhiteSpace(title);
 
 	return title;
+}
+
+string MariaInterpreter::getNewTitle(string &inputString) {
+	return inputString.substr(inputString.find("title")+6, inputString.size());
 }
 
 MariaTime* MariaInterpreter::getStartTime(string &inputString) {
@@ -174,9 +178,7 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 		return false;
 	} else if (input[0] == "home" && input.size() < 1) {
 		return false;
-	} else if (input[0] == "exit" && input.size() < 1) {
-		return false;
-	} else if (input[0] == "quit" && input.size() < 1) {
+	} else if ((input[0] == "exit" || input[0] == "quit") && input.size() < 1) {
 		return false;
 	}
 
@@ -198,6 +200,17 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 			// Timed task.
 		} else {
 			// Invalid format.
+			return false;
+		}
+	}
+
+	if (input[0] == "edit") {
+		int keyword[2];
+
+		keyword[0] = inputString.find("change");
+		keyword[1] = inputString.find("title");
+
+		if (keyword[0] == string::npos || keyword[1] == string::npos) {
 			return false;
 		}
 	}

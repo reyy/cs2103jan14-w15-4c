@@ -6,6 +6,8 @@
 
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
+	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/maria_icon.png")));
+
 	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
  	mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
@@ -22,7 +24,6 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
 	//mariaUI->setState(MariaUI::HOME);
 	
-
 	//QCoreApplication::installNativeEventFilter(new MyXcbEventFilter());
 	//Below are things that you can edit.
 	//mariaUI->setBackgroundColor("#ff88ff");
@@ -61,8 +62,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 			temp->setLoadingDone();
 			temp->setQuitAfterLoadingTrue();
 			mariaStateManager->transitState();
-		} else if(commandType == MariaInterpreter::CommandType::Quit){
-			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			std::string taskTitle = mariaInterpreter->getTitle(inputText);
 
@@ -111,6 +110,19 @@ bool MariaLogic::processCommand(std::string inputText) {
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
+		} else if (commandType == MariaInterpreter::CommandType::EditTask) {
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(mariaInterpreter->getTitle(inputText));
+
+			if (listOfTasks.size() == 1) {
+				listOfTasks[0]->setTitle(mariaInterpreter->getNewTitle(inputText));
+				if (mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->updateTask();
+				}
+			} else if (listOfTasks.size() == 0) {
+				// Task not found
+			} else {
+				// Conflict! More than 1 task found.
+			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaStateManager->queueState(MariaStateManager::SHOW,new MariaUIStateShow((QMainWindow*)mariaUI));
@@ -141,6 +153,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 	return true;
 }
 
+void MariaLogic::terminateProgram() {
+	quit();
+}
 
 void MariaLogic::doShowHide(){
 	RegisterHotKey(NULL,1,MOD_CONTROL | MOD_NOREPEAT,VK_SPACE);

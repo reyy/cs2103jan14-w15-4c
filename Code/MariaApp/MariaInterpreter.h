@@ -42,6 +42,8 @@ public:
 	/// @return	The task's title would be returned on valid input. Blank otherwise.
 	string getTitle(string &inputString);
 
+	string getNewTitle(string &inputString);
+
 	MariaTime* getStartTime(string &inputString);
 	MariaTime* getEndTime(string &inputString);
 

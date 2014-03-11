@@ -11,7 +11,7 @@ namespace MariaTest {
 
 			string input = "";
 
-			Assert::IsTrue(program->checkInputValidity(input));
+			Assert::IsFalse(program->checkInputValidity(input));
 
 			delete program;
 		}
@@ -21,7 +21,7 @@ namespace MariaTest {
 
 			string input = "create";
 
-			Assert::IsTrue(program->checkInputValidity(input));
+			Assert::IsFalse(program->checkInputValidity(input));
 
 			delete program;
 		}
@@ -51,7 +51,7 @@ namespace MariaTest {
 
 			string input = "create Meeting with John by 14/02/14";
 
-			Assert::IsTrue(program->checkInputValidity(input));
+			Assert::IsFalse(program->checkInputValidity(input));
 
 			delete program;
 		}
@@ -71,7 +71,7 @@ namespace MariaTest {
 
 			string input = "edit";
 
-			Assert::IsTrue(program->checkInputValidity(input));
+			Assert::IsFalse(program->checkInputValidity(input));
 
 			delete program;
 		}
@@ -91,7 +91,7 @@ namespace MariaTest {
 
 			string input = "delete";
 
-			Assert::IsTrue(program->checkInputValidity(input));
+			Assert::IsFalse(program->checkInputValidity(input));
 
 			delete program;
 		}

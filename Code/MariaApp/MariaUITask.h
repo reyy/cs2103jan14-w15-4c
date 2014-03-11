@@ -8,6 +8,7 @@
 class MariaUITask : QWidget{
 	Q_OBJECT
 public:
+	static const int TIME_UPDATE_FREQUENCY=1000;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE;
@@ -40,11 +41,16 @@ public:
 	MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width);
 	~MariaUITask();
 
-	void setTitlePretext(string pretext);
+	bool setTitlePretext(string pretext);
 	void setPosition(QPointF position);
 	QPointF getPosition();
 	void setDestination(QPointF destination);
 	QPointF getDestination();
+
+	bool updateDetails();
+
+	void stopUpdatingTime();
+	void startUpdatingTime();
 
 	void show();
 	void hide();

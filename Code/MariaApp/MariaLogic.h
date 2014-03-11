@@ -17,6 +17,7 @@ public:
 	~MariaLogic(void);
 
 	bool processCommand(std::string inputText);
+	void terminateProgram();
 public slots:
 	void doShowHide();
 	
@@ -28,5 +29,6 @@ private:
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 
+	
 	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };

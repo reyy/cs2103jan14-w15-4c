@@ -42,7 +42,7 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 	_timeText->hide();
 
 	_width=width;
-	
+
 	_updatePositionTimer = new QTimer(this);
 	connect(_updatePositionTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
 	_updatePositionTimer->start(1);
@@ -50,7 +50,7 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 	_updateTimeTextTimer = new QTimer(this);
 	connect(_updateTimeTextTimer, SIGNAL(timeout()), this, SLOT(updateTimeText()));
 	updateTimeText();
-	_updateTimeTextTimer->start(1000);
+	_updateTimeTextTimer->start(TIME_UPDATE_FREQUENCY);
 }
 
 MariaUITask::~MariaUITask() {
@@ -66,18 +66,23 @@ MariaUITask::~MariaUITask() {
 	delete _timeText;
 }
 
-void MariaUITask::setTitlePretext(string pretext) {
-	_displayTitle->setText(QString::fromStdString(pretext)+QString::fromStdString(_taskReference->getTitle()));
+bool MariaUITask::setTitlePretext(string pretext) {
+	if(_taskReference!=NULL) {
+		_displayTitle->setText(QString::fromStdString(pretext)+QString::fromStdString(_taskReference->getTitle()));
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool MariaUITask::updatePosition() {
 	if(abs(_position.x()-_destination.x())>VALUE_THRESHOLD||
 		abs(_position.y()-_destination.y())>VALUE_THRESHOLD) {
-		_position.setX(_position.x()+(_destination.x()-_position.x())*FLOW_FACTOR);
-		_position.setY(_position.y()+(_destination.y()-_position.y())*FLOW_FACTOR);
-		_displayTitle->setGeometry(QRect(_position.x(),_position.y(),_width,TASK_HEIGHT));
-		_timeText->setGeometry(QRect(_position.x()+TIMESTAMP_X_OFFSET,_position.y(),_width,TASK_HEIGHT));
-		return true;
+			_position.setX(_position.x()+(_destination.x()-_position.x())*FLOW_FACTOR);
+			_position.setY(_position.y()+(_destination.y()-_position.y())*FLOW_FACTOR);
+			_displayTitle->setGeometry(QRect(_position.x(),_position.y(),_width,TASK_HEIGHT));
+			_timeText->setGeometry(QRect(_position.x()+TIMESTAMP_X_OFFSET,_position.y(),_width,TASK_HEIGHT));
+			return true;
 	} else {
 		if(_updatePositionTimer->isActive()) {
 			_updatePositionTimer->stop();
@@ -87,26 +92,26 @@ bool MariaUITask::updatePosition() {
 }
 
 void MariaUITask::updateTimeText() {
+	if(_taskReference!=NULL) {
+		string timeFormatted = _taskReference->getTimeFromNow();
 
-	string timeFormatted = _taskReference->getTimeFromNow();
+		if(_taskReference->getType() == MariaTask::DEADLINE) {
+			if(timeFormatted.empty()){
+				timeFormatted = MESSAGE_DEADLINETASK_OVERDUE;
+			}else{
+				timeFormatted = MESSAGE_DEADLINETASK_DUE + timeFormatted;
+			}
+			_timeText->setText(QString::fromStdString(timeFormatted));
 
-	if(_taskReference->getType() == MariaTask::DEADLINE) {
-		if(timeFormatted.empty()){
-			timeFormatted = MESSAGE_DEADLINETASK_OVERDUE;
-		}else{
-			timeFormatted = MESSAGE_DEADLINETASK_DUE + timeFormatted;
+		}else if(_taskReference->getType() == MariaTask::TIMED){
+			if(timeFormatted.empty()){
+				timeFormatted = MESSAGE_TIMEDTASK_AFTER;
+			}else{
+				timeFormatted = MESSAGE_TIMEDTASK_BEFORE + timeFormatted;
+			}
 		}
 		_timeText->setText(QString::fromStdString(timeFormatted));
-
-	}else if(_taskReference->getType() == MariaTask::TIMED){
-		if(timeFormatted.empty()){
-			timeFormatted = MESSAGE_TIMEDTASK_AFTER;
-		}else{
-			timeFormatted = MESSAGE_TIMEDTASK_BEFORE + timeFormatted;
-		}
-	}
-	_timeText->setText(QString::fromStdString(timeFormatted));
-	
+	}	
 }
 
 void MariaUITask::setPosition(QPointF position) {
@@ -129,6 +134,27 @@ void MariaUITask::setDestination(QPointF destination) {
 
 QPointF MariaUITask::getDestination() {
 	return _destination;
+}
+
+bool MariaUITask::updateDetails() {
+	if(_taskReference!=NULL) {
+		_displayTitle->setText(QString::fromStdString(_taskReference->getTitle()));
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaUITask::stopUpdatingTime() {
+	if(_updateTimeTextTimer->isActive()) {
+		_updateTimeTextTimer->stop();
+	}
+}
+
+void MariaUITask::startUpdatingTime() {
+	if(!_updateTimeTextTimer->isActive()) {
+		_updateTimeTextTimer->start(TIME_UPDATE_FREQUENCY);
+	}
 }
 
 void MariaUITask::show() {
