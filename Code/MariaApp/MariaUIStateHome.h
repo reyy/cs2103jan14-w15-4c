@@ -37,6 +37,7 @@ public:
 
 	MariaUITask* addTask(MariaTask *task);
 	MariaUITask* eraseTask(int index);
+	MariaUITask* eraseTask(MariaTask* task);
 	void clearTask();
 	void sortTask();
 };

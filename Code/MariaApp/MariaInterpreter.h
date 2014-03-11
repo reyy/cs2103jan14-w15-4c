@@ -18,6 +18,7 @@ public:
 		EditTask,
 		ShowAllTask,
 		DeleteTask,
+		GoToHome,
 		Exit,
 		Quit,
 	} CommandType;

@@ -44,6 +44,9 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 	} else if (input[0] == "delete") {
 		inputString = replaceText(inputString, "delete", "");
 		command = DeleteTask;
+	} else if (input[0] == "home") {
+		inputString = replaceText(inputString, "home", "");
+		command = GoToHome;
 	} else if (input[0] == "exit") {
 		inputString = replaceText(inputString, "exit", "");
 		command = Exit;
@@ -154,7 +157,9 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 		input[0] != "edit" &&
 		input[0] != "show" &&
 		input[0] != "delete" &&
-		input[0] != "exit") {
+		input[0] != "home" &&
+		input[0] != "exit" &&
+		input[0] != "quit") {
 		return false;
 	}
 
@@ -167,7 +172,11 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 		return false;
 	} else if (input[0] == "delete" && input.size() < 2) {
 		return false;
+	} else if (input[0] == "home" && input.size() < 1) {
+		return false;
 	} else if (input[0] == "exit" && input.size() < 1) {
+		return false;
+	} else if (input[0] == "quit" && input.size() < 1) {
 		return false;
 	}
 
