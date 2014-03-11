@@ -92,6 +92,22 @@ MariaUITask* MariaUIStateHome::eraseTask(int index) {
 	return temp;
 }
 
+MariaUITask* MariaUIStateHome::eraseTask(MariaTask* task) {
+	MariaUITask* temp = NULL;
+	for (int i = 0; i < _taskStack.size(); i++) {
+		if (_taskStack[i]->getMariaTask() == task) {
+			temp = _taskStack[i];
+			_taskStack.erase(_taskStack.begin()+i);
+		}
+	}
+
+	for(int i=0;i<_taskStack.size();i++) {
+		_taskStack.at(i)->setTitlePretext(std::to_string(i+1)+". ");
+		_taskStack.at(i)->setDestination(QPointF(TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*i));
+	}
+	return temp;
+}
+
 void MariaUIStateHome::clearTask() {
 	for(int i=0;i<_taskStack.size();i++) {
 		delete _taskStack.at(i);

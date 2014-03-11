@@ -108,6 +108,21 @@ bool MariaLogic::processCommand(std::string inputText) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaStateManager->queueState(MariaStateManager::SHOW,new MariaUIStateShow((QMainWindow*)mariaUI));
 			mariaStateManager->transitState();
+		} else if (commandType == MariaInterpreter::CommandType::DeleteTask) {
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(mariaInterpreter->getTitle(inputText));
+
+			if (listOfTasks.size() == 1) {
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseTask(listOfTasks[0]);
+					mariaTaskManager->archiveTask(listOfTasks[0]);
+					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+				}
+			} else if (listOfTasks.size() == 0) {
+				// Task not found.
+			} else {
+				// More than 1 task
+			}
 		} else {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Its a valid command, but I'm limited.");
 			//mariaStateManager->queueState(MariaStateManager::HOME);
