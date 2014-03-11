@@ -54,8 +54,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 			temp->setLoadingDone();
 			temp->setQuitAfterLoadingTrue();
 			mariaStateManager->transitState();
-		} else if(commandType == MariaInterpreter::CommandType::Quit){
-			quit();
 		} else if(commandType == MariaInterpreter::CommandType::AddFloatingTask){
 			std::string taskTitle = mariaInterpreter->getTitle(inputText);
 
@@ -104,6 +102,16 @@ bool MariaLogic::processCommand(std::string inputText) {
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
+		} else if (commandType == MariaInterpreter::CommandType::EditTask) {
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(mariaInterpreter->getTitle(inputText));
+
+			if (listOfTasks.size() == 1) {
+				listOfTasks[0]->setTitle(mariaInterpreter->getNewTitle(inputText));
+			} else if (listOfTasks.size() == 0) {
+				// Task not found
+			} else {
+				// Conflict! More than 1 task found.
+			}
 		} else if(commandType == MariaInterpreter::CommandType::ShowAllTask){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's a calendar for demo purposes.");
 			mariaStateManager->queueState(MariaStateManager::SHOW,new MariaUIStateShow((QMainWindow*)mariaUI));
@@ -132,6 +140,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 	//todo: call interpreter to generate task & pass to task manager
 	return true;
+}
+
+void MariaLogic::terminateProgram() {
+	quit();
 }
 
 int main(int argc, char *argv[]) {

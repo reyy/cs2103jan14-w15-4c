@@ -14,6 +14,7 @@ public:
 	~MariaLogic(void);
 
 	bool processCommand(std::string inputText);
+	void terminateProgram();
 
 private:
 	MariaUI				*mariaUI;

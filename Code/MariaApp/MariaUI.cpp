@@ -142,7 +142,7 @@ void MariaUI::updateStatePosAnimation() {
 }
 */
 void MariaUI::quitAction() {
-	_mariaLogic->processCommand("quit");
+	_mariaLogic->terminateProgram();
 }
 
 void MariaUI::updateBackgroundColor() {
