@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QAbstractNativeEventFilter>
+#include <Windows.h>
+#include <process.h>
 #include <string>
 #include "MariaUI.h"
 #include "MariaStateManager.h"
@@ -14,6 +17,9 @@ public:
 	~MariaLogic(void);
 
 	bool processCommand(std::string inputText);
+public slots:
+	void doShowHide();
+	
 
 private:
 	MariaUI				*mariaUI;
@@ -22,4 +28,5 @@ private:
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 
+	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };

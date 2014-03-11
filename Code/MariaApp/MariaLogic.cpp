@@ -4,6 +4,7 @@
 #include "MariaUIStateHome.h"
 #include "MariaUIStateShow.h"
 
+
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
@@ -20,12 +21,19 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	//mariaUI->getLoading()->setDisplayText("Loading");
 	//Put loading intensive stuffs in-between changing state to intro and to other state.
 	//mariaUI->setState(MariaUI::HOME);
+	
 
+	//QCoreApplication::installNativeEventFilter(new MyXcbEventFilter());
 	//Below are things that you can edit.
 	//mariaUI->setBackgroundColor("#ff88ff");
 	mariaUI->getCommandBar()->getTextbox()->setQuestionText("What would you like to do?");
 	//mariaUI->getStatus()->setStatus(MariaUIStatus::WAIT);
 	mariaUI->getCommandBar()->getTextbox()->setSuggestText("create Meeting tomorrow for discussion");
+
+	/*QObject::connect((QObject)(this), &MariaUI::showHideEvent,
+                     (QObject)(this), &MariaLogic::doShowHide);*/
+	_beginthread( &MariaLogic::doShowHideWrapper,0, this);
+	//CreateThread( NULL,0, (doShowHide), NULL,0,NULL);
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -132,6 +140,24 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 	//todo: call interpreter to generate task & pass to task manager
 	return true;
+}
+
+
+void MariaLogic::doShowHide(){
+	RegisterHotKey(NULL,1,MOD_CONTROL | MOD_NOREPEAT,VK_SPACE);
+	MSG msg;
+    while(GetMessage(&msg,NULL,0,0)){
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+        if (msg.message == WM_HOTKEY){
+			emit mariaUI->showHideEvent();
+		}
+    }
+}
+
+void __cdecl MariaLogic::doShowHideWrapper(void* mariaLogic){
+	
+	static_cast<MariaLogic*>(mariaLogic)->doShowHide();
 }
 
 int main(int argc, char *argv[]) {
