@@ -5,7 +5,7 @@
 #include <string>
 #include "MariaTask.h"
 
-class MariaUITask : QWidget{
+class MariaUITaskExpanded : QWidget{
 	Q_OBJECT
 public:
 	static const int TEXTBOX_X_OFFSET=20;
@@ -15,9 +15,11 @@ public:
 	static const int BULLET_Y_OFFSET=4;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
-	static const float FONT_SIZE;
+	static const float FONT_SIZE_TITLE;
+	static const float FONT_SIZE_DESCRIPTION;
 	static const float TASK_HEIGHT;
-	static const float TIMESTAMP_X_OFFSET;
+	static const float DESCRIPTION_X_OFFSET;
+	static const float DESCRIPTION_Y_OFFSET;
 	static const string MESSAGE_DEADLINETASK_DUE;
 	static const string MESSAGE_DEADLINETASK_OVERDUE;
 	static const string MESSAGE_TIMEDTASK_BEFORE;
@@ -30,7 +32,7 @@ private:
 	
 	QLabel *_displayTitle;
 	MariaTask *_taskReference;
-	QLabel *_timeText;
+	QLabel *_desciptionText;
 	QLabel *_typeOfTask;
 	QPixmap *_taskTypeIconHandler;
 	float _width;
@@ -41,11 +43,10 @@ private:
 
 protected slots:
 	bool updatePosition();
-	void updateTimeText();
 
 public:
-	MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width);
-	~MariaUITask();
+	MariaUITaskExpanded(QMainWindow *qmainWindow, MariaTask *task, float width);
+	~MariaUITaskExpanded();
 
 	bool setTitlePretext(string pretext);
 	void setPosition(QPointF position);
@@ -54,9 +55,6 @@ public:
 	QPointF getDestination();
 
 	bool updateDetails();
-
-	void stopUpdatingTime();
-	void startUpdatingTime();
 
 	void show();
 	void hide();

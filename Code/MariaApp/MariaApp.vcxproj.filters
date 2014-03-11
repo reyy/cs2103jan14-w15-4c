@@ -93,6 +93,18 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="MariaUITaskExpanded.cpp">
+      <Filter>UI\UIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateConflict.cpp">
+      <Filter>UI\States</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITaskExpanded.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITaskExpanded.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -119,6 +131,9 @@
     </CustomBuild>
     <CustomBuild Include="MariaUIStateHome.h">
       <Filter>UI\States</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUITaskExpanded.h">
+      <Filter>UI\UIElement</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +189,9 @@
       <Filter>UI\States</Filter>
     </ClInclude>
     <ClInclude Include="MariaUIStateSetting.h">
+      <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateConflict.h">
       <Filter>UI\States</Filter>
     </ClInclude>
   </ItemGroup>
