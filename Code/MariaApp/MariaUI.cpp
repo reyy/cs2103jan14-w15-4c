@@ -172,11 +172,6 @@ void MariaUI::resizeEvent(QResizeEvent* event) {
 
 void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 	int keyPressed = keyevent->key();
-	/*if(keyPressed == Qt::Key_Control && keyevent->modifiers() == Qt::CTRL + Qt::Key_Space){
-		this->setWindowState(Qt::WindowState::WindowMinimized);
-		trayIcon->show();
-                hide();
-	}*/
 
 	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter){
 		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
@@ -268,8 +263,12 @@ void MariaUI::endOldState() {
 
 void MariaUI::showHideEvent(){
 	if(isVisible()){
+		setWindowState(Qt::WindowState::WindowMinimized);
+		trayIcon->show();
 		hide();
 	}else{
+		setWindowState(Qt::WindowState::WindowActive);
+		trayIcon->hide();
 		show();
 	}
 }
