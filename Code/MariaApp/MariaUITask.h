@@ -8,7 +8,11 @@
 class MariaUITask : QWidget{
 	Q_OBJECT
 public:
+	static const int TEXTBOX_X_OFFSET=20;
+	static const int BULLET_SPACE=10;
 	static const int TIME_UPDATE_FREQUENCY=1000;
+	static const int BULLET_X_OFFSET=2;
+	static const int BULLET_Y_OFFSET=4;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE;
@@ -26,9 +30,11 @@ private:
 	
 	QLabel *_displayTitle;
 	MariaTask *_taskReference;
-
 	QLabel *_timeText;
+	QLabel *_typeOfTask;
+	QPixmap *_taskTypeIconHandler;
 	float _width;
+
 	
 	QTimer *_updatePositionTimer;
 	QTimer *_updateTimeTextTimer;

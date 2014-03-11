@@ -7,6 +7,7 @@
 
 class MariaUIClock : QWidget {
 	Q_OBJECT
+
 private:
 	static const float TIME_WIDTH;
 	static const float TIME_HEIGHT;
@@ -16,11 +17,19 @@ private:
 	static const float DATE_HEIGHT;
 	static const float DATE_X_OFFSET;
 	static const float DATE_Y_OFFSET;
+	static const float DAY_WIDTH;
+	static const float DAY_HEIGHT;
+	static const float DAY_X_OFFSET;
+	static const float DAY_Y_OFFSET;
+
+	static const char * const DAYS[];
+	static const char * const MONTHS[];
 
 	QMainWindow *_qmainWindow;
 	
 	QLabel *_currentTime;
 	QLabel *_currentDate;
+	QLabel *_currentDay;
 	QTimer *_clockTimer;
 
 protected slots:

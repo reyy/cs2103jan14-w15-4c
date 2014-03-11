@@ -1,10 +1,10 @@
 #include "MariaUITask.h"
 #include "MariaTime.h"
 
-const float MariaUITask::FLOW_FACTOR=0.1;
+const float MariaUITask::FLOW_FACTOR=0.05;
 const float MariaUITask::VALUE_THRESHOLD=1.0;
-const float MariaUITask::FONT_SIZE=10.0;
-const float MariaUITask::TASK_HEIGHT=14.0;
+const float MariaUITask::FONT_SIZE=16.0;
+const float MariaUITask::TASK_HEIGHT=24.0;
 const float MariaUITask::TIMESTAMP_X_OFFSET=-3.0;
 const string MariaUITask::MESSAGE_DEADLINETASK_DUE="Due in ";
 const string MariaUITask::MESSAGE_DEADLINETASK_OVERDUE="Overdue";
@@ -20,25 +20,32 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 	_taskReference=task;
 	_displayTitle = new QLabel(_qmainWindow);
 	_timeText = new QLabel(_qmainWindow);
+	_typeOfTask = new QLabel(_qmainWindow);
 	switch(_taskReference->getType()) {
 	case MariaTask::FLOATING:
-		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,0,0,128);border: 1px solid rgba(25,25,25,25);font-size:"+QString::number(FONT_SIZE)+"px;");		
+		_taskTypeIconHandler = new QPixmap("./Resources/ui_task_type_floating.png");
+		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid rgba(200,200,200,255);font-size:"+QString::number(FONT_SIZE)+"px;");		
 		break;
 	case MariaTask::DEADLINE:
-		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(255,255,0,128);border: 1px solid rgba(25,25,25,25);font-size:"+QString::number(FONT_SIZE)+"px;");
+		_taskTypeIconHandler = new QPixmap("./Resources/ui_task_type_deadline.png");
+		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid rgba(200,200,200,255);font-size:"+QString::number(FONT_SIZE)+"px;");
 		break;
 	case MariaTask::TIMED:
-		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(0,128,255,128);border: 1px solid rgba(25,25,25,25);font-size:"+QString::number(FONT_SIZE)+"px;");
+		_taskTypeIconHandler = new QPixmap("./Resources/ui_task_type_timed.png");
+		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid rgba(200,200,200,255);font-size:"+QString::number(FONT_SIZE)+"px;");
 		break;
 	default:
-		_displayTitle->setStyleSheet("color:#ffffff; background-color:rgba(0,0,255,128);border: 1px solid white;font-size:"+QString::number(FONT_SIZE)+"px;");
+		_taskTypeIconHandler = new QPixmap("./Resources/ui_task_type_default.png");
+		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid white;font-size:"+QString::number(FONT_SIZE)+"px;");
 		break;
 	}
+	_typeOfTask->setPixmap(*_taskTypeIconHandler);
+	_typeOfTask->hide();
 	_displayTitle->setText(QString::fromStdString(_taskReference->getTitle()));
 	_displayTitle->setAlignment(Qt::AlignLeft);
-	_timeText->setAlignment(Qt::AlignRight);
 	_displayTitle->hide();
-	_timeText->setStyleSheet("color:#ffffff;font-size:"+QString::number(FONT_SIZE)+"px;");
+	_timeText->setAlignment(Qt::AlignRight);
+	_timeText->setStyleSheet("color:#000000;font-size:"+QString::number(FONT_SIZE)+"px; padding-right: "+QString::number(TEXTBOX_X_OFFSET)+"px;");
 	_timeText->hide();
 
 	_width=width;
@@ -60,6 +67,8 @@ MariaUITask::~MariaUITask() {
 	if(_updatePositionTimer->isActive()) {
 		_updatePositionTimer->stop();
 	}
+	delete _taskTypeIconHandler;
+	delete _typeOfTask;
 	delete _updatePositionTimer;
 	delete _updatePositionTimer;
 	delete _displayTitle;
@@ -82,6 +91,7 @@ bool MariaUITask::updatePosition() {
 			_position.setY(_position.y()+(_destination.y()-_position.y())*FLOW_FACTOR);
 			_displayTitle->setGeometry(QRect(_position.x(),_position.y(),_width,TASK_HEIGHT));
 			_timeText->setGeometry(QRect(_position.x()+TIMESTAMP_X_OFFSET,_position.y(),_width,TASK_HEIGHT));
+			_typeOfTask->setGeometry(QRect(_position.x()+TEXTBOX_X_OFFSET+BULLET_X_OFFSET,_position.y()+BULLET_Y_OFFSET,_taskTypeIconHandler->width(),_taskTypeIconHandler->height()));
 			return true;
 	} else {
 		if(_updatePositionTimer->isActive()) {
@@ -160,11 +170,13 @@ void MariaUITask::startUpdatingTime() {
 void MariaUITask::show() {
 	_displayTitle->show();
 	_timeText->show();
+	_typeOfTask->show();
 }
 
 void MariaUITask::hide() {
 	_displayTitle->hide();
 	_timeText->hide();
+	_typeOfTask->hide();
 }
 
 MariaTask * MariaUITask::getMariaTask() {

@@ -46,7 +46,7 @@ time_t MariaTime::get() {
 }
 
 int MariaTime::getYear(){
-	return timeStruct.tm_year;
+	return timeStruct.tm_year + YEAR_OFFSET;
 }
 
 int MariaTime::getMonth(){
@@ -67,6 +67,10 @@ int MariaTime::getMin(){
 
 int MariaTime::getSec(){
 	return timeStruct.tm_sec;
+}
+
+int MariaTime::getDayWeek(){
+	return timeStruct.tm_wday;
 }
 
 void MariaTime::setYear(int year){
