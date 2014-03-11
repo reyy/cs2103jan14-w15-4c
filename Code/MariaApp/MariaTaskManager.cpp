@@ -8,6 +8,9 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList){
 }
 
 MariaTaskManager::~MariaTaskManager(void){
+	for(MariaTask* t: (*this->taskList)){
+		delete t;
+	}
 	delete taskList;
 }
 
@@ -46,6 +49,7 @@ bool MariaTaskManager::archiveTask(MariaTask* task){
 	auto it = std::find(taskList->begin(), taskList->end(), task);
 
 	if(it != taskList->end()){
+		delete (*it);
 		taskList->erase(it);
 		return true;
 	}else{
