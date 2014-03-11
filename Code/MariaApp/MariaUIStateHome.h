@@ -22,6 +22,7 @@ private:
 
 	MariaUIClock *_clock;
 	std::vector<MariaUITask*> _taskStack;
+	std::vector<MariaUITask*> _taskDisposeStack;
 
 	void initBeginState();
 	void initActiveState();
@@ -30,12 +31,15 @@ private:
 	bool timerActiveState();
 	bool timerEndState();
 
+	void updateNumber();
+
 	static bool sortTaskFunction(MariaUITask *i,MariaUITask *j);
 public:
 	MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow);
 	~MariaUIStateHome();
 
 	MariaUITask* addTask(MariaTask *task);
+	void updateTask();
 	MariaUITask* eraseTask(int index);
 	MariaUITask* eraseTask(MariaTask* task);
 	void clearTask();
