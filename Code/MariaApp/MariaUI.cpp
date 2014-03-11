@@ -21,7 +21,7 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	_commandBar->getTextbox()->setFocus();
 	show();
 
-	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/maria_icon.png")));
+	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
 
 	QObject::connect(this,SIGNAL(triggerShowHideEvent()),this, SLOT(showHideEvent()));
 }
