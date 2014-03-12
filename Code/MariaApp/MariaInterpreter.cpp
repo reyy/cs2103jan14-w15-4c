@@ -66,6 +66,9 @@ MariaInputObject::CommandType MariaInterpreter::getCommandType(string &inputStri
 	} else if (input[0] == "delete") {
 		inputString = replaceText(inputString, "delete", "");
 		command = MariaInputObject::CommandDelete;
+	} else if (input[0] == "clear") {
+		inputString = replaceText(inputString, "clear", "");
+		command = MariaInputObject::CommandDeleteAll;
 	} else if (input[0] == "home") {
 		inputString = replaceText(inputString, "home", "");
 		command = MariaInputObject::CommandGoToHome;
@@ -159,7 +162,7 @@ MariaTime* MariaInterpreter::getStartTime(string &inputString) {
 		startTime->setHour(hour);
 		startTime->setMin(min);
 	} else {
-		vector<string> date = tokenizeString(firstPass[1], '\/');
+		vector<string> date = tokenizeString(firstPass[1], 47);
 
 		day = atoi(date[0].c_str());
 		month = atoi(date[1].c_str());
@@ -204,7 +207,7 @@ MariaTime* MariaInterpreter::getEndTime(string &inputString) {
 		endTime->setHour(hour);
 		endTime->setMin(min);
 	} else {
-		vector<string> date = tokenizeString(firstPass[1], '\/');
+		vector<string> date = tokenizeString(firstPass[1], 47);
 
 		day = atoi(date[0].c_str());
 		month = atoi(date[1].c_str());
@@ -241,6 +244,7 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 		input[0] != "edit" &&
 		input[0] != "show" &&
 		input[0] != "delete" &&
+		input[0] != "clear" &&
 		input[0] != "home" &&
 		input[0] != "exit" &&
 		input[0] != "quit") {
@@ -255,6 +259,8 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 	} else if (input[0] == "show" && input.size() < 1) {
 		return false;
 	} else if (input[0] == "delete" && input.size() < 2) {
+		return false;
+	} else if (input[0] == "clear" && input.size() < 1) {
 		return false;
 	} else if (input[0] == "home" && input.size() < 1) {
 		return false;

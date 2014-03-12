@@ -129,14 +129,27 @@ bool MariaLogic::processCommand(std::string inputText) {
 					mariaStateManager->transitState();
 				}
 			}
+		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandDeleteAll) {
+			//Check if the current state is the home state, do a live add.
+			if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks are deleted.");
+				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->clearTask();
+
+				// TODO: replace this part to delete all
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask("");
+				for (int i = 0; i < listOfTasks.size(); i++) {
+					mariaTaskManager->archiveTask(listOfTasks[i]);
+				}
+				mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+			}
 		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandGoToHome) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
 			mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
 			mariaStateManager->transitState();
 		} else {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Its a valid command, but I'm limited.");
-			//mariaStateManager->queueState(MariaStateManager::HOME);
-			//mariaStateManager->transitState();
+			mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
+			mariaStateManager->transitState();
 		}
 	}
 
