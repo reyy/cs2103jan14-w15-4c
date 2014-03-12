@@ -119,15 +119,15 @@ string MariaTime::getTimeFromNow(){
 	}else{
 		string returnString;
 		if(((int)difference % 60) >0 ){
-			returnString += to_string((int)difference % 60) + " Seconds";
+			returnString += to_string((int)difference % 60) + " Secs";
 		}
 		difference /= 60;
 		if(((int)difference % 60) >0 ){
-			returnString = to_string((int)difference % 60) + " Minutes " + returnString;
+			returnString = to_string((int)difference % 60) + " Mins " + returnString;
 		}
 		difference /= 60;
 		if(((int)difference % 24) >0 ){
-			returnString = to_string((int)difference % 24) + " Hours " + returnString;
+			returnString = to_string((int)difference % 24) + " Hrs " + returnString;
 		}
 		return returnString;
 	}

@@ -7,7 +7,7 @@
 
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
-	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/maria_icon.png")));
+	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
 
 	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
