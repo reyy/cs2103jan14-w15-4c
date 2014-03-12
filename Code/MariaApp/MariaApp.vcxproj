@@ -203,6 +203,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MariaFileManager.cpp" />
+    <ClCompile Include="MariaInputObject.cpp" />
     <ClCompile Include="MariaInterpreter.cpp" />
     <ClCompile Include="MariaLogic.cpp" />
     <ClCompile Include="MariaStateManager.cpp" />
@@ -249,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
+    <ClInclude Include="MariaInputObject.h" />
     <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
     <CustomBuild Include="MariaStateManager.h">

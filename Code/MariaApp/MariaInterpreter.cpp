@@ -1,14 +1,46 @@
 #include "MariaInterpreter.h"
 
-MariaInterpreter::MariaInterpreter(map<string, CommandType> *inputCommandList){
+MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::CommandType> *inputCommandList){
 	userDefinedCommands = inputCommandList;
 }
 
 MariaInterpreter::~MariaInterpreter(void){
 }
 
-MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputString) {
-	CommandType command = Invalid;
+MariaInputObject* MariaInterpreter::parseInput(string inputString) {
+	MariaInputObject* inputObject = new MariaInputObject();
+
+	inputObject->setOriginalInput(inputString);
+	inputObject->setValidity(checkInputValidity(inputString));
+	inputObject->isValid() ? inputObject->setCommandType(getCommandType(inputString)) : inputObject->setCommandType(MariaInputObject::CommandInvalid);
+
+	switch (inputObject->getCommandType()) {
+	case MariaInputObject::CommandAdd:
+		inputObject->setTitle(this->getTitle(inputString));
+		inputObject->setAddType(this->getAddType(inputString));
+		if (inputObject->getAddType() == MariaInputObject::AddTimed) {
+			inputObject->setStartTime(this->getStartTime(inputString));
+			inputObject->setEndTime(this->getEndTime(inputString));
+		} else if (inputObject->getAddType() == MariaInputObject::AddDeadline) {
+			inputObject->setEndTime(this->getEndTime(inputString));
+		}
+		break;
+	case MariaInputObject::CommandEdit:
+		inputObject->setTitle(this->getTitle(inputString));
+		inputObject->setEditField(this->getEditField(inputString));
+		break;
+	case MariaInputObject::CommandDelete:
+		inputObject->setTitle(this->getTitle(inputString));
+		break;
+	default:
+		break;
+	}
+
+	return inputObject;
+}
+
+MariaInputObject::CommandType MariaInterpreter::getCommandType(string &inputString) {
+	MariaInputObject::CommandType command = MariaInputObject::CommandInvalid;
 	vector<string> input;
 
 	if (!checkInputValidity(inputString)) {
@@ -24,37 +56,43 @@ MariaInterpreter::CommandType MariaInterpreter::getCommandType(string &inputStri
 
 	if (input[0] == "create") {
 		inputString = replaceText(inputString, "create", "");
-
-		int fromKeywordPos = inputString.find("from");
-		int byKeywordPos = inputString.find("by");
-
-		if (fromKeywordPos == string::npos && byKeywordPos == string::npos) {
-			command = AddFloatingTask;
-		} else if (fromKeywordPos != string::npos && byKeywordPos == string::npos) {
-			command = AddTimedTask;
-		} else if (fromKeywordPos == string::npos && byKeywordPos != string::npos) {
-			command = AddDeadlineTask;
-		}
+		command = MariaInputObject::CommandAdd;
 	} else if (input[0] == "show") {
 		inputString = replaceText(inputString, "show", "");
-		command = ShowAllTask;
+		command = MariaInputObject::CommandShowAll;
 	} else if (input[0] == "edit") {
 		inputString = replaceText(inputString, "edit", "");
-		command = EditTask;
+		command = MariaInputObject::CommandEdit;
 	} else if (input[0] == "delete") {
 		inputString = replaceText(inputString, "delete", "");
-		command = DeleteTask;
+		command = MariaInputObject::CommandDelete;
 	} else if (input[0] == "home") {
 		inputString = replaceText(inputString, "home", "");
-		command = GoToHome;
+		command = MariaInputObject::CommandGoToHome;
 	} else if (input[0] == "exit") {
 		inputString = replaceText(inputString, "exit", "");
-		command = Exit;
+		command = MariaInputObject::CommandExit;
 	}
 
 	inputString = trimWhiteSpace(inputString);
 
 	return command;
+}
+
+MariaInputObject::AddType MariaInterpreter::getAddType(string &inputString) {
+	MariaInputObject::AddType addType = MariaInputObject::AddNone;
+
+	int fromKeywordPos = inputString.find("from ");
+	int byKeywordPos = inputString.find("by ");
+
+	if (fromKeywordPos == string::npos && byKeywordPos == string::npos) {
+		addType = MariaInputObject::AddFloating;
+	} else if (fromKeywordPos != string::npos && byKeywordPos == string::npos) {
+		addType = MariaInputObject::AddTimed;
+	} else if (fromKeywordPos == string::npos && byKeywordPos != string::npos) {
+		addType = MariaInputObject::AddDeadline;
+	}
+	return addType;
 }
 
 string MariaInterpreter::getTitle(string &inputString) {
@@ -84,13 +122,13 @@ string MariaInterpreter::getTitle(string &inputString) {
 	return title;
 }
 
-string MariaInterpreter::getNewTitle(string &inputString) {
+string MariaInterpreter::getEditField(string &inputString) {
 	return inputString.substr(inputString.find("title")+6, inputString.size());
 }
 
 MariaTime* MariaInterpreter::getStartTime(string &inputString) {
 	MariaTime* startTime = NULL;
-	int endOfStartStringPos = inputString.find("to");
+	int endOfStartStringPos = inputString.find(" to ");
 	string startTimeString;
 
 	if (endOfStartStringPos == string::npos) {
@@ -101,18 +139,39 @@ MariaTime* MariaInterpreter::getStartTime(string &inputString) {
 
 	// Format: DD-MM-YY HH:MM
 	vector<string> firstPass = tokenizeString(startTimeString);
-	vector<string> date = tokenizeString(firstPass[1], '\/');
-	vector<string> time = tokenizeString(firstPass[2], ':');
+	vector<string> date;
+	vector<string> time;
+	int year, month, day, hour, min;
 
-	int day = atoi(date[0].c_str());
-	int month = atoi(date[1].c_str());
-	// ASSUMPTION: date entered is in 2000s
-	int year = atoi(date[2].c_str()) + 2000;
+	if (firstPass[1] == "today") {
+		startTime = new MariaTime(MariaTime::getCurrentTime());
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+		startTime->setHour(hour);
+		startTime->setMin(min);
+	} else if (firstPass[1] == "tomorrow") {
+		startTime = new MariaTime(MariaTime::getCurrentTime());
+		startTime->setDay(startTime->getDay()+1);
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+		startTime->setHour(hour);
+		startTime->setMin(min);
+	} else {
+		vector<string> date = tokenizeString(firstPass[1], '\/');
 
-	int hour = atoi(time[0].c_str());
-	int min = atoi(time[1].c_str());
+		day = atoi(date[0].c_str());
+		month = atoi(date[1].c_str());
+		// ASSUMPTION: date entered is in 2000s
+		year = atoi(date[2].c_str()) + 2000;
 
-	startTime = new MariaTime(year, month, day, hour, min);
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+
+		startTime = new MariaTime(year, month, day, hour, min);
+	}
 
 	inputString = replaceText(inputString, startTimeString, "");
 	inputString = trimWhiteSpace(inputString);
@@ -125,18 +184,39 @@ MariaTime* MariaInterpreter::getEndTime(string &inputString) {
 
 	// Format: DD-MM-YY HH:MM
 	vector<string> firstPass = tokenizeString(inputString);
-	vector<string> date = tokenizeString(firstPass[1], '\/');
-	vector<string> time = tokenizeString(firstPass[2], ':');
+	vector<string> date;
+	vector<string> time;
+	int year, month, day, hour, min;
 
-	int day = atoi(date[0].c_str());
-	int month = atoi(date[1].c_str());
-	// ASSUMPTION: date entered is in 2000s
-	int year = atoi(date[2].c_str()) + 2000;
+	if (firstPass[1] == "today") {
+		endTime = new MariaTime(MariaTime::getCurrentTime());
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+		endTime->setHour(hour);
+		endTime->setMin(min);
+	} else if (firstPass[1] == "tomorrow") {
+		endTime = new MariaTime(MariaTime::getCurrentTime());
+		endTime->setDay(endTime->getDay()+1);
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+		endTime->setHour(hour);
+		endTime->setMin(min);
+	} else {
+		vector<string> date = tokenizeString(firstPass[1], '\/');
 
-	int hour = atoi(time[0].c_str());
-	int min = atoi(time[1].c_str());
+		day = atoi(date[0].c_str());
+		month = atoi(date[1].c_str());
+		// ASSUMPTION: date entered is in 2000s
+		year = atoi(date[2].c_str()) + 2000;
 
-	endTime = new MariaTime(year, month, day, hour, min);
+		time = tokenizeString(firstPass[2], ':');
+		hour = atoi(time[0].c_str());
+		min = atoi(time[1].c_str());
+
+		endTime = new MariaTime(year, month, day, hour, min);
+	}
 
 	inputString = replaceText(inputString, inputString, "");
 	inputString = trimWhiteSpace(inputString);
@@ -188,9 +268,9 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 	if (input[0] == "create") {
 		int keyword[3];
 
-		keyword[0] = inputString.find("from");
-		keyword[1] = inputString.find("to");
-		keyword[2] = inputString.find("by");
+		keyword[0] = inputString.find(" from ");
+		keyword[1] = inputString.find(" to ");
+		keyword[2] = inputString.find(" by ");
 
 		if (keyword[0] == string::npos && keyword[1] == string::npos && keyword[2] == string::npos) {
 			// Floating task.
@@ -207,8 +287,8 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 	if (input[0] == "edit") {
 		int keyword[2];
 
-		keyword[0] = inputString.find("change");
-		keyword[1] = inputString.find("title");
+		keyword[0] = inputString.find(" change ");
+		keyword[1] = inputString.find( "title ");
 
 		if (keyword[0] == string::npos || keyword[1] == string::npos) {
 			return false;
