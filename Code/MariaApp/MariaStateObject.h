@@ -33,6 +33,6 @@ protected:
 
 public:
 	MariaStateObject(QMainWindow* qmainWindow);
-	~MariaStateObject();
+	virtual ~MariaStateObject();
 };
 

@@ -36,7 +36,7 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 		break;
 	default:
 		_taskTypeIconHandler = new QPixmap("./Resources/ui_task_type_default.png");
-		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid white;font-size:"+QString::number(FONT_SIZE)+"px;");
+		_displayTitle->setStyleSheet("color:#000000; padding-left: "+QString::number(BULLET_SPACE+TEXTBOX_X_OFFSET)+"px; background-color:rgba(255,255,255,255);border: 1px solid rgba(200,200,200,255);font-size:"+QString::number(FONT_SIZE)+"px;");
 		break;
 	}
 	_typeOfTask->setPixmap(*_taskTypeIconHandler);
@@ -57,7 +57,6 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width)
 	_updateTimeTextTimer = new QTimer(this);
 	connect(_updateTimeTextTimer, SIGNAL(timeout()), this, SLOT(updateTimeText()));
 	updateTimeText();
-	_updateTimeTextTimer->start(TIME_UPDATE_FREQUENCY);
 }
 
 MariaUITask::~MariaUITask() {
@@ -69,7 +68,7 @@ MariaUITask::~MariaUITask() {
 	}
 	delete _taskTypeIconHandler;
 	delete _typeOfTask;
-	delete _updatePositionTimer;
+	delete _updateTimeTextTimer;
 	delete _updatePositionTimer;
 	delete _displayTitle;
 	delete _timeText;

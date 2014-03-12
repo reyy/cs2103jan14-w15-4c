@@ -5,7 +5,8 @@
 #include "MariaStateObject.h"
 
 class MariaUIStateShow : public MariaStateObject {
-	
+	static const float TASK_STARTHEIGHT_SCALE;
+
 	QMainWindow *_qmainWindow;
 
 	void initBeginState();
