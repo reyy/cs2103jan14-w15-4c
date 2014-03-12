@@ -93,7 +93,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			mariaStateManager->queueState(MariaStateManager::SHOW,new MariaUIStateShow((QMainWindow*)mariaUI));
 			mariaStateManager->transitState();
 		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandDelete) {
-			string toDeleteTitle = mariaInterpreter->getTitle(inputText);
+			string toDeleteTitle = input->getTitle();
 
 			if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::CONFLICT) {
 				int numberToDelete=atoi(toDeleteTitle.c_str());
