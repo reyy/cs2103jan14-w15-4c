@@ -6,7 +6,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace MariaTest {
 	TEST_CLASS(Interpreter_ValidityTest) {
 	public:
-		TEST_METHOD(Interpreter_Valid_EmptyString_F) {
+		TEST_METHOD(Interpreter_Valid_EmptyString) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "";
@@ -16,7 +16,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_Create_F) {
+		TEST_METHOD(Interpreter_Valid_Create) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create";
@@ -26,7 +26,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_CreateFloatingTask_T) {
+		TEST_METHOD(Interpreter_Valid_CreateFloatingTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create Meeting with John";
@@ -36,7 +36,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_CreateDeadlineTask_T) {
+		TEST_METHOD(Interpreter_Valid_CreateDeadlineTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create Meeting with John by 14/02/14 13:00";
@@ -46,17 +46,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_CreateDeadlineTask_F) {
-			MariaInterpreter* program = new MariaInterpreter();
-
-			string input = "create Meeting with John by 14/02/14";
-
-			Assert::IsFalse(program->checkInputValidity(input));
-
-			delete program;
-		}
-
-		TEST_METHOD(Interpreter_Valid_CreateTimedTask_T) {
+		TEST_METHOD(Interpreter_Valid_CreateTimedTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "create Meeting with John from 14/02/14 13:00 to 14/02/14 14:00";
@@ -66,7 +56,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_Edit_F) {
+		TEST_METHOD(Interpreter_Valid_Edit) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "edit";
@@ -76,7 +66,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_Show_T) {
+		TEST_METHOD(Interpreter_Valid_Show) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "show";
@@ -86,7 +76,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_DeleteWithoutTitle_F) {
+		TEST_METHOD(Interpreter_Valid_DeleteWithoutTitle) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "delete";
@@ -96,7 +86,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_DeleteWithTask_T) {
+		TEST_METHOD(Interpreter_Valid_DeleteWithTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "delete Meeting with John";
@@ -106,7 +96,7 @@ namespace MariaTest {
 			delete program;
 		}
 
-		TEST_METHOD(Interpreter_Valid_Exit_T) {
+		TEST_METHOD(Interpreter_Valid_Exit) {
 			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "exit";

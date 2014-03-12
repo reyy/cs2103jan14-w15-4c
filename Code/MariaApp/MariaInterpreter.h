@@ -5,26 +5,39 @@
 #include <sstream>
 #include <functional>
 #include <regex>
-#include "MariaTime.h"
+#include "MariaInputObject.h"
 using namespace std;
+
+/**
+ *
+ * Features not working:
+ *	- getEditType()
+ *	- getConflictID()
+ *
+ *
+ *
+ */
 
 class MariaInterpreter{
 public:
-	typedef enum {
-		Invalid,
-		AddFloatingTask,
-		AddDeadlineTask,
-		AddTimedTask,
-		EditTask,
-		ShowAllTask,
-		DeleteTask,
-		GoToHome,
-		Exit,
-		Quit,
-	} CommandType;
-
-	MariaInterpreter(map<string, CommandType>* inputCommandList = NULL);
+	MariaInterpreter(map<string, MariaInputObject::CommandType>* inputCommandList = NULL);
 	~MariaInterpreter(void);
+
+	/// Takes in the user's input, works its magic on it
+	/// and churns out a MariaInputObject that contains everything
+	/// you need to know about the original input!
+	///
+	/// @param	inputString		This be the user's input.
+	///
+	/// @return	This be the magical object that holds the answer to everything...
+	MariaInputObject* parseInput(string inputString);
+
+#ifdef _DEBUG
+public:
+#else
+private:
+#endif
+	map<string, MariaInputObject::CommandType> *userDefinedCommands;
 
 	/// Gets a CommandType flag depending on the user's input.
 	/// The command keyword would also be removed from the inputString.
@@ -32,7 +45,9 @@ public:
 	/// @param	inputString	User's input.
 	///
 	/// @return	The command's flag will be returned on valid input. Invalid flag otherwise.
-	CommandType getCommandType(string &inputString);
+	MariaInputObject::CommandType getCommandType(string &inputString);
+
+	MariaInputObject::AddType getAddType(string &inputString);
 
 	/// Gets the task's title from the user's input.
 	/// The title would also be removed from the inputString.
@@ -42,17 +57,10 @@ public:
 	/// @return	The task's title would be returned on valid input. Blank otherwise.
 	string getTitle(string &inputString);
 
-	string getNewTitle(string &inputString);
+	string getEditField(string &inputString);
 
 	MariaTime* getStartTime(string &inputString);
 	MariaTime* getEndTime(string &inputString);
-
-#ifdef _DEBUG
-public:
-#else
-private:
-#endif
-	map<string, CommandType> *userDefinedCommands;
 
 	/// Checks the validity of the user's input depending on
 	/// the presence of certain keywords, number of words and so on.

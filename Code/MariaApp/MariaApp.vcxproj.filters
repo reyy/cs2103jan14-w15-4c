@@ -93,6 +93,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="MariaInputObject.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaUI.h">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="MariaUIStateSetting.h">
       <Filter>UI\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaInputObject.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
