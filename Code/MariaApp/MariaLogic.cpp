@@ -76,10 +76,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
 		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandEdit) {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(mariaInterpreter->getTitle(inputText));
 
 			if (listOfTasks.size() == 1) {
-				listOfTasks[0]->setTitle(input->getEditField());
+				listOfTasks[0]->setTitle(input->getTitle());
 				if (mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->updateTask();
 				}
