@@ -15,6 +15,7 @@ public:
 	static const float TASKBAR_STARTHEIGHT_SCALE;
 	static const float TASK_STARTHEIGHT_SCALE;
 	static const float TASK_STARTHEIGHT_DIFFERENCE;
+	static const int MAX_ITEM_IN_PAGE=20;
 
 private:
 	QMainWindow *_qmainWindow;
@@ -23,6 +24,8 @@ private:
 	MariaUIClock *_clock;
 	std::vector<MariaUITask*> _taskStack;
 	std::vector<MariaUITask*> _taskDisposeStack;
+
+	int _page;
 
 	void initBeginState();
 	void initActiveState();
@@ -42,8 +45,13 @@ public:
 	void updateTask();
 	MariaUITask* eraseTask(int index);
 	MariaUITask* eraseTask(MariaTask* task);
+	void eraseAllTask();
 	void clearTask();
 	void sortTask();
 	int getTotalTask();
+
+	void setPage(int page);
+	int getPage();
+	void updatePage();
 };
 

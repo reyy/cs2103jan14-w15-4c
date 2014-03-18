@@ -133,7 +133,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			//Check if the current state is the home state, do a live add.
 			if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks are deleted.");
-				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->clearTask();
+				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseAllTask();
 
 				// TODO: replace this part to delete all
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask("");
