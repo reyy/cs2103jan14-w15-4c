@@ -82,7 +82,7 @@ void MariaUIStateHome::updateNumber() {
 }
 
 MariaUITask* MariaUIStateHome::addTask(MariaTask *task) {
-	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width());
+	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width(),MariaUITask::DISPLAY_TYPE::NORMAL);
 
 	temp->setPosition(QPointF(_qmainWindow->width(),_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
 	if(_taskStack.size()>MAX_ITEM_IN_PAGE) {

@@ -101,7 +101,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
 				//Will crash if the number exceeds the array.
 				if(numberToDelete>0&&numberToDelete<=tempObj->getTotalTask()) {
-					MariaUITaskExpanded* toDeleteTask = tempObj->eraseTask(numberToDelete-1);
+					MariaUITask* toDeleteTask = tempObj->eraseTask(numberToDelete-1);
 					mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
 					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
 

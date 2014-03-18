@@ -52,12 +52,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITaskExpanded.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITaskExpanded.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="MariaUI.cpp">
       <Filter>User Interface</Filter>
     </ClCompile>
@@ -95,9 +89,6 @@
       <Filter>User Interface\Elements</Filter>
     </ClCompile>
     <ClCompile Include="MariaUITask.cpp">
-      <Filter>User Interface\Elements</Filter>
-    </ClCompile>
-    <ClCompile Include="MariaUITaskExpanded.cpp">
       <Filter>User Interface\Elements</Filter>
     </ClCompile>
     <ClCompile Include="MariaUITextbox.cpp">
@@ -156,9 +147,6 @@
       <Filter>User Interface\Elements</Filter>
     </CustomBuild>
     <CustomBuild Include="MariaUITask.h">
-      <Filter>User Interface\Elements</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MariaUITaskExpanded.h">
       <Filter>User Interface\Elements</Filter>
     </CustomBuild>
   </ItemGroup>
