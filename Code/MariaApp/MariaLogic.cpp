@@ -76,17 +76,36 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
 			}
 		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandEdit) {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(mariaInterpreter->getTitle(inputText));
+			string toEditTitle = input->getTitle();
 
-			if (listOfTasks.size() == 1) {
-				listOfTasks[0]->setTitle(input->getTitle());
-				if (mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->updateTask();
+			if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::CONFLICT) {
+				int numberToEdit=atoi(toEditTitle.c_str());
+				MariaUIStateConflict* tempObj=(MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
+				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
+				//Will crash if the number exceeds the array.
+				if(numberToEdit>0&&numberToEdit<=tempObj->getTotalTask()) {
+					//TO DO, transit to edit state.
+					mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
+					mariaStateManager->transitState();
 				}
-			} else if (listOfTasks.size() == 0) {
-				// Task not found
 			} else {
-				// Conflict! More than 1 task found.
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
+
+				if (listOfTasks.size() == 1) {
+					//Check if the current state is the home state, do a live add.
+					if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
+						//TO DO, transit to edit state.
+						mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
+						mariaStateManager->transitState();
+					}
+				} else if (listOfTasks.size() == 0) {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
+				} else {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar task, which one should I edit?");
+
+					mariaStateManager->queueState(MariaStateManager::CONFLICT,new MariaUIStateConflict(toEditTitle,mariaTaskManager,(QMainWindow*)mariaUI));
+					mariaStateManager->transitState();
+				}
 			}
 		} else if(input->getCommandType() == MariaInputObject::CommandType::CommandShowAll){
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's the calendar.");
