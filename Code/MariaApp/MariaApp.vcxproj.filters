@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="MariaFileManager.cpp" />
+    <ClCompile Include="MariaInputObject.cpp" />
+    <ClCompile Include="MariaInterpreter.cpp" />
+    <ClCompile Include="MariaLogic.cpp" />
+    <ClCompile Include="MariaStateManager.cpp" />
+    <ClCompile Include="MariaStateObject.cpp" />
+    <ClCompile Include="MariaTask.cpp" />
+    <ClCompile Include="MariaTaskManager.cpp" />
+    <ClCompile Include="MariaTime.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaStateManager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaStateManager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUI.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUI.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIClock.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIClock.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUICommandBar.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUICommandBar.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIStatus.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIStatus.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITask.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUI.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateConflict.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateEdit.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateHome.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateLoading.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateSetting.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateShow.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIClock.cpp">
+      <Filter>User Interface\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUICommandBar.cpp">
+      <Filter>User Interface\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStatus.cpp">
+      <Filter>User Interface\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUITask.cpp">
+      <Filter>User Interface\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUITextbox.cpp">
+      <Filter>User Interface\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaUIStateDisplay.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MariaFileManager.h" />
+    <ClInclude Include="MariaInputObject.h" />
+    <ClInclude Include="MariaInterpreter.h" />
+    <ClInclude Include="MariaLogic.h" />
+    <ClInclude Include="MariaStateObject.h" />
+    <ClInclude Include="MariaTask.h" />
+    <ClInclude Include="MariaTaskManager.h" />
+    <ClInclude Include="MariaTime.h" />
+    <ClInclude Include="MariaUIStateConflict.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateEdit.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateLoading.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateSetting.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateShow.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUITextbox.h">
+      <Filter>User Interface\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateDisplay.h">
+      <Filter>User Interface\States</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="MariaStateManager.h" />
+    <CustomBuild Include="MariaUI.h">
+      <Filter>User Interface</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUIStateHome.h">
+      <Filter>User Interface\States</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUIClock.h">
+      <Filter>User Interface\Elements</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUICommandBar.h">
+      <Filter>User Interface\Elements</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUIStatus.h">
+      <Filter>User Interface\Elements</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUITask.h">
+      <Filter>User Interface\Elements</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{c3eab93a-9554-4f59-83fd-2f220ec6d3be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="User Interface">
+      <UniqueIdentifier>{c057e7f9-b5cb-4d92-b1b8-d030ec1c6981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="User Interface\States">
+      <UniqueIdentifier>{b96e0cb1-f870-4a6d-b914-9b1ea04e47cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="User Interface\Elements">
+      <UniqueIdentifier>{ed526828-93cf-4d1d-8218-d17585430a57}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
