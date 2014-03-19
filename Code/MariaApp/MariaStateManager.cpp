@@ -1,10 +1,10 @@
 #include "MariaStateManager.h"
 
 MariaStateManager::MariaStateManager() {
-	_currentState=BLANK;
-	_currentTransition=BEGIN;
-	_currentStateObject=NULL;
-	_transitCalled=false;
+	_currentState = BLANK;
+	_currentTransition = BEGIN;
+	_currentStateObject = NULL;
+	_transitCalled = false;
 
 	_stateBeginTimer = new QTimer(this);
 	connect(_stateBeginTimer, SIGNAL(timeout()), this, SLOT(timerBeginState()));
@@ -24,30 +24,30 @@ MariaStateManager::~MariaStateManager() {
 
 void MariaStateManager::initBeginState() {
 	if(_stateQueue.size()>0) {
-		_currentTransition=BEGIN;
-		_currentState=_stateQueue.front();
+		_currentTransition = BEGIN;
+		_currentState = _stateQueue.front();
 		_stateQueue.pop();
-		_currentStateObject=_stateQueueObject.front();
+		_currentStateObject = _stateQueueObject.front();
 		_stateQueueObject.pop();
 		_currentStateObject->initBeginState();
 		_currentStateObject->setStartDestination();
 
-		_transitCalled=false;
+		_transitCalled = false;
 
 		_stateBeginTimer->start(1);
 	} else {
-		_currentState=BLANK;
+		_currentState = BLANK;
 	}
 }
 
 void MariaStateManager::initActiveState() {
-	_currentTransition=ACTIVE;
+	_currentTransition = ACTIVE;
 	_currentStateObject->initActiveState();
 	_stateActiveTimer->start(1);
 }
 
 void MariaStateManager::initEndState() {
-	_currentTransition=END;
+	_currentTransition = END;
 	_currentStateObject->initEndState();
 	_currentStateObject->setEndDestination();
 	_stateEndTimer->start(1);
@@ -93,28 +93,28 @@ void MariaStateManager::timerEndState() {
 	}
 }
 
-void MariaStateManager::queueState(STATE_TYPE type,MariaStateObject* stateObject) {
+void MariaStateManager::queueState(STATE_TYPE type, MariaStateObject* stateObject) {
 
-	assert(type!=NULL);
-	assert(stateObject!=NULL);
+	assert(type != NULL);
+	assert(stateObject != NULL);
 	
 	_stateQueue.push(type);
 	_stateQueueObject.push(stateObject);
 
-	if(getCurrentState()==BLANK) {
+	if(getCurrentState() == BLANK) {
 		initBeginState();
 	}
 }
 
 void MariaStateManager::transitState() {
-	if(_currentTransition==ACTIVE) {
+	if(_currentTransition == ACTIVE) {
 		if(_stateActiveTimer->isActive()) {
-			_transitCalled=true;
+			_transitCalled = true;
 		} else {
 			initEndState();
 		}
 	} else {
-		_transitCalled=true;
+		_transitCalled = true;
 	}
 }
 

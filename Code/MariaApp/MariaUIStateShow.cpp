@@ -3,12 +3,12 @@
 #include "MariaUI.h"
 #include "MariaTaskManager.h"
 
-const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE=0.1;
-const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE=0.2;
+const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
+const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.2;
 
-MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow,MariaTaskManager *taskManager,VIEW_TYPE currentViewType,MariaTime targetTime) : MariaUIStateDisplay(qmainWindow,taskManager,TASK_STARTHEIGHT_SCALE) {
-	_currentViewType=currentViewType;
-	_targetTime=targetTime;
+MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, VIEW_TYPE currentViewType, MariaTime targetTime) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
+	_currentViewType = currentViewType;
+	_targetTime = targetTime;
 }
 
 MariaUIStateShow::~MariaUIStateShow() {
@@ -18,7 +18,7 @@ MariaUIStateShow::~MariaUIStateShow() {
 
 void MariaUIStateShow::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
-	((MariaUI*)_qmainWindow)->setBackgroundColor(116,30,168);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(116, 30, 168);
 
 	_titleLabel = new QLabel(_qmainWindow);
 	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
@@ -42,7 +42,7 @@ void MariaUIStateShow::initBeginState() {
 
 void MariaUIStateShow::initActiveState() {
 	vector<MariaTask*> tempList = _taskManager->findTask("");
-	for(MariaTask* temp : tempList){
+	for(MariaTask* temp : tempList) {
 		addTask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
 	}
 }
@@ -52,7 +52,7 @@ void MariaUIStateShow::initEndState() {
 }
 
 bool MariaUIStateShow::timerBeginState() {
-	_titleLabel->setGeometry(QRect(getPosition().x()+_qmainWindow->width()*0.5-60,getPosition().y()+80,120,98));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + 80, 120, 98));
 	return false;
 }
 
@@ -61,6 +61,6 @@ bool MariaUIStateShow::timerActiveState() {
 }
 
 bool MariaUIStateShow::timerEndState() {
-	_titleLabel->setGeometry(QRect(getPosition().x()+_qmainWindow->width()*0.5-60,getPosition().y()+80,120,98));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + 80, 120, 98));
 	return false;
 }

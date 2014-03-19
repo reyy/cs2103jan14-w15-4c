@@ -9,42 +9,42 @@ const string MariaFileManager::TASK_ENDTIME_FIELD = "\t[End]";
 const string MariaFileManager::TASK_CLOSE_FIELD = "[End Task]";
 const string MariaFileManager::TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 
-MariaFileManager::MariaFileManager(void){
+MariaFileManager::MariaFileManager(void) {
 	
 }
 
-MariaFileManager::~MariaFileManager(void){
+MariaFileManager::~MariaFileManager(void) {
 }
 
 // This method is called to open the user input file when the program
 // is first run. It parses and stores previously saved user data.
-vector<MariaTask*>* MariaFileManager::openFile(){
+vector<MariaTask*>* MariaFileManager::openFile() {
 	ifstream fileReader(INPUT_FILE);
-	if (!fileExists()){
+	if (!fileExists()) {
 		return createNewFile();
-	}else if (fileReader.is_open()){
+	} else if (fileReader.is_open()) {
 		return readFile(&fileReader);
-	}else{
+	} else {
 		throw exception("File Exists but cannot be opened.");
 	}
 }
 
-vector<MariaTask*>* MariaFileManager::createNewFile(){
+vector<MariaTask*>* MariaFileManager::createNewFile() {
 	ofstream fileWriter(INPUT_FILE);
 	fileWriter.close();
 
 	return new vector<MariaTask*>();
 }
 
-// This method overwrites the user input file  
+// This method overwrites the user input file 
 // with the current data from messageList.
-bool MariaFileManager::writeFile(vector<MariaTask*> taskList){
+bool MariaFileManager::writeFile(vector<MariaTask*> taskList) {
 	ofstream fileWriter(INPUT_FILE);
-	if(!fileWriter.is_open()){
+	if(!fileWriter.is_open()) {
 		return false;
 	}
 
-	for(MariaTask* task : taskList){
+	for(MariaTask* task : taskList) {
 		fileWriter << taskToString(task);
 	}
 	fileWriter.close();
@@ -55,17 +55,17 @@ bool MariaFileManager::writeFile(vector<MariaTask*> taskList){
 
 // This method reads and stores data from an input file.
 // Requires an already open ifstream to pull data from.
-vector<MariaTask*>* MariaFileManager::readFile(ifstream *fileReader){
+vector<MariaTask*>* MariaFileManager::readFile(ifstream *fileReader) {
 	vector<MariaTask*>* taskList = new vector<MariaTask*>();
 
-	while(true){
+	while(true) {
 		string lineRead;
 		string inputText[ATTRIBUTES_PER_TASK];
 
-		for(int i = 0; i< ATTRIBUTES_PER_TASK; i++){
-			if(getline (*fileReader,lineRead)){
+		for( int i = 0; i< ATTRIBUTES_PER_TASK; i++ ) {
+			if(getline (*fileReader, lineRead)) {
 				inputText[i] = lineRead;
-			}else{
+			} else {
 				fileReader->close();
 				return taskList;
 			}
@@ -75,23 +75,23 @@ vector<MariaTask*>* MariaFileManager::readFile(ifstream *fileReader){
 }
 
 bool MariaFileManager::fileExists() {
-    struct stat fileInfo;
+ struct stat fileInfo;
 	return stat(INPUT_FILE.c_str(), &fileInfo) == 0;
 }
 
-MariaTask* MariaFileManager::stringToTask(string inputText[]){
+MariaTask* MariaFileManager::stringToTask(string inputText[]) {
 	MariaTask* newTask = new MariaTask();
-	for(int i = 0; i < ATTRIBUTES_PER_TASK; i++){
+	for( int i = 0; i < ATTRIBUTES_PER_TASK; i++ ) {
 		string field = getFirstWord(inputText[i]);
 		string value = removeFirstWord(inputText[i], field);
 
-		if(field == TASK_TITLE_FIELD){
+		if(field == TASK_TITLE_FIELD) {
 			newTask->setTitle(value);
-		}else if (field == TASK_DESC_FIELD){
+		} else if (field == TASK_DESC_FIELD) {
 			newTask->setDescription(value);
-		}else if (field == TASK_STARTTIME_FIELD){
+		} else if (field == TASK_STARTTIME_FIELD) {
 			newTask->setStart(stringToTime(value));
-		}else if (field == TASK_ENDTIME_FIELD){
+		} else if (field == TASK_ENDTIME_FIELD) {
 			newTask->setEnd(stringToTime(value));
 		}
 		
@@ -100,47 +100,47 @@ MariaTask* MariaFileManager::stringToTask(string inputText[]){
 	return newTask;
 }
 
-MariaTime* MariaFileManager::stringToTime(string inputText){
-	if(inputText == ""){
+MariaTime* MariaFileManager::stringToTime(string inputText) {
+	if(inputText == "") {
 		return NULL;
-	}else{
+	} else {
 		return new MariaTime(inputText);
 	}
 }
 
-string MariaFileManager::taskToString(MariaTask *task){
+string MariaFileManager::taskToString(MariaTask *task) {
 	
-	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE +
-							TASK_TITLE_FIELD	 + task->getTitle()					+ NEW_LINE +
-							TASK_DESC_FIELD		 + task->getDescription()			+ NEW_LINE +
-							TASK_STARTTIME_FIELD + timeToString(task->getStart())	+ NEW_LINE +
-							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		+ NEW_LINE +
-							TASK_CLOSE_FIELD    + NEW_LINE;
+	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE + 
+							TASK_TITLE_FIELD	 + task->getTitle()					 + NEW_LINE + 
+							TASK_DESC_FIELD		 + task->getDescription()			 + NEW_LINE + 
+							TASK_STARTTIME_FIELD + timeToString(task->getStart())	 + NEW_LINE + 
+							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		 + NEW_LINE + 
+							TASK_CLOSE_FIELD + NEW_LINE;
 
 	return returnString;
 }
 
-string MariaFileManager::timeToString(MariaTime* inputTime){
-	if(inputTime ==  NULL){
+string MariaFileManager::timeToString(MariaTime* inputTime) {
+	if(inputTime == NULL) {
 		return "";
-	}else{
+	} else {
 		return inputTime->get(TIME_FORMAT);
 	}
 }
 
 // This method returns the first word from input string
-string MariaFileManager::getFirstWord(string inputText){
-	for(int i=0; i<inputText.length(); i++){
-		if(inputText[i] == ']'){
-			return inputText.substr(0,i+1);
+string MariaFileManager::getFirstWord(string inputText) {
+	for( int i = 0; i<inputText.length(); i++ ) {
+		if(inputText[i] == ']') {
+			return inputText.substr(0, i + 1);
 		}
 	}
 	return inputText;
 }
 
 // This method returns the input string without its first word 
-string MariaFileManager::removeFirstWord(string inputText, string firstWord){
-	if(inputText.length() <= firstWord.length()){
+string MariaFileManager::removeFirstWord(string inputText, string firstWord) {
+	if(inputText.length() <= firstWord.length()) {
 		return "";
 	}
 	return inputText.substr(firstWord.length());

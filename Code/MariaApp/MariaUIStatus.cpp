@@ -1,21 +1,21 @@
 #include "MariaUIStatus.h"
 
-MariaUIStatus::MariaUIStatus(QMainWindow * qmainWindow){
-	_qmainWindow=qmainWindow;
+MariaUIStatus::MariaUIStatus(QMainWindow * qmainWindow) {
+	_qmainWindow = qmainWindow;
 
 	loadImages();
 
-	_statusImageIndex=0;
+	_statusImageIndex = 0;
 	_statusIcon = new QLabel(_qmainWindow);
 	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
 	_statusIcon->hide();
 
 	_statusAnimationTimer = new QTimer(this);
-    connect(_statusAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatusAnimation()));
+ connect(_statusAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatusAnimation()));
 }
 
 MariaUIStatus::~MariaUIStatus(void) {
-	for(int i=0;i<AMOUNT_OF_IMAGES;i++) {
+	for( int i = 0 ; i < AMOUNT_OF_IMAGES;i++ ) {
 		delete _imageHandle[i];
 	}
 	delete _statusAnimationTimer;
@@ -37,22 +37,22 @@ void MariaUIStatus::updateStatusAnimation() {
 	switch(_currentStatus) {
 	case OK:
 		_statusAnimationTimer->stop();
-		_statusImageIndex=IMAGE_INDEX_OK;
+		_statusImageIndex = IMAGE_INDEX_OK;
 		break;
 	case INVALID:
 		_statusAnimationTimer->stop();
 		break;
 	case WAIT:
 		if(_statusImageIndex<IMAGE_INDEX_WAIT_0||_statusImageIndex>IMAGE_INDEX_WAIT_3)
-			_statusImageIndex=IMAGE_INDEX_WAIT_0;
+			_statusImageIndex = IMAGE_INDEX_WAIT_0;
 		if(_statusImageIndex<IMAGE_INDEX_WAIT_3)
-			_statusImageIndex++;
+			_statusImageIndex++ ;
 		else
-			_statusImageIndex=IMAGE_INDEX_WAIT_0;
+			_statusImageIndex = IMAGE_INDEX_WAIT_0;
 		break;
 	case UNKNOWN:
 		_statusAnimationTimer->stop();
-		_statusImageIndex=IMAGE_INDEX_UNKNOWN;
+		_statusImageIndex = IMAGE_INDEX_UNKNOWN;
 		break;
 	case NONE:
 		_statusAnimationTimer->stop();
@@ -66,8 +66,8 @@ void MariaUIStatus::updateStatusAnimation() {
 }
 
 void MariaUIStatus::setStatus(STATUS_TYPE type) {
-	if(_currentStatus!=type) {
-		_currentStatus=type;
+	if(_currentStatus != type) {
+		_currentStatus = type;
 		updateStatusAnimation();
 		if(!_statusAnimationTimer->isActive())
 			_statusAnimationTimer->start(ANIMATION_SPEED);
@@ -79,5 +79,5 @@ MariaUIStatus::STATUS_TYPE MariaUIStatus::getStatus() {
 }
 
 void MariaUIStatus::updateGUI(QPointF statePosition) {
-	_statusIcon->setGeometry(QRect(statePosition.x()+TEXTBOX_X_OFFSET, statePosition.y(), _imageHandle[0]->width(), _imageHandle[0]->height()));
+	_statusIcon->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y(), _imageHandle[0]->width(), _imageHandle[0]->height()));
 }

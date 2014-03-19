@@ -5,28 +5,28 @@
 class MariaInputObject {
 public:
 	typedef enum {
-		CommandInvalid,
-		CommandAdd,
-		CommandEdit,
-		CommandShowAll,
-		CommandDelete,
-		CommandDeleteAll,
-		CommandGoToHome,
-		CommandExit,
+		CommandInvalid, 
+		CommandAdd, 
+		CommandEdit, 
+		CommandShowAll, 
+		CommandDelete, 
+		CommandDeleteAll, 
+		CommandGoToHome, 
+		CommandExit, 
 	} CommandType;
 
 	typedef enum {
-		AddNone,
-		AddFloating,
-		AddDeadline,
-		AddTimed,
+		AddNone, 
+		AddFloating, 
+		AddDeadline, 
+		AddTimed, 
 	} AddType;
 
 	typedef enum {
-		EditNone,
-		EditTitle,
-		EditStartTime,
-		EditEndTime,
+		EditNone, 
+		EditTitle, 
+		EditStartTime, 
+		EditEndTime, 
 	} EditType;
 
 	MariaInputObject();

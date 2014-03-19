@@ -6,7 +6,7 @@
 #include "MariaStateObject.h"
 
 class MariaUIStateLoading : public MariaStateObject {
-	static const int AMOUNT_OF_DOTS=5;
+	static const int AMOUNT_OF_DOTS = 5;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float DISPLAY_TEXT_WIDTH;

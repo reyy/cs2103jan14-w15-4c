@@ -3,10 +3,10 @@
 #include "MariaUI.h"
 #include "MariaTaskManager.h"
 
-const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE=0.25;
-const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE=0.35;
+const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.25;
+const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE = 0.35;
 
-MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow,MariaTaskManager *taskManager) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
+MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, MariaTaskManager *taskManager) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
 	_clock = new MariaUIClock(_qmainWindow);
 }
 
@@ -20,12 +20,12 @@ void MariaUIStateHome::initBeginState() {
 	_clock->startUpdating();
 
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
-	((MariaUI*)_qmainWindow)->setBackgroundColor(114,143,22);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(114, 143, 22);
 }
 
 void MariaUIStateHome::initActiveState() {
 	vector<MariaTask*> tempList = _taskManager->findTask("");
-	for(MariaTask* temp : tempList){
+	for(MariaTask* temp : tempList) {
 		addTask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
 	}
 }

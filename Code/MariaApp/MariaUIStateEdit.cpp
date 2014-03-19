@@ -2,7 +2,7 @@
 #include "MariaUI.h"
 
 MariaUIStateEdit::MariaUIStateEdit(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
-	_qmainWindow=qmainWindow;
+	_qmainWindow = qmainWindow;
 }
 
 MariaUIStateEdit::~MariaUIStateEdit() {

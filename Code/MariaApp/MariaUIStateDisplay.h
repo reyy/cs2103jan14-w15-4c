@@ -10,7 +10,7 @@
 class MariaTaskManager;
 class MariaUIStateDisplay : public MariaStateObject {
 public:
-	static const int TEXTBOX_X_OFFSET=30;
+	static const int TEXTBOX_X_OFFSET = 30;
 
 protected:
 	QMainWindow *_qmainWindow;

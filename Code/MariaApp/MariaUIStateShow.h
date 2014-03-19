@@ -12,11 +12,11 @@ class MariaUIStateShow : public MariaUIStateDisplay {
 public:
 	static const float TASK_STARTHEIGHT_SCALE;
 	static const float TASKBAR_STARTHEIGHT_SCALE;
-	static const int MAX_ITEM_IN_PAGE=20;
+	static const int MAX_ITEM_IN_PAGE = 20;
 
 	typedef enum {
-		DAY,
-		MONTH,
+		DAY, 
+		MONTH, 
 		YEAR
 	} VIEW_TYPE;
 
@@ -32,7 +32,7 @@ private:
 	bool timerActiveState();
 	bool timerEndState();
 public:
-	MariaUIStateShow(QMainWindow* qmainWindow,MariaTaskManager *taskManager,VIEW_TYPE currentViewType,MariaTime targetTime);
+	MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, VIEW_TYPE currentViewType, MariaTime targetTime);
 	~MariaUIStateShow();
 };
 
