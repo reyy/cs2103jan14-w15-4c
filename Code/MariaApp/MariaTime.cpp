@@ -1,5 +1,7 @@
 #include "MariaTime.h"
 
+const char * const MariaTime::DAYS[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+const char * const MariaTime::MONTHS[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November" ,"December"};
 
 MariaTime::MariaTime(int year , int month , int day , int hour , int min , int sec ){
 	timeStruct.tm_year = year - YEAR_OFFSET;
