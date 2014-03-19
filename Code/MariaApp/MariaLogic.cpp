@@ -11,7 +11,14 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 
 	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
-	mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
+	for(int i = 0; i < 3; i++){
+		try{
+			mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
+			break;
+		}catch(exception e){
+			//todo: do something about failed file
+		}
+	}
 	mariaUI = new MariaUI(this);
 	mariaStateManager = new MariaStateManager();
 

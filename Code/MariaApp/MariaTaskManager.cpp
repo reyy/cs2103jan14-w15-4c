@@ -1,10 +1,12 @@
 #include "MariaTaskManager.h"
+#include <assert.h>
 
 MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 	taskList = inputTaskList;
 	if(taskList == NULL) {
 		taskList = new vector<MariaTask*>();
 	}
+	sortTasks();
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
@@ -17,6 +19,8 @@ MariaTaskManager::~MariaTaskManager(void) {
 MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end) {
 	MariaTask *tempTask = new MariaTask(name, start, end);
 	taskList->push_back(tempTask);
+
+	sortTasks();
 	return tempTask;
 }
 
@@ -47,10 +51,14 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end) 
 }
 
 vector<MariaTask*> MariaTaskManager::getAllTasks() {
-	return *this->taskList;
+	assert(taskList!=NULL);
+
+	return *taskList;
 }
 
-bool MariaTaskManager::archiveTask(MariaTask* task) {
+bool MariaTaskManager::archiveTask(MariaTask* task){
+	assert(task!=NULL);
+	
 	auto it = std::find(taskList->begin(), taskList->end(), task);
 
 	if(it != taskList->end()) {
@@ -71,4 +79,12 @@ string MariaTaskManager::lowercaseString(string text) {
 	}
 
 	return toReturn;
+}
+
+void MariaTaskManager::sortTasks(){
+	std::sort(taskList->begin(), taskList->end(), &compareTasks);
+}
+
+bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2){
+	return ((*t1) < (*t2));
 }

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "MariaTask.h"
 using namespace std;
 
@@ -24,4 +25,6 @@ public:
 #endif
 	vector<MariaTask*> *taskList;
 	string lowercaseString(string text);
+	void sortTasks();
+	static bool compareTasks(MariaTask* d1, MariaTask* d2);
 };
