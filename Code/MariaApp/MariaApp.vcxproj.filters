@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaStateManager.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUI.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIClock.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUICommandBar.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIRolling.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIStatus.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITask.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITaskExpanded.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaStateManager.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUI.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIClock.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUICommandBar.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIRolling.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIStatus.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITaskExpanded.cpp" />
+    <ClCompile Include="MariaFileManager.cpp" />
+    <ClCompile Include="MariaInputObject.cpp" />
+    <ClCompile Include="MariaInterpreter.cpp" />
+    <ClCompile Include="MariaLogic.cpp" />
+    <ClCompile Include="MariaStateManager.cpp" />
+    <ClCompile Include="MariaStateObject.cpp" />
+    <ClCompile Include="MariaTask.cpp" />
+    <ClCompile Include="MariaTaskManager.cpp" />
+    <ClCompile Include="MariaTime.cpp" />
+    <ClCompile Include="MariaUI.cpp" />
+    <ClCompile Include="MariaUICalendar.cpp" />
+    <ClCompile Include="MariaUIClock.cpp" />
+    <ClCompile Include="MariaUICommandBar.cpp" />
+    <ClCompile Include="MariaUIHome.cpp" />
+    <ClCompile Include="MariaUIRolling.cpp" />
+    <ClCompile Include="MariaUIStateConflict.cpp" />
+    <ClCompile Include="MariaUIStateEdit.cpp" />
+    <ClCompile Include="MariaUIStateHome.cpp" />
+    <ClCompile Include="MariaUIStateLoading.cpp" />
+    <ClCompile Include="MariaUIStateSetting.cpp" />
+    <ClCompile Include="MariaUIStateShow.cpp" />
+    <ClCompile Include="MariaUIStatus.cpp" />
+    <ClCompile Include="MariaUITask.cpp" />
+    <ClCompile Include="MariaUITaskExpanded.cpp" />
+    <ClCompile Include="MariaUITextbox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MariaFileManager.h" />
+    <ClInclude Include="MariaInputObject.h" />
+    <ClInclude Include="MariaInterpreter.h" />
+    <ClInclude Include="MariaLogic.h" />
+    <ClInclude Include="MariaStateObject.h" />
+    <ClInclude Include="MariaTask.h" />
+    <ClInclude Include="MariaTaskManager.h" />
+    <ClInclude Include="MariaUIHome.h" />
+    <ClInclude Include="MariaUIStateConflict.h" />
+    <ClInclude Include="MariaUIStateEdit.h" />
+    <ClInclude Include="MariaUIStateLoading.h" />
+    <ClInclude Include="MariaUIStateSetting.h" />
+    <ClInclude Include="MariaUIStateShow.h" />
+    <ClInclude Include="MariaUITextbox.h" />
+    <ClInclude Include="MariaTime.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="MariaUI.h" />
+    <CustomBuild Include="MariaStateManager.h" />
+    <CustomBuild Include="MariaUIStatus.h" />
+    <CustomBuild Include="MariaUIClock.h" />
+    <CustomBuild Include="MariaUICommandBar.h" />
+    <CustomBuild Include="MariaUIStateHome.h" />
+    <CustomBuild Include="MariaUITask.h" />
+    <CustomBuild Include="MariaUITaskExpanded.h" />
+    <CustomBuild Include="MariaUICalendar.h" />
+    <CustomBuild Include="MariaUIRolling.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+  </ItemGroup>
+</Project>
