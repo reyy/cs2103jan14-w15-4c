@@ -15,6 +15,10 @@ namespace MariaTest {
 			////Assert::AreEqual((*tempList)[0]->getTitle(), (string)("new task"));
 
 			//delete program;
+			
+			MariaTime a = MariaTime::getCurrentTime();
+			for(int i=0; i<999999999; i++){}
+			Assert::AreEqual(-1,a.compareTo(MariaTime::getCurrentTime()));
 		}
 
 		TEST_METHOD(Task_DeleteTask) {

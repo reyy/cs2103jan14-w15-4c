@@ -146,15 +146,12 @@ MariaTime MariaTime::getCurrentTime() {
 	return toReturn;
 }
 
-/*MariaTime MariaTime::compareTime(MariaTime *a, MariaTime *b){
-	double difference = difftime(a->get(), b->get());
-	MariaTime toReturn(YEAR_OFFSET,MONTH_OFFSET,0,0,0,0);
-	toReturn.setSec((int)difference % 60);
-	difference /= 60;
-	toReturn.setMin((int)difference%(60));
-	difference /= 60;
-	toReturn.setHour((int)difference%(24));
-	difference /= 24;
-	toReturn.setDay((int)difference);
-	return toReturn;
-}*/
+int MariaTime::compareTo(MariaTime other){
+	double difference = difftime(get(), other.get());
+	if( difference > 0 ){
+		return 1;
+	}else if( difference < 0 ){
+		return -1;
+	}
+	return 0;
+}
