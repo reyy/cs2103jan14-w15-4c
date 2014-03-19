@@ -36,8 +36,9 @@ public:
 	void setMin(int);
 	void setSec(int);
 
+	int compareTo(MariaTime other);
+
 	static MariaTime getCurrentTime();
-	//static MariaTime compareTime(MariaTime *a, MariaTime *b);
 
 private:
 	time_t timeStamp;
