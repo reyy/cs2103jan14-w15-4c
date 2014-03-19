@@ -70,7 +70,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				//Check if the current state is the home state, do a live add.
 				if(mariaStateManager->getCurrentState()==MariaStateManager::STATE_TYPE::HOME) {
 					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addTask(toAdd);
-					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '"+ inputText + "'");
@@ -122,7 +122,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				if(numberToDelete>0&&numberToDelete<=tempObj->getTotalTask()) {
 					MariaUITask* toDeleteTask = tempObj->eraseTask(numberToDelete-1);
 					mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
-					mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Resolved! Anything else?");
 					mariaStateManager->queueState(MariaStateManager::HOME,new MariaUIStateHome(mariaTaskManager,(QMainWindow*)mariaUI));
@@ -137,7 +137,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'"+toDeleteTitle+"' is delete!");
 						((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseTask(listOfTasks[0]);
 						mariaTaskManager->archiveTask(listOfTasks[0]);
-						mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -155,11 +155,11 @@ bool MariaLogic::processCommand(std::string inputText) {
 				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseAllTask();
 
 				// TODO: replace this part to delete all
-				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask("");
+				vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
 				for (int i = 0; i < listOfTasks.size(); i++) {
 					mariaTaskManager->archiveTask(listOfTasks[i]);
 				}
-				mariaFileManager->writeFile(mariaTaskManager->findTask(""));
+				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			}
 		} else if (input->getCommandType() == MariaInputObject::CommandType::CommandGoToHome) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");

@@ -28,7 +28,7 @@ void MariaUIStateHome::initBeginState() {
 }
 
 void MariaUIStateHome::initActiveState() {
-	vector<MariaTask*> tempList = _taskManager->findTask("");
+	vector<MariaTask*> tempList = _taskManager->getAllTasks();
 	for(MariaTask* temp : tempList){
 		addTask(temp);
 	}
