@@ -146,7 +146,7 @@ MariaTime MariaTime::getCurrentTime() {
 	return toReturn;
 }
 
-int MariaTime::compareTo(MariaTime other){
+int MariaTime::compareTo(MariaTime other) {
 	double difference = difftime(get(), other.get());
 	if( difference > 0 ){
 		return 1;

@@ -56,6 +56,18 @@ vector<MariaTask*> MariaTaskManager::getAllTasks() {
 	return *taskList;
 }
 
+vector<MariaTask*> MariaTaskManager::getAllTasks(MariaTask::TaskType type) {
+	assert(taskList!=NULL);
+	vector<MariaTask*> returnList;
+
+	for(MariaTask *temp : *taskList) {
+		if(temp->getType() == type) {
+			returnList.push_back(temp);
+		}
+	}
+	return returnList;
+}
+
 bool MariaTaskManager::archiveTask(MariaTask* task){
 	assert(task!=NULL);
 	
@@ -82,7 +94,17 @@ string MariaTaskManager::lowercaseString(string text) {
 }
 
 void MariaTaskManager::sortTasks(){
-	std::sort(taskList->begin(), taskList->end(), &compareTasks);
+	vector<MariaTask*> floatingTasks = getAllTasks(MariaTask::FLOATING);
+	vector<MariaTask*> deadlineTasks = getAllTasks(MariaTask::DEADLINE);
+	vector<MariaTask*> timedTasks = getAllTasks(MariaTask::TIMED);
+	std::sort(floatingTasks.begin(), floatingTasks.end(), &compareTasks);
+	std::sort(deadlineTasks.begin(), deadlineTasks.end(), &compareTasks);
+	std::sort(timedTasks.begin(), timedTasks.end(), &compareTasks);
+	delete taskList;
+	taskList = new vector<MariaTask*>();
+	taskList->insert(taskList->end(), floatingTasks.begin(), floatingTasks.end());
+	taskList->insert(taskList->end(), deadlineTasks.begin(), deadlineTasks.end());
+	taskList->insert(taskList->end(), timedTasks.begin(), timedTasks.end());
 }
 
 bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2){

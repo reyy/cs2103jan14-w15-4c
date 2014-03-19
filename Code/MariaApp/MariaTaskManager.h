@@ -14,6 +14,7 @@ public:
 	MariaTask* addTask(string name, MariaTime* start = NULL, MariaTime* end = NULL);
 	vector<MariaTask*> findTask(string searchString);
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end);
+	vector<MariaTask*> getAllTasks(MariaTask::TaskType);
 	vector<MariaTask*> getAllTasks();
 
 	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!

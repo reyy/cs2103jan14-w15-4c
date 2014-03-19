@@ -47,10 +47,11 @@ namespace MariaTest {
 			MariaTaskManager* program = new MariaTaskManager();
 			program->addTask("bbb");
 			program->addTask("aaa");
+			program->addTask("1",NULL,&MariaTime::getCurrentTime());
 			program->addTask("ccc");
 			program->addTask("123");
 			program->sortTasks();
-			Assert::AreEqual((*program->taskList)[0]->getTitle(),(string)"123");
+			Assert::AreEqual((*program->taskList)[4]->getTitle(),(string)"1");
 		}
 	};
 }
