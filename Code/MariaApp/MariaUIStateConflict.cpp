@@ -58,7 +58,7 @@ bool MariaUIStateConflict::timerEndState() {
 //Function determines which task shall be sorted as smaller.
 //Deadline task shall take precedence in the sort.
 //Followed by dateline task. Then floating task.
-bool MariaUIStateConflict::sortTaskFunction(MariaUITaskExpanded *i,MariaUITaskExpanded *j) {
+bool MariaUIStateConflict::sortTaskFunction(MariaUITask *i,MariaUITask *j) {
 
 	MariaTask *a=i->getMariaTask();
 	MariaTask *b=j->getMariaTask();
@@ -76,8 +76,8 @@ void MariaUIStateConflict::updateNumber() {
 	}
 }
 
-MariaUITaskExpanded* MariaUIStateConflict::addTask(MariaTask *task) {
-	MariaUITaskExpanded *temp = new MariaUITaskExpanded(_qmainWindow,task,_qmainWindow->width());
+MariaUITask* MariaUIStateConflict::addTask(MariaTask *task) {
+	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width(),MariaUITask::DISPLAY_TYPE::EXPANDED);
 
 	temp->setPosition(QPointF(_qmainWindow->width(),_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
 	temp->setDestination(QPointF(0.0,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
@@ -95,11 +95,11 @@ void MariaUIStateConflict::updateTask() {
 	}
 }
 
-MariaUITaskExpanded* MariaUIStateConflict::eraseTask(int index) {
+MariaUITask* MariaUIStateConflict::eraseTask(int index) {
 	
 	assert(index<_taskStack.size());
 
-	MariaUITaskExpanded* temp = NULL;
+	MariaUITask* temp = NULL;
 	temp = _taskStack[index];
 	_taskDisposeStack.push_back(temp);
 	temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*index));
@@ -109,8 +109,8 @@ MariaUITaskExpanded* MariaUIStateConflict::eraseTask(int index) {
 	return temp;
 }
 
-MariaUITaskExpanded* MariaUIStateConflict::eraseTask(MariaTask* task) {
-	MariaUITaskExpanded* temp = NULL;
+MariaUITask* MariaUIStateConflict::eraseTask(MariaTask* task) {
+	MariaUITask* temp = NULL;
 	for (int i = 0; i < _taskStack.size(); i++) {
 		if (_taskStack[i]->getMariaTask() == task) {
 			temp = _taskStack[i];

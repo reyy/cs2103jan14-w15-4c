@@ -22,6 +22,7 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	show();
 
 	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
+	trayIcon->setToolTip("M.A.R.I.A.");
 
 	QObject::connect(this,SIGNAL(triggerShowHideEvent()),this, SLOT(showHideEvent()));
 }
@@ -74,81 +75,6 @@ void MariaUI::initBackgroundColor(int r, int g, int b) {
 	updateBackgroundColor();
 }
 
-/*
-void MariaUI::updateStatePreAnimation() {
-	bool canstop=false;
-
-	switch(_currentState) {
-	case CALENDAR:
-	case HOME:
-		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
-			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
-			updateGUI();
-		} else {
-			canstop=true;
-			_rollingCoord.setY(_destCoord.y());
-		}
-		break;
-	case INTRO:
-		canstop=true;
-		break;
-	default:
-		canstop=true;
-		break;
-	}
-	
-	if(canstop) {
-		_statePreAnimationTimer->stop();
-		_processingState=false;
-		if(_stateQueue.size()>0) {
-			endOldState();
-		}
-	}
-}
-
-void MariaUI::updateStatePosAnimation() {
-	bool canstop=false;
-	switch(_currentState) {
-	case CALENDAR:
-		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
-			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
-			updateGUI();
-		} else {
-			if(_calendar->isEndRollingDone()) {
-				_calendar->clearActiveDisplay();
-				_rollingCoord.setY(_destCoord.y());
-				canstop=true;
-			}
-		}
-		break;
-	case HOME:
-		if(abs(_rollingCoord.y()-_destCoord.y())>0.5) {
-			_rollingCoord.setY(_rollingCoord.y()+(_destCoord.y()-_rollingCoord.y())*0.01);
-			updateGUI();
-		} else {
-			if(_home->isEndRollingDone()) {
-				_home->clearActiveDisplay();
-				_rollingCoord.setY(_destCoord.y());
-				canstop=true;
-			}
-		}
-		break;
-	case INTRO:
-		if(_loading->isAnimationDone()) {
-			canstop=true;
-		}
-		break;
-	default:
-		canstop=true;
-		break;
-	}
-	
-	if(canstop) {
-		_statePosAnimationTimer->stop();
-		beginNewState();
-	}
-}
-*/
 void MariaUI::quitAction() {
 	_mariaLogic->terminateProgram();
 }
@@ -190,85 +116,12 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent){
 		keyevent->ignore();
 	}
 }
-/*
-void MariaUI::beginNewState() {
-	_currentState=_stateQueue.front();
-	_stateQueue.pop();
-
-	switch(_currentState) {
-	case CALENDAR: {
-			_calendar->createUI(MariaUICalendar::DEFAULT);
-				//TO DO - update to allow users to choose a view type.
-		
-			vector<MariaTask*> tempList = _mariaTaskManager->findTask("");
-				for(MariaTask* temp : tempList){
-					_calendar->addDisplay(*temp);
-				}
-			_calendar->startRolling();
-			}
-	case SETTING:
-		_destCoord.setY(30);
-		break;
-	case HOME:{
-			_home->createUI();
-			_home->startRolling();
-			_destCoord.setY(height()*0.5-10);
-		}
-		break;
-	case INTRO:
-		_status->setStatus(MariaUIStatus::NONE);
-		_loading->startLoadingAnimation();
-		break;
-	case QUIT:
-		_mariaLogic->processCommand("quit");
-	default:
-		break;
-	}
-	if(!_statePreAnimationTimer->isActive())
-		_statePreAnimationTimer->start(1);
-}
-
-void MariaUI::endOldState() {
-	if(!_processingState) {
-		_processingState=true;
-
-		switch(_currentState) {
-		case CALENDAR:
-			_calendar->endRolling();
-			//Checks if the state you are going to is within the environment itself.
-			if(_stateQueue.front()!=CALENDAR&&
-				_stateQueue.front()!=SETTING&&
-				_stateQueue.front()!=HOME) {
-				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
-			}
-			break;
-		case HOME:
-			_home->endRolling();
-			//Checks if the state you are going to is within the environment itself.
-			if(_stateQueue.front()!=CALENDAR&&
-				_stateQueue.front()!=SETTING&&
-				_stateQueue.front()!=HOME) {
-				_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
-			}
-			break;
-		case INTRO:
-			_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
-			_loading->endLoadingAnimation();
-			break;
-		default:
-			_destCoord.setY(-WINDOW_DEFAULT_SIZE_Y);
-			break;
-		}
-		if(!_statePosAnimationTimer->isActive())
-			_statePosAnimationTimer->start(1);
-	}
-}
-*/
 
 void MariaUI::showHideEvent(){
 	if(isVisible()){
 		setWindowState(Qt::WindowState::WindowMinimized);
 		trayIcon->show();
+		trayIcon->showMessage("M.A.R.I.A. is still running!","Press Ctrl + Space to show M.A.R.I.A.\nType \'exit\' to quit the program.");
 		hide();
 	}else{
 		setWindowState(Qt::WindowState::WindowActive);

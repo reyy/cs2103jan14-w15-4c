@@ -14,6 +14,8 @@ MariaUITextbox::MariaUITextbox(QMainWindow *qmainWindow) {
 
 	_questionText = new QLabel(_qmainWindow);
 	_questionText->setStyleSheet("background-color: rgba(0,0,0,0);border:0px;color:#ffffff;font-weight:bold;font-size:"+QString::number(FONT_SIZE_QUESTION_TEXT)+"px;");
+	_questionText->setAlignment(Qt::AlignBottom|Qt::AlignLeft);
+	_questionText->setWordWrap(true);
 }
 
 MariaUITextbox::~MariaUITextbox() {

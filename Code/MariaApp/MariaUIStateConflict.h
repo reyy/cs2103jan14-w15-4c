@@ -5,7 +5,7 @@
 #include <QtWidgets/qlabel.h>
 #include "MariaStateObject.h"
 #include "MariaUIClock.h"
-#include "MariaUITaskExpanded.h"
+#include "MariaUITask.h"
 #include "MariaTask.h"
 
 class MariaTaskManager;
@@ -21,8 +21,8 @@ private:
 	MariaTaskManager* _taskManager;
 
 	string _conflictTaskTitle;
-	std::vector<MariaUITaskExpanded*> _taskStack;
-	std::vector<MariaUITaskExpanded*> _taskDisposeStack;
+	std::vector<MariaUITask*> _taskStack;
+	std::vector<MariaUITask*> _taskDisposeStack;
 
 	void initBeginState();
 	void initActiveState();
@@ -33,15 +33,15 @@ private:
 
 	void updateNumber();
 
-	static bool sortTaskFunction(MariaUITaskExpanded *i,MariaUITaskExpanded *j);
+	static bool sortTaskFunction(MariaUITask *i,MariaUITask *j);
 public:
 	MariaUIStateConflict(string conflictTaskTitle, MariaTaskManager *taskManager,QMainWindow* qmainWindow);
 	~MariaUIStateConflict();
 
-	MariaUITaskExpanded* addTask(MariaTask *task);
+	MariaUITask* addTask(MariaTask *task);
 	void updateTask();
-	MariaUITaskExpanded* eraseTask(int index);
-	MariaUITaskExpanded* eraseTask(MariaTask* task);
+	MariaUITask* eraseTask(int index);
+	MariaUITask* eraseTask(MariaTask* task);
 	void clearTask();
 	void sortTask();
 	int getTotalTask();

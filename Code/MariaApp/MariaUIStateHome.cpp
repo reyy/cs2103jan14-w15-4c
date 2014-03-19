@@ -22,12 +22,13 @@ MariaUIStateHome::~MariaUIStateHome() {
 void MariaUIStateHome::initBeginState() {
 	clearTask();
 	_clock->startUpdating();
+	_page=0;
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
 	((MariaUI*)_qmainWindow)->setBackgroundColor(114,143,22);
 }
 
 void MariaUIStateHome::initActiveState() {
-	vector<MariaTask*> tempList = _taskManager->findTask("");
+	vector<MariaTask*> tempList = _taskManager->getAllTasks();
 	for(MariaTask* temp : tempList){
 		addTask(temp);
 	}
@@ -81,12 +82,18 @@ void MariaUIStateHome::updateNumber() {
 }
 
 MariaUITask* MariaUIStateHome::addTask(MariaTask *task) {
-	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width());
+	MariaUITask *temp = new MariaUITask(_qmainWindow,task,_qmainWindow->width(),MariaUITask::DISPLAY_TYPE::NORMAL);
 
 	temp->setPosition(QPointF(_qmainWindow->width(),_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
-	temp->setDestination(QPointF(0.0,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
+	if(_taskStack.size()>MAX_ITEM_IN_PAGE) {
+		temp->setDestination(QPointF(0.0,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()+_qmainWindow->height()));
+	} else {
+		temp->setDestination(QPointF(0.0,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*_taskStack.size()));
+	}
 	temp->show();
-	temp->startUpdatingTime();
+	if(task->getType()!=MariaTask::FLOATING) {
+		temp->startUpdatingTime();
+	}
 
 	_taskStack.push_back(temp);
 
@@ -131,8 +138,21 @@ MariaUITask* MariaUIStateHome::eraseTask(MariaTask* task) {
 	return temp;
 }
 
+void MariaUIStateHome::eraseAllTask() {
+	for (int i = 0; i < _taskStack.size(); i++) {
+		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*i));
+		_taskStack.at(i)->stopUpdatingTime();
+	}
+
+	while (_taskStack.size()>0) {
+		_taskDisposeStack.push_back(_taskStack.at(0));
+		_taskStack.erase(_taskStack.begin());
+	}
+}
+
 void MariaUIStateHome::clearTask() {
 	for(int i=0;i<_taskStack.size();i++) {
+		_taskStack.at(i)->stopUpdatingTime();
 		delete _taskStack.at(i);
 	}
 
@@ -141,6 +161,7 @@ void MariaUIStateHome::clearTask() {
 	}
 
 	for(int i=0;i<_taskDisposeStack.size();i++) {
+		_taskDisposeStack.at(i)->stopUpdatingTime();
 		delete _taskDisposeStack.at(i);
 	}
 
@@ -156,4 +177,19 @@ void MariaUIStateHome::sortTask() {
 
 int MariaUIStateHome::getTotalTask() {
 	return _taskStack.size();
+}
+
+void MariaUIStateHome::setPage(int page) {
+	_page=page;
+}
+
+int MariaUIStateHome::getPage() {
+	return _page;
+}
+
+void MariaUIStateHome::updatePage() {
+
+	for(int i=0;i<_taskStack.size();i++) {
+		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET,_qmainWindow->height()*TASK_STARTHEIGHT_SCALE+TASK_STARTHEIGHT_DIFFERENCE*(i-MAX_ITEM_IN_PAGE*_page)));			
+	}
 }
