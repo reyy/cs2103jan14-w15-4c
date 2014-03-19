@@ -82,5 +82,12 @@ void MariaTask::refreshTaskType(){
 }
 
 bool MariaTask::operator<(MariaTask rhs) { 
+	if(type == rhs.getType()){
+		if(type == MariaTask::TIMED){
+			return start->get() < rhs.getStart()->get();
+		}else if(type == MariaTask::DEADLINE){
+			return end->get() < rhs.getEnd()->get();
+		}
+	}
 	return title < rhs.getTitle(); 
 }

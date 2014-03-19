@@ -6,6 +6,7 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList){
 	if(taskList == NULL){
 		taskList = new vector<MariaTask*>();
 	}
+	sortTasks();
 }
 
 MariaTaskManager::~MariaTaskManager(void){
