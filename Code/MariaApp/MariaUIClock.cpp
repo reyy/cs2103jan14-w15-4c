@@ -14,9 +14,6 @@ const float MariaUIClock::DAY_HEIGHT=30;
 const float MariaUIClock::DAY_X_OFFSET=5;
 const float MariaUIClock::DAY_Y_OFFSET=40;
 
-const char * const MariaUIClock::DAYS[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-const char * const MariaUIClock::MONTHS[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November" ,"December"};
-
 MariaUIClock::MariaUIClock(QMainWindow *qmainWindow) {
 	_qmainWindow=qmainWindow;
 
@@ -70,8 +67,8 @@ void MariaUIClock::updateClock() {
 		tempString+="PM";
 	}
 	_currentTime->setText(tempString);
-	_currentDate->setText(QString::number(currentTime.getDay())+" "+QString(MONTHS[currentTime.getMonth()-1])+" "+QString::number(currentTime.getYear()));
-	_currentDay->setText(QString(DAYS[currentTime.getDayWeek()]));
+	_currentDate->setText(QString::number(currentTime.getDay())+" "+QString(MariaTime::MONTHS[currentTime.getMonth()-1])+" "+QString::number(currentTime.getYear()));
+	_currentDay->setText(QString(MariaTime::DAYS[currentTime.getDayWeek()]));
 }
 
 void MariaUIClock::startUpdating() {
