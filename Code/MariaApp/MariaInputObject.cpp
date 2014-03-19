@@ -61,6 +61,10 @@ void MariaInputObject::setEditType(EditType newEditType) {
 	_editType = newEditType;
 }
 
+void MariaInputObject::setStateType(MariaStateManager::STATE_TYPE newStateType) {
+	_stateType = newStateType;
+}
+
 bool MariaInputObject::isValid() const {
 	return _validInput;
 }
@@ -99,4 +103,8 @@ MariaInputObject::AddType MariaInputObject::getAddType() const {
 
 MariaInputObject::EditType MariaInputObject::getEditType() const {
 	return _editType;
+}
+
+MariaStateManager::STATE_TYPE MariaInputObject::getStateType() const {
+	return _stateType;
 }

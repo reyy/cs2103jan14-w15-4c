@@ -45,6 +45,7 @@ public:
 	void setEndTime(MariaTime* newEndTime);
 	void setAddType(AddType newAddType);
 	void setEditType(EditType newEditType);
+	void setStateType(MariaStateManager::STATE_TYPE newStateType);
 
 	bool isValid() const;
 	string getOriginalInput() const;
@@ -56,11 +57,13 @@ public:
 	MariaTime* getEndTime() const;
 	AddType getAddType() const;
 	EditType getEditType() const;
+	MariaStateManager::STATE_TYPE getStateType() const;
 
 private:
 	CommandType _commandType;
 	AddType _addType;
 	EditType _editType;
+	MariaStateManager::STATE_TYPE _stateType;
 
 	bool _validInput;
 	string _originalInput;
