@@ -7,7 +7,7 @@ const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE=0.25;
 const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE=0.35;
 const float MariaUIStateHome::TASK_STARTHEIGHT_DIFFERENCE=24.0;
 
-MariaUIStateHome::MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow,MariaTaskManager *taskManager) : MariaStateObject(qmainWindow) {
 	_qmainWindow=qmainWindow;
 	_taskManager=taskManager;
 
