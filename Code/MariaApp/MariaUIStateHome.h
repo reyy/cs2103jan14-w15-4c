@@ -38,7 +38,7 @@ private:
 
 	static bool sortTaskFunction(MariaUITask *i,MariaUITask *j);
 public:
-	MariaUIStateHome(MariaTaskManager *taskManager,QMainWindow* qmainWindow);
+	MariaUIStateHome(QMainWindow* qmainWindow,MariaTaskManager *taskManager);
 	~MariaUIStateHome();
 
 	MariaUITask* addTask(MariaTask *task);

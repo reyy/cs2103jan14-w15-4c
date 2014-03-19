@@ -34,12 +34,6 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_MariaUICommandBar.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIRolling.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIRolling.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUIStatus.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
@@ -53,12 +47,6 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="MariaUI.cpp">
-      <Filter>User Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="MariaUICalendar.cpp">
-      <Filter>User Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="MariaUIRolling.cpp">
       <Filter>User Interface</Filter>
     </ClCompile>
     <ClCompile Include="MariaUIStateConflict.cpp">
@@ -126,12 +114,6 @@
   <ItemGroup>
     <CustomBuild Include="MariaStateManager.h" />
     <CustomBuild Include="MariaUI.h">
-      <Filter>User Interface</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MariaUICalendar.h">
-      <Filter>User Interface</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MariaUIRolling.h">
       <Filter>User Interface</Filter>
     </CustomBuild>
     <CustomBuild Include="MariaUIStateHome.h">

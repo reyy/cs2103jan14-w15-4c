@@ -22,9 +22,6 @@ private:
 	static const float DAY_X_OFFSET;
 	static const float DAY_Y_OFFSET;
 
-	static const char * const DAYS[];
-	static const char * const MONTHS[];
-
 	QMainWindow *_qmainWindow;
 	
 	QLabel *_currentTime;
