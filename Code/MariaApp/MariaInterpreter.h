@@ -33,7 +33,7 @@ public:
 	/// @param	inputString		This be the user's input.
 	///
 	/// @return	This be the magical object that holds the answer to everything...
-	MariaInputObject* parseInput(string inputString, MariaStateManager::STATE_TYPE currentState);
+	MariaInputObject* parseInput(string inputString, MariaStateManager::STATE_TYPE currentState = MariaStateManager::STATE_TYPE::HOME);
 
 #ifdef _DEBUG
 public:
@@ -50,8 +50,6 @@ private:
 	/// @return	The command's flag will be returned on valid input. Invalid flag otherwise.
 	MariaInputObject::CommandType getCommandType(string &inputString);
 
-	MariaInputObject::AddType getAddType(string &inputString);
-
 	/// Gets the task's title from the user's input.
 	/// The title would also be removed from the inputString.
 	///
@@ -63,10 +61,10 @@ private:
 
 	string getEditField(string &inputString);
 
-	MariaTime* getStartTime(string &inputString);
-	MariaTime* getEndTime(string &inputString);
-	vector<MariaTime*> parseDateTime(vector<string> &tokenizedInput);
-	MariaTime* parseDateTime(vector<string> dateTimeList);
+	vector<MariaTime*> parseDateTimeString(vector<string> &tokenizedInput);
+	MariaTime* parseDateTime(vector<string> dateTimeList, bool hasDate, bool hasTime);
+	void parseDate(string text, int &year, int &month, int &day);
+	void parseTime(string text, int &hour, int &min);
 
 	/// Checks the validity of the user's input depending on
 	/// the presence of certain keywords, number of words and so on.
@@ -96,6 +94,14 @@ private:
 	bool isInteger(string text);
 	bool isDate(string text);
 	bool isTime(string text);
+
+	bool isStringToday(string text);
+	bool isStringTomorrow(string text);
+	bool isStringDayFormat(string text);
+	bool isStringDateFormat(string text);
+	int getDayOfWeek(string text);
+	bool isStringMatch(string text, string expr);
+	bool doesStringContain(string text, string expr);
 
 	void getDate(string input, int &day, int &month, int &year);
 	void getTime(string input, int &hour, int &min);

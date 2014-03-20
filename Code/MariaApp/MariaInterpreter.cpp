@@ -45,6 +45,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 
 	vector<string> tokenizedInput = tokenizeString(inputString);
 	map<string, MariaInputObject::CommandType>::iterator commandKeyword;
+	vector<MariaTime*> timeList;
 
 	if (currentState == MariaStateManager::STATE_TYPE::HOME) {
 		// Check for command keyword.
@@ -65,14 +66,17 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 
 			switch (inputObject->getCommandType()) {
 			case MariaInputObject::CommandAdd:
-				//this->parseTime(tokenizedInput);
-				//_logger.push_back("Log: parseInput(): CommandAdd");
-				inputObject->setAddType(this->getAddType(inputString));
-				if (inputObject->getAddType() == MariaInputObject::AddTimed) {
-					inputObject->setStartTime(this->getStartTime(inputString));
-					inputObject->setEndTime(this->getEndTime(inputString));
-				} else if (inputObject->getAddType() == MariaInputObject::AddDeadline) {
-					inputObject->setEndTime(this->getEndTime(inputString));
+				timeList = this->parseDateTimeString(tokenizedInput);
+
+				if (timeList.size() == 0) {
+					inputObject->setAddType(MariaInputObject::AddType::AddFloating);
+				} else if (timeList.size() == 1) {
+					inputObject->setAddType(MariaInputObject::AddType::AddDeadline);
+					inputObject->setEndTime(timeList[0]);
+				} else if (timeList.size() == 2) {
+					inputObject->setAddType(MariaInputObject::AddType::AddTimed);
+					inputObject->setStartTime(timeList[0]);
+					inputObject->setEndTime(timeList[1]);
 				}
 				break;
 			case MariaInputObject::CommandEdit:
@@ -117,22 +121,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	return inputObject;
 }
 
-MariaInputObject::AddType MariaInterpreter::getAddType(string &inputString) {
-	MariaInputObject::AddType addType = MariaInputObject::AddNone;
-
-	int fromKeywordPos = inputString.find("from ");
-	int byKeywordPos = inputString.find("by ");
-
-	if (fromKeywordPos == string::npos && byKeywordPos == string::npos) {
-		addType = MariaInputObject::AddFloating;
-	} else if (fromKeywordPos != string::npos && byKeywordPos == string::npos) {
-		addType = MariaInputObject::AddTimed;
-	} else if (fromKeywordPos == string::npos && byKeywordPos != string::npos) {
-		addType = MariaInputObject::AddDeadline;
-	}
-	return addType;
-}
-
 string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 	string title = "";
 	for (int i = 0; i < tokenizedInput.size(); i++) {
@@ -165,149 +153,176 @@ string MariaInterpreter::getEditField(string &inputString) {
 	return inputString.substr(inputString.find("title") + 6, inputString.size());
 }
 
-MariaTime* MariaInterpreter::getStartTime(string &inputString) {
-	MariaTime* startTime = NULL;
-	int endOfStartStringPos = inputString.find(" to ");
-	string startTimeString;
+vector<MariaTime*> MariaInterpreter::parseDateTimeString(vector<string> &tokenizedInput) {
+	vector<MariaTime*> timeObjectList;
+	vector<string> workingList;
 
-	if (endOfStartStringPos == string::npos) {
-		startTimeString = inputString;
-	} else {
-		startTimeString = inputString.substr(0, endOfStartStringPos);
+	for (int i = 0; i < tokenizedInput.size(); i++) {
+		if (isDate(tokenizedInput[i])) {
+			// Check the next token to see if it is a time string
+			if ((i < tokenizedInput.size() - 1) &&
+				isTime(tokenizedInput[i+1])) {
+				// Case: DT??
+				// Extract both the date and time from the tokens.
+				// Insert them into a new mariatime object.
+				workingList.push_back(tokenizedInput[i]);
+				workingList.push_back(tokenizedInput[i+1]);
+				timeObjectList.push_back(parseDateTime(workingList, true, true));
+				workingList.clear();
+				// Since this is a complete mariatime object, we can skip one object.
+				i++;
+			} else {
+				// Case: D??? & Case: D/D?
+				workingList.push_back(tokenizedInput[i]);
+				timeObjectList.push_back(parseDateTime(workingList, true, false));
+				workingList.clear();
+			}
+		} else if (isTime(tokenizedInput[i])) {
+			workingList.push_back(tokenizedInput[i]);
+			timeObjectList.push_back(parseDateTime(workingList, false, true));
+			workingList.clear();
+		}
 	}
-
-	// Format: DD-MM-YY HH:MM
-	vector<string> firstPass = tokenizeString(startTimeString);
-	vector<string> date;
-	vector<string> time;
-	int year, month, day, hour, min;
-
-	if (firstPass[1] == "today") {
-		startTime = new MariaTime(MariaTime::getCurrentTime());
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-		startTime->setHour(hour);
-		startTime->setMin(min);
-	} else if (firstPass[1] == "tomorrow") {
-		startTime = new MariaTime(MariaTime::getCurrentTime());
-		startTime->setDay(startTime->getDay() + 1);
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-		startTime->setHour(hour);
-		startTime->setMin(min);
-	} else {
-		vector<string> date = tokenizeString(firstPass[1], 47);
-
-		day = atoi(date[0].c_str());
-		month = atoi(date[1].c_str());
-		// ASSUMPTION: date entered is in 2000s
-		year = atoi(date[2].c_str()) + 2000;
-
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-
-		startTime = new MariaTime(year, month, day, hour, min);
-	}
-
-	inputString = replaceText(inputString, startTimeString, "");
-	inputString = trimWhiteSpace(inputString);
-
-	return startTime;
+	return timeObjectList;
 }
 
-MariaTime* MariaInterpreter::getEndTime(string &inputString) {
-	MariaTime* endTime = NULL;
-
-	// Format: DD-MM-YY HH:MM
-	vector<string> firstPass = tokenizeString(inputString);
-	vector<string> date;
-	vector<string> time;
-	int year, month, day, hour, min;
-
-	if (firstPass[1] == "today") {
-		endTime = new MariaTime(MariaTime::getCurrentTime());
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-		endTime->setHour(hour);
-		endTime->setMin(min);
-	} else if (firstPass[1] == "tomorrow") {
-		endTime = new MariaTime(MariaTime::getCurrentTime());
-		endTime->setDay(endTime->getDay() + 1);
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-		endTime->setHour(hour);
-		endTime->setMin(min);
-	} else {
-		vector<string> date = tokenizeString(firstPass[1], 47);
-
-		day = atoi(date[0].c_str());
-		month = atoi(date[1].c_str());
-		// ASSUMPTION: date entered is in 2000s
-		year = atoi(date[2].c_str()) + 2000;
-
-		time = tokenizeString(firstPass[2], ':');
-		hour = atoi(time[0].c_str());
-		min = atoi(time[1].c_str());
-
-		endTime = new MariaTime(year, month, day, hour, min);
-	}
-
-	inputString = replaceText(inputString, inputString, "");
-	inputString = trimWhiteSpace(inputString);
-
-	return endTime;
-}
-
-vector<MariaTime*> MariaInterpreter::parseDateTime(vector<string> &tokenizedInput) {
-	int dateCount = 0;
-	int timeCount = 0;
-
-	for (string token : tokenizedInput) {
-		isDate(token)?dateCount++:0;
-		isTime(token)?timeCount++:0;
-	}
-
-	if (dateCount == 2 || timeCount == 2) {
-		// timed task
-		int apple = 0;
-	} else if ((dateCount == 1 && timeCount <= 1) ||
-			(dateCount == 0 && timeCount == 1)) {
-		// deadline task
-		int banana = 1;
-	} else {
-		// floating task
-		int coconut = 2;
-	}
-	vector<MariaTime*> toReturn;
-	return toReturn;
-}
-
-MariaTime* MariaInterpreter::parseDateTime(vector<string> dateTimeList) {
+MariaTime* MariaInterpreter::parseDateTime(vector<string> dateTimeList, bool hasDate, bool hasTime) {
 	assert(dateTimeList.size() > 0 && dateTimeList.size() <= 2);
 
 	// Here must be: date OR time OR date/time
 
 	MariaTime* toReturn = NULL;
+	vector<string> workingList;
+	int delimiterPos;
+	int year, month, day, hour, min;
 
 	if (dateTimeList.size() == 1) {
-		if (isDate(dateTimeList[0])) {
-			// It's a date! *winks*
-			// But first, we need to know what kind of date it is.
-			// Use portions of isDate
-		} else if (isTime(dateTimeList[0])) {
+		if (hasDate) {
+			parseDate(dateTimeList[0], year, month, day);
+
 			toReturn = new MariaTime(MariaTime::getCurrentTime());
-			// Need to do comparison, if currentTime is already past set time.
+			toReturn->setYear(year);
+			toReturn->setMonth(month);
+			toReturn->setDay(day);
+		} else if (hasTime) {
+			parseTime(dateTimeList[0], hour, min);
+
+			toReturn = new MariaTime(MariaTime::getCurrentTime());
+			toReturn->setHour(hour);
+			toReturn->setMin(min);
 		}
 	} else {
-		// Need to know what kind of date it is...
-		// Also need to know what kind of time it is...
+		// Just construct the mariatime object
+		if (isStringToday(dateTimeList[0])) {
+			toReturn = new MariaTime(MariaTime::getCurrentTime());
+
+			parseTime(dateTimeList[1], hour, min);
+			toReturn->setHour(hour);
+			toReturn->setMin(min);
+		} else if (isStringTomorrow(dateTimeList[0])) {
+			toReturn = new MariaTime(MariaTime::getCurrentTime());
+			toReturn->setDay(toReturn->getDay()+1);
+
+			parseTime(dateTimeList[1], hour, min);
+			toReturn->setHour(hour);
+			toReturn->setMin(min);
+		} else {
+			parseDate(dateTimeList[0], year, month, day);
+			parseTime(dateTimeList[1], hour, min);
+
+			toReturn = new MariaTime();
+			toReturn->setYear(year);
+			toReturn->setMonth(month);
+			toReturn->setDay(day);
+			toReturn->setHour(hour);
+			toReturn->setMin(min);
+		}
 	}
+
+	toReturn->setSec(0);
 	return toReturn;
+}
+
+void MariaInterpreter::parseDate(string text, int &year, int &month, int &day) {
+	vector<string> workingList;
+	int delimiterPos;
+	const char dateDelimiterArray[3] = { '/', '-', '.' };
+
+	if (isStringToday(text)) {
+		year = MariaTime::getCurrentTime().getYear();
+		month = MariaTime::getCurrentTime().getMonth();
+		day = MariaTime::getCurrentTime().getDay();
+	} else if (isStringTomorrow(text)) {
+		year = MariaTime::getCurrentTime().getYear();
+		month = MariaTime::getCurrentTime().getMonth();
+		day = MariaTime::getCurrentTime().getDay()+1;
+	}
+
+	// It's a date object only.
+	for (int i = 0; i < 3; i++) {
+		if (text.find(dateDelimiterArray[i]) != string::npos) {
+			// Process.
+			workingList = tokenizeString(text, dateDelimiterArray[i]);
+
+			assert(workingList.size() == 3);
+			year = atoi(workingList[2].c_str());
+			month = atoi(workingList[1].c_str());
+			day = atoi(workingList[0].c_str());
+
+			year < 100 ? year += 2000 : 0;
+
+			workingList.clear();
+
+			return;
+		}
+	}
+}
+
+void MariaInterpreter::parseTime(string text, int &hour, int &min) {
+	// It's a time object only.
+	bool hasDelimiter = false;
+	const char timeDelimiterArray[2] = { ':', '.' };
+	int delimiterPos;
+	vector<string> workingList;
+
+	for (int i = 0; i < 2; i++) {
+		if (text.find(timeDelimiterArray[i]) != string::npos) {
+			// Process.
+			workingList = tokenizeString(text, timeDelimiterArray[i]);
+
+			assert(workingList.size() == 2);
+			hour = atoi(workingList[0].c_str());
+			min = atoi(workingList[1].c_str());
+
+			hasDelimiter = true;
+
+			return;
+		}
+	}
+
+	if (!hasDelimiter) {
+		// Check the length of the string.
+		// Process it manually.
+		string temp;
+
+		if (doesStringContain(text, "am|pm|mn|nn")) {
+			// We need to process this differently.
+		} else {
+			if (text.size() == 3) {
+				// E.g.: 111 - 1:11
+				temp = text[0];
+				hour = atoi(temp.c_str());
+				temp = text.substr(1, 2);
+				min = atoi(temp.c_str());
+			} else if (text.size() == 4) {
+				// E.g.: 2359
+				temp = text.substr(0, 2);
+				hour = atoi(temp.c_str());
+				temp = text.substr(2, 2);
+				min = atoi(temp.c_str());
+			}
+		}
+	}
 }
 
 bool MariaInterpreter::checkInputValidity(string inputString) {
@@ -429,32 +444,74 @@ bool MariaInterpreter::isInteger(string text) {
 bool MariaInterpreter::isDate(string text) {
 	text = lowercaseString(text);
 
-	// Check if it is a day format
-	regex dayExpression("today|tomorrow|mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|sunday");
-	if (regex_match(text, dayExpression)) {
-		return true;
-	}
-
-	// Next check if it is a date format
-	regex dateExpression("[0123][0-9]/[01][0-9]/[0-9][0-9]([0-9][0-9])?");
-	if (regex_match(text, dateExpression)) {
-		//TODO: Check is valid date.
-		return true;
-	}
-
 	//TODO: Check "24 june"
 
-	return false;
+	return isStringToday(text) ||
+		isStringTomorrow(text) ||
+		isStringDayFormat(text) ||
+		isStringDateFormat(text);
+}
+
+bool MariaInterpreter::isStringToday(string text) {
+	regex todayExpression("today");
+
+	return regex_match(text, todayExpression);
+}
+
+bool MariaInterpreter::isStringTomorrow(string text) {
+	regex tomorrowExpression("tomorrow");
+
+	return regex_match(text, tomorrowExpression);
+}
+
+bool MariaInterpreter::isStringDayFormat(string text) {
+	regex dayExpression("mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|sunday");
+
+	return regex_match(text, dayExpression);
+}
+
+bool MariaInterpreter::isStringDateFormat(string text) {
+	regex dateExpression("[0123][0-9](/|.|-)[01][0-9](/|.|-)[0-9][0-9]([0-9][0-9])?");
+
+	return regex_match(text, dateExpression);
 }
 
 bool MariaInterpreter::isTime(string text) {
-	regex timeExpression("([012]?[0-9]:?[0-5][0-9])|([01]?[0-9]:?[0-5][0-9])(am|pm)");
+	regex timeExpression("([012]?[0-9](:|.)?[0-5][0-9])|([01]?[0-9](:|.)?[0-5][0-9])(am|pm)");
 	if (regex_match(text, timeExpression)) {
 		//TODO: Check is valid time.
 		return true;
 	}
 
 	return false;
+}
+
+int MariaInterpreter::getDayOfWeek(string text) {
+	regex dayExpression("mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|sunday");
+	smatch matches;
+	const string dayExpressionArray[7] = { "mon(day)?", "tues?(day)?", "wed(nesday)?", "thur?s?(day)?", "fri(day)?", "sat(urday)?", "sunday"};
+
+	if (regex_match(text, matches, dayExpression)) {
+		for (int i = 0; i < 7; i++) {
+			if (isStringMatch(matches[0], dayExpressionArray[i])) {
+				return i;
+			}
+		}
+	}
+
+	return -1;
+}
+
+bool MariaInterpreter::isStringMatch(string text, string expr) {
+	regex expression(expr);
+
+	return regex_match(text, expression);
+}
+
+bool MariaInterpreter::doesStringContain(string text, string expr) {
+	regex expression(expr);
+
+	return regex_search(text, expression);
 }
 
 void MariaInterpreter::getDate(string input, int &day, int &month, int &year) {
