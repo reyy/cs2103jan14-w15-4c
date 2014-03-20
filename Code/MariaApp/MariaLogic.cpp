@@ -52,7 +52,7 @@ MariaLogic::~MariaLogic(void) {
 }
 
 bool MariaLogic::processCommand(std::string inputText) {
-	MariaInputObject* input = mariaInterpreter->parseInput(inputText);
+	MariaInputObject* input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 
 	if(input->getCommandType() == MariaInputObject::CommandType::CommandInvalid) {

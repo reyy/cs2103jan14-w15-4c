@@ -3,9 +3,12 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include <algorithm>
 #include <functional>
 #include <regex>
+#include <exception>
 #include "MariaInputObject.h"
+#include "MariaStateManager.h"
 using namespace std;
 
 /**
@@ -30,24 +33,16 @@ public:
 	/// @param	inputString		This be the user's input.
 	///
 	/// @return	This be the magical object that holds the answer to everything...
-	MariaInputObject* parseInput(string inputString);
+	MariaInputObject* parseInput(string inputString, MariaStateManager::STATE_TYPE currentState = MariaStateManager::STATE_TYPE::HOME);
 
 #ifdef _DEBUG
 public:
 #else
 private:
 #endif
-	map<string, MariaInputObject::CommandType> *userDefinedCommands;
+	map<string, MariaInputObject::CommandType>* commandKeywordList;
 
-	/// Gets a CommandType flag depending on the user's input.
-	/// The command keyword would also be removed from the inputString.
-	///
-	/// @param	inputString	User's input.
-	///
-	/// @return	The command's flag will be returned on valid input. Invalid flag otherwise.
-	MariaInputObject::CommandType getCommandType(string &inputString);
-
-	MariaInputObject::AddType getAddType(string &inputString);
+	MariaInputObject::EditType getEditType(vector<string> &tokenizedInput);
 
 	/// Gets the task's title from the user's input.
 	/// The title would also be removed from the inputString.
@@ -55,20 +50,15 @@ private:
 	/// @param	inputString	User's input.
 	///
 	/// @return	The task's title would be returned on valid input. Blank otherwise.
-	string getTitle(string &inputString);
+	//string getTitle(string &inputString);
+	string getTitle(vector<string> &tokenizedInput);
 
-	string getEditField(string &inputString);
+	string getEditField(vector<string> &tokenizedInput);
 
-	MariaTime* getStartTime(string &inputString);
-	MariaTime* getEndTime(string &inputString);
-
-	/// Checks the validity of the user's input depending on
-	/// the presence of certain keywords, number of words and so on.
-	///
-	/// @param	User's input.
-	///
-	/// @return	True if valid. False otherwise.
-	bool checkInputValidity(string inputString);
+	vector<MariaTime*> parseDateTimeString(vector<string> &tokenizedInput);
+	MariaTime* parseDateTime(vector<string> dateTimeList, bool hasDate, bool hasTime);
+	void parseDate(string text, int &year, int &month, int &day);
+	void parseTime(string text, int &hour, int &min);
 
 	/// Replaces oldText in the inputString with newText.
 	///
@@ -82,7 +72,25 @@ private:
 
 	vector<string> tokenizeString(string inputString, char delimiter = ' ');
 
+	string stitchString(vector<string> token, int startPos, int endPos, string delimiter = " ");
+
+	void removeTokens(vector<string> &input, int startPos, int endPos);
+
 	string lowercaseString(string text);
+	bool isInteger(string text);
+	bool isDate(string text);
+	bool isTime(string text);
+
+	bool isStringToday(string text);
+	bool isStringTomorrow(string text);
+	bool isStringDayFormat(string text);
+	bool isStringDateFormat(string text);
+	int getDayOfWeek(string text);
+	bool isStringMatch(string text, string expr, bool ignoreCasing = true);
+	bool doesStringContain(string text, string expr, bool ignoreCasing = true);
+
+	void getDate(string input, int &day, int &month, int &year);
+	void getTime(string input, int &hour, int &min);
 
 	// To trim whitespace.
 	inline string trimWhiteSpaceLeft(string text);
