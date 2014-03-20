@@ -3,7 +3,7 @@
 #include "MariaUI.h"
 #include "MariaTaskManager.h"
 
-const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.2;
+const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.24;
 const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE = 0.65;
 
 MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, MariaTaskManager *taskManager) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {

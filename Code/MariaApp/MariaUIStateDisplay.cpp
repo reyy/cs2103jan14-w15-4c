@@ -99,6 +99,8 @@ void MariaUIStateDisplay::eraseAllUITask() {
 		_taskDisposeStack.push_back(_taskStack.at(0));
 		_taskStack.erase(_taskStack.begin());
 	}
+	
+	updateGUI();
 }
 
 void MariaUIStateDisplay::clearUITask() {
@@ -119,6 +121,9 @@ void MariaUIStateDisplay::clearUITask() {
 	while(_taskDisposeStack.size()>0) {
 		_taskDisposeStack.pop_back();
 	}
+
+	
+	updateGUI();
 }
 
 int MariaUIStateDisplay::getTotalUITask() {

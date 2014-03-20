@@ -31,7 +31,7 @@ MariaTime::MariaTime(string value) {
 	timeStruct.tm_year = year - YEAR_OFFSET;
 	timeStruct.tm_mon = month - MONTH_OFFSET;
 	timeStamp = mktime(&timeStruct);
-	
+
 }
 
 
@@ -62,11 +62,11 @@ int MariaTime::getMonth() {
 int MariaTime::getDay() {
 	return timeStruct.tm_mday;
 }
-	
+
 int MariaTime::getHour() {
 	return timeStruct.tm_hour;
 }
-	
+
 int MariaTime::getMin() {
 	return timeStruct.tm_min;
 }
@@ -137,15 +137,15 @@ string MariaTime::getTimeFromNow() {
 		}
 		return returnString;
 	}
-	
+
 }
 
 MariaTime MariaTime::getCurrentTime() {
-	
+
 	time_t rawtime;
 	time ( &rawtime );
 	MariaTime toReturn(rawtime);
- //toReturn.timeStruct = *localtime ( &rawtime );
+	//toReturn.timeStruct = *localtime ( &rawtime );
 	//toReturn.timeStruct.tm_year += YEAR_OFFSET;
 	return toReturn;
 }
@@ -153,18 +153,34 @@ MariaTime MariaTime::getCurrentTime() {
 string MariaTime::convertTimeToString(MariaTime *time) {
 	string toReturn;
 
-	if(time->getHour()<12) {
-		toReturn=std::to_string(time->getHour())+timeSeparator;
-		if(time->getMin()<10) {
-			toReturn+="0";
+	if(time->getHour() == 0 || time->getHour() == 12 ) {
+		if(time->getHour() == 0) {
+			toReturn=std::to_string(time->getHour()+12)+timeSeparator;
+			if(time->getMin()<10) {
+				toReturn+="0";
+			}
+			toReturn+=std::to_string(time->getMin())+timeMorning;
+		} else {
+			toReturn=std::to_string(time->getHour())+timeSeparator;
+			if(time->getMin()<10) {
+				toReturn+="0";
+			}
+			toReturn+=std::to_string(time->getMin())+timeEvening;
 		}
-		toReturn+=std::to_string(time->getMin())+timeMorning;
 	} else {
-		toReturn=std::to_string(time->getHour()-12)+timeSeparator;
-		if(time->getMin()<10) {
-			toReturn+="0";
+		if(time->getHour() < 12) {
+			toReturn=std::to_string(time->getHour())+timeSeparator;
+			if(time->getMin()<10) {
+				toReturn+="0";
+			}
+			toReturn+=std::to_string(time->getMin())+timeMorning;
+		} else {
+			toReturn=std::to_string(time->getHour()-12)+timeSeparator;
+			if(time->getMin()<10) {
+				toReturn+="0";
+			}
+			toReturn+=std::to_string(time->getMin())+timeEvening;
 		}
-		toReturn+=std::to_string(time->getMin())+timeEvening;
 	}
 
 	return toReturn;

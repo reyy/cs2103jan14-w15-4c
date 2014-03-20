@@ -94,6 +94,12 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUIPreview.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITextbox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MariaUITextbox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -118,9 +124,6 @@
     </ClInclude>
     <ClInclude Include="MariaUIStateShow.h">
       <Filter>User Interface\States</Filter>
-    </ClInclude>
-    <ClInclude Include="MariaUITextbox.h">
-      <Filter>User Interface\Elements</Filter>
     </ClInclude>
     <ClInclude Include="MariaUIStateDisplay.h">
       <Filter>User Interface\States</Filter>
@@ -147,6 +150,9 @@
       <Filter>User Interface\Elements</Filter>
     </CustomBuild>
     <CustomBuild Include="MariaUIPreview.h">
+      <Filter>User Interface\Elements</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MariaUITextbox.h">
       <Filter>User Interface\Elements</Filter>
     </CustomBuild>
   </ItemGroup>
