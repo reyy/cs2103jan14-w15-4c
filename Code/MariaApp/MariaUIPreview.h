@@ -15,6 +15,7 @@ public:
 	static const string PREVIEW_EVENT_TOMORROW;
 	static const string PREVIEW_EVENT_TOMORROW_MULTIPLE;
 
+	static const string PREVIEW_EVENT_TODAY_NONE;
 	static const string PREVIEW_EVENT_TODAY_FIRST_AT;
 	static const string PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME;
 	static const string PREVIEW_EVENT_TODAY_NEXT_AT;
@@ -23,11 +24,12 @@ public:
 	static const string PREVIEW_DEADLINE_TOMORROW;
 	static const string PREVIEW_DEADLINE_TOMORROW_MUTIPLE;
 
-	static const string PREVIEW_DEADLINE_TODAY;
+	static const string PREVIEW_DEADLINE_TODAY_AT;
+	static const string PREVIEW_DEADLINE_TODAY_REMAINING_TIME;
 	static const string PREVIEW_DEADLINE_TODAY_MUTIPLE;
-	static const string PREVIEW_DEADLINE_ITEM;
+	static const string PREVIEW_DEADLINE_ITEM_AT;
+	static const string PREVIEW_DEADLINE_ITEM_REMAINING_TIME;
 
-	static const string PREVIEW_FLOATING_SUGGESTION_NO_EVENT;
 	static const string PREVIEW_FLOATING_SUGGESTION_DEFAULT;
 
 	static const float START_HEIGHT_SCALE;
@@ -44,10 +46,13 @@ private:
 	QTimer *_updateTextTimer;
 	QLabel *_mainText;
 
+	MariaTask *_generatedSuggestionTask;
 	
-	string updateTodayText();
-	string updateTomorrowText();
-	string updateSuggestionText();
+	string generateTodayText();
+	string generateTomorrowText();
+
+	//Force denotes whether to generate a new task instead of using the existing store task.
+	string generateSuggestionText(bool force);
 
 public slots:
 	void updateText();

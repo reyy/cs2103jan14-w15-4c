@@ -44,16 +44,28 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 		if(temp->getType() == type) {
 		switch(type) {
 			case MariaTask::TaskType::DEADLINE:
-				if(start == NULL && temp->getEnd()->get() <= end->get()) {
+				if(temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
 					returnList.push_back(temp);
 				}
 				break;
 			case MariaTask::TaskType::TIMED:
-				if(temp->getStart()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
+				if(temp->getStart()->get() >= start->get() && temp->getStart()->get() <= end->get()) {
 					returnList.push_back(temp);
 				}
 				break;
 			}
+		}
+	}
+
+	return returnList;
+}
+
+vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type) {
+	vector<MariaTask*> returnList;
+
+	for(MariaTask* temp : *taskList) {
+		if(temp->getType() == type) {
+			returnList.push_back(temp);
 		}
 	}
 
