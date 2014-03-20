@@ -19,17 +19,17 @@ public:
 	} CommandType;
 
 	typedef enum {
-		AddNone,
-		AddFloating,
-		AddDeadline,
-		AddTimed,
+		AddNone, 
+		AddFloating, 
+		AddDeadline, 
+		AddTimed, 
 	} AddType;
 
 	typedef enum {
-		EditNone,
-		EditTitle,
-		EditStartTime,
-		EditEndTime,
+		EditNone, 
+		EditTitle, 
+		EditStartTime, 
+		EditEndTime, 
 	} EditType;
 
 	MariaInputObject();

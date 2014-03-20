@@ -7,8 +7,6 @@ public:
 	static const float VALUE_THRESHOLD;
 
 private:
-	QMainWindow* _qmainWindow;
-
 	QPointF _position;
 	QPointF _destination;
 
@@ -17,6 +15,7 @@ private:
 	bool updatePosition();
 	friend class MariaStateManager;
 protected:
+	QMainWindow* _qmainWindow;
 	bool _transitionAuto;
 
 	QPointF getPosition();

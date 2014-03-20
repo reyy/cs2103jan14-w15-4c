@@ -82,6 +82,9 @@
     <ClCompile Include="MariaUITextbox.cpp">
       <Filter>User Interface\Elements</Filter>
     </ClCompile>
+    <ClCompile Include="MariaUIStateDisplay.cpp">
+      <Filter>User Interface\States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="MariaUITextbox.h">
       <Filter>User Interface\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaUIStateDisplay.h">
+      <Filter>User Interface\States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

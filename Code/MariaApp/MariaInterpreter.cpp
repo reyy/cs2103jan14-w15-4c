@@ -1,6 +1,6 @@
 #include "MariaInterpreter.h"
 
-MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::CommandType> *inputCommandList){
+MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::CommandType> *inputCommandList) {
 	commandKeywordList = inputCommandList;
 	if (commandKeywordList == NULL) {
 		commandKeywordList = new map<string, MariaInputObject::CommandType>();
@@ -162,7 +162,7 @@ string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 }
 
 string MariaInterpreter::getEditField(string &inputString) {
-	return inputString.substr(inputString.find("title")+6, inputString.size());
+	return inputString.substr(inputString.find("title") + 6, inputString.size());
 }
 
 MariaTime* MariaInterpreter::getStartTime(string &inputString) {
@@ -191,7 +191,7 @@ MariaTime* MariaInterpreter::getStartTime(string &inputString) {
 		startTime->setMin(min);
 	} else if (firstPass[1] == "tomorrow") {
 		startTime = new MariaTime(MariaTime::getCurrentTime());
-		startTime->setDay(startTime->getDay()+1);
+		startTime->setDay(startTime->getDay() + 1);
 		time = tokenizeString(firstPass[2], ':');
 		hour = atoi(time[0].c_str());
 		min = atoi(time[1].c_str());
@@ -236,7 +236,7 @@ MariaTime* MariaInterpreter::getEndTime(string &inputString) {
 		endTime->setMin(min);
 	} else if (firstPass[1] == "tomorrow") {
 		endTime = new MariaTime(MariaTime::getCurrentTime());
-		endTime->setDay(endTime->getDay()+1);
+		endTime->setDay(endTime->getDay() + 1);
 		time = tokenizeString(firstPass[2], ':');
 		hour = atoi(time[0].c_str());
 		min = atoi(time[1].c_str());
@@ -343,7 +343,7 @@ bool MariaInterpreter::checkInputValidity(string inputString) {
 		return false;
 	}
 
-	// For our "create" command, we need to check if it is a floating,
+	// For our "create" command, we need to check if it is a floating, 
 	// deadline or timed task. So we need to see if the respective
 	// keywords are present.
 	if (input[0] == "create") {
@@ -393,9 +393,9 @@ string MariaInterpreter::replaceText(string inputString, string oldText, string 
 	regex term(oldText);
 
 	return regex_replace(
-		inputString,
-		term,
-		newText,
+		inputString, 
+		term, 
+		newText, 
 		(firstInstanceOnly?regex_constants::format_first_only:regex_constants::match_default));
 }
 
@@ -414,7 +414,7 @@ vector<string> MariaInterpreter::tokenizeString(string inputString, char delimit
 string MariaInterpreter::lowercaseString(string text) {
 	string toReturn = "";
 
-	for (int i = 0; i < text.size(); i++) {
+	for (int i = 0; i < text.size(); i++ ) {
 		toReturn += tolower(text[i]);
 	}
 

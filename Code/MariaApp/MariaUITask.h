@@ -8,11 +8,11 @@
 class MariaUITask : QWidget{
 	Q_OBJECT
 public:
-	static const int TEXTBOX_X_OFFSET=30;
-	static const int BULLET_SPACE=20;
-	static const int TIME_UPDATE_FREQUENCY=1000;
-	static const int BULLET_X_OFFSET=2;
-	static const int BULLET_Y_OFFSET=4;
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int BULLET_SPACE = 20;
+	static const int TIME_UPDATE_FREQUENCY = 1000;
+	static const int BULLET_X_OFFSET = 2;
+	static const int BULLET_Y_OFFSET = 4;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE_TITLE;
@@ -28,7 +28,7 @@ public:
 	static const float TIMESTAMP_X_OFFSET;
 
 	typedef enum{
-		NORMAL,
+		NORMAL, 
 		EXPANDED
 	} DISPLAY_TYPE;
 
@@ -55,7 +55,7 @@ protected slots:
 	void updateTimeText();
 
 public:
-	MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width,DISPLAY_TYPE type);
+	MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width, DISPLAY_TYPE type);
 	~MariaUITask();
 
 	bool setTitlePretext(string pretext);
@@ -71,6 +71,8 @@ public:
 
 	void show();
 	void hide();
+
+	float getTaskHeight();
 
 	MariaTask * getMariaTask();
 };

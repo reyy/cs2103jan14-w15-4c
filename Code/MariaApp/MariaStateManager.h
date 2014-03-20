@@ -10,19 +10,19 @@ class MariaStateManager : public QWidget {
 
 public:
 	typedef enum {
-		BLANK,
-		HOME,
-		SHOW,
-		EDIT,
-		SETTING,
-		CONFLICT,
-		LOADING,
+		BLANK, 
+		HOME, 
+		SHOW, 
+		EDIT, 
+		SETTING, 
+		CONFLICT, 
+		LOADING, 
 		QUIT
 	} STATE_TYPE;
 
 	typedef enum {
-		BEGIN,
-		ACTIVE,
+		BEGIN, 
+		ACTIVE, 
 		END
 	} STATE_TRANSITION;
 
@@ -45,15 +45,15 @@ private:
 	void initEndState();
 
 private slots:
-	void timerBeginUpdate();
-	void timerActiveUpdate();
-	void timerEndUpdate();
+	void timerBeginState();
+	void timerActiveState();
+	void timerEndState();
 
 public:
 	MariaStateManager();
 	~MariaStateManager();
 	
-	void queueState(STATE_TYPE type,MariaStateObject* stateObject);
+	void queueState(STATE_TYPE type, MariaStateObject* stateObject);
 	void transitState();
 	STATE_TYPE getCurrentState();
 	STATE_TRANSITION getTransition();

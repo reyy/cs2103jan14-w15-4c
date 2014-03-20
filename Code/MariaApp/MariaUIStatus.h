@@ -7,19 +7,19 @@
 class MariaUIStatus : QWidget {
 	Q_OBJECT
 
-		static const int TEXTBOX_X_OFFSET=30;
-	static const int AMOUNT_OF_IMAGES=6;
-	static const int IMAGE_INDEX_OK=0;
-	static const int IMAGE_INDEX_UNKNOWN=1;
+		static const int TEXTBOX_X_OFFSET = 30;
+	static const int AMOUNT_OF_IMAGES = 6;
+	static const int IMAGE_INDEX_OK = 0;
+	static const int IMAGE_INDEX_UNKNOWN = 1;
 
 	//Image index assigned for animation must be consequtive.
-	static const int IMAGE_INDEX_WAIT_0=2;
-	static const int IMAGE_INDEX_WAIT_1=3;
-	static const int IMAGE_INDEX_WAIT_2=4;
-	static const int IMAGE_INDEX_WAIT_3=5;
+	static const int IMAGE_INDEX_WAIT_0 = 2;
+	static const int IMAGE_INDEX_WAIT_1 = 3;
+	static const int IMAGE_INDEX_WAIT_2 = 4;
+	static const int IMAGE_INDEX_WAIT_3 = 5;
 
 	//Animation speed in milliseconds.
-	static const int ANIMATION_SPEED=500;
+	static const int ANIMATION_SPEED = 500;
 
 public:
 	enum STATUS_TYPE {

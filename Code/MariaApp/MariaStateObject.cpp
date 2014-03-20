@@ -1,11 +1,11 @@
 #include "MariaStateObject.h"
 
-const float MariaStateObject::FLOW_FACTOR=0.01;
-const float MariaStateObject::VALUE_THRESHOLD=1.0;
+const float MariaStateObject::FLOW_FACTOR = 0.01;
+const float MariaStateObject::VALUE_THRESHOLD = 1.0;
 
 MariaStateObject::MariaStateObject(QMainWindow* qmainWindow) {
-	_qmainWindow=qmainWindow;
-	_transitionAuto=false;
+	_qmainWindow = qmainWindow;
+	_transitionAuto = false;
 }
 
 MariaStateObject::~MariaStateObject() {
@@ -27,8 +27,8 @@ bool MariaStateObject::updatePosition() {
 	
 	if(abs(_position.x()-_destination.x())>VALUE_THRESHOLD||
 		abs(_position.y()-_destination.y())>VALUE_THRESHOLD) {
-		_position.setX(_position.x()+(_destination.x()-_position.x())*FLOW_FACTOR);
-		_position.setY(_position.y()+(_destination.y()-_position.y())*FLOW_FACTOR);
+		_position.setX(_position.x() + (_destination.x()-_position.x())*FLOW_FACTOR);
+		_position.setY(_position.y() + (_destination.y()-_position.y())*FLOW_FACTOR);
 		return true;
 	} else {
 		return false;

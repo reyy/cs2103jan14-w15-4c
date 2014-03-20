@@ -7,23 +7,23 @@ using namespace std;
 class MariaTask{
 public:
 	typedef enum {
-		FLOATING,
-		DEADLINE,
+		FLOATING, 
+		DEADLINE, 
 		TIMED
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
-	MariaTask(string title, string description,MariaTime* start, MariaTime* end);
+	MariaTask(string title, string description, MariaTime* start, MariaTime* end);
 	~MariaTask();
 	
 	
 	TaskType getType();
 	string getTitle();
 	string getDescription();
+	string getTimeFromNow();
 	MariaTime* getStart();
 	MariaTime* getEnd();
 	double getDuration();
-	string getTimeFromNow();
 	
 	void setTitle(string);
 	void setDescription(string);
@@ -31,6 +31,8 @@ public:
 	void setEnd(MariaTime*);
 
 	void refreshTaskType();
+
+	bool operator<(MariaTask rhs);
 
 private:
 	TaskType	type;
