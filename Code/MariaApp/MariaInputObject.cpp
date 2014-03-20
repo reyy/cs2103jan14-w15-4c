@@ -7,6 +7,7 @@ MariaInputObject::MariaInputObject() {
 
 	_startTime = NULL;
 	_endTime = NULL;
+	_editTime = NULL;
 }
 
 MariaInputObject::~MariaInputObject() {
@@ -18,6 +19,11 @@ MariaInputObject::~MariaInputObject() {
 	if (_endTime != NULL) {
 		delete _endTime;
 		_endTime = NULL;
+	}
+
+	if (_editTime != NULL) {
+		delete _editTime;
+		_editTime = NULL;
 	}
 }
 
@@ -51,6 +57,10 @@ void MariaInputObject::setStartTime(MariaTime* newStartTime) {
 
 void MariaInputObject::setEndTime(MariaTime* newEndTime) {
 	_endTime = newEndTime;
+}
+
+void MariaInputObject::setEditTime(MariaTime* newEditTime) {
+	_editTime = newEditTime;
 }
 
 void MariaInputObject::setAddType(AddType newAddType) {
@@ -95,6 +105,10 @@ MariaTime* MariaInputObject::getStartTime() const {
 
 MariaTime* MariaInputObject::getEndTime() const {
 	return _endTime;
+}
+
+MariaTime* MariaInputObject::getEditTime() const {
+	return _editTime;
 }
 
 MariaInputObject::AddType MariaInputObject::getAddType() const {

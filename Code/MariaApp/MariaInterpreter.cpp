@@ -49,7 +49,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 
 	if (currentState == MariaStateManager::STATE_TYPE::HOME) {
 		// Check for command keyword.
-		commandKeyword = commandKeywordList->find(tokenizedInput[0]);
+		commandKeyword = commandKeywordList->find(lowercaseString(tokenizedInput[0]));
 
 		if (commandKeyword == commandKeywordList->end()) {
 			// Command keyword not recognized.
@@ -80,11 +80,15 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 				}
 				break;
 			case MariaInputObject::CommandEdit:
-				//_logger.push_back("Log: parseInput(): CommandEdit");
-				inputObject->setEditField(this->getEditField(inputString));
+				inputObject->setEditType(this->getEditType(tokenizedInput));
+
+				if (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0])) {
+					inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
+				} else {
+					inputObject->setEditField(this->getEditField(tokenizedInput));
+				}
 				break;
 			case MariaInputObject::CommandDelete:
-				//_logger.push_back("Log: parseInput(): CommandDelete");
 				break;
 			default:
 				break;
@@ -124,10 +128,8 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 	string title = "";
 	for (int i = 0; i < tokenizedInput.size(); i++) {
-		// Search for the following 'stop' keywords: by, from, to, today, tomorrow, time
-		if (tokenizedInput[i] == "by" ||
-			tokenizedInput[i] == "from" ||
-			tokenizedInput[i] == "to") {
+		// Search for the following 'stop' keywords: by, from, to, today, tomorrow, time, date, change
+		if (isStringMatch(tokenizedInput[i], "by|from|to")) {
 			// Check the next token to see if it is a date or time.
 			if (((i + 1) < tokenizedInput.size()) &&
 				(isDate(tokenizedInput[i+1]) || isTime(tokenizedInput[i+1]))) {
@@ -142,6 +144,10 @@ string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 			title = stitchString(tokenizedInput, 0, i);
 			removeTokens(tokenizedInput, 0, i);
 			return title;
+		} else if (isStringMatch(tokenizedInput[i], "change(title|start|end)")) {
+			title = stitchString(tokenizedInput, 0, i);
+			removeTokens(tokenizedInput, 0, i);
+			return title;
 		}
 	}
 	title = stitchString(tokenizedInput, 0, tokenizedInput.size());
@@ -149,8 +155,25 @@ string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 	return title;
 }
 
-string MariaInterpreter::getEditField(string &inputString) {
-	return inputString.substr(inputString.find("title") + 6, inputString.size());
+MariaInputObject::EditType MariaInterpreter::getEditType(vector<string> &tokenizedInput) {
+	MariaInputObject::EditType editType = MariaInputObject::EditNone;
+
+	if (isStringMatch(tokenizedInput[0], "changetitle")) {
+		editType = MariaInputObject::EditTitle;
+		removeTokens(tokenizedInput, 0, 1);
+	} else if (isStringMatch(tokenizedInput[0], "changestart")) {
+		editType = MariaInputObject::EditStartTime;
+		removeTokens(tokenizedInput, 0, 1);
+	} else if (isStringMatch(tokenizedInput[0], "changeend")) {
+		editType = MariaInputObject::EditEndTime;
+		removeTokens(tokenizedInput, 0, 1);
+	}
+
+	return editType;
+}
+
+string MariaInterpreter::getEditField(vector<string> &tokenizedInput) {
+	return stitchString(tokenizedInput, 0, tokenizedInput.size());
 }
 
 vector<MariaTime*> MariaInterpreter::parseDateTimeString(vector<string> &tokenizedInput) {
@@ -325,85 +348,6 @@ void MariaInterpreter::parseTime(string text, int &hour, int &min) {
 	}
 }
 
-bool MariaInterpreter::checkInputValidity(string inputString) {
-	//_logger.push_back("Log: checkInputValidity(): START");
-	if (inputString.size() <= 0) {
-		//_logger.push_back("WARNING: Input is empty.");
-		return false;
-	}
-
-	// Let's get rid of any unnecessary spaces in the inputString.
-	inputString = trimWhiteSpace(inputString);
-
-	// Tokenize the inputString to help in the validation of the input.
-	vector<string> input = tokenizeString(inputString);
-
-	// Time to check the first word, which is supposed to be a keyword.
-	input[0] = lowercaseString(input[0]);
-	map<string, MariaInputObject::CommandType>::iterator keyword = commandKeywordList->find(input[0]);
-	if (keyword == commandKeywordList->end()) {
-		//_logger.push_back("WARNING: Command keyword not recognized.");
-		return false;
-	}
-
-	// Now let's check if the input fulfils the minimum number of tokens.
-	if ((keyword->second == MariaInputObject::CommandAdd && input.size() < 2) ||
-		(keyword->second == MariaInputObject::CommandEdit && input.size() < 2) ||
-		(keyword->second == MariaInputObject::CommandShowAll && input.size() < 1) ||
-		(keyword->second == MariaInputObject::CommandDelete && input.size() < 2) ||
-		(keyword->second == MariaInputObject::CommandDeleteAll && input.size() < 1) ||
-		(keyword->second == MariaInputObject::CommandGoToHome && input.size() < 1) ||
-		(keyword->second == MariaInputObject::CommandExit && input.size() < 1)) {
-			//_logger.push_back("WARNING: Input not of sufficient length.");
-		return false;
-	}
-
-	// For our "create" command, we need to check if it is a floating, 
-	// deadline or timed task. So we need to see if the respective
-	// keywords are present.
-	if (input[0] == "create") {
-		//_logger.push_back("Log: CommandAdd");
-		int keyword[3];
-
-		keyword[0] = inputString.find(" from ");
-		keyword[1] = inputString.find(" to ");
-		keyword[2] = inputString.find(" by ");
-
-		if (keyword[0] == string::npos && keyword[1] == string::npos && keyword[2] == string::npos) {
-			// Floating task.
-			//_logger.push_back("Log: CommandAdd: Floating Task request detected.");
-		} else if (keyword[0] == string::npos && keyword[1] == string::npos && keyword[2] != string::npos) {
-			// Deadline task.
-			//_logger.push_back("Log: CommandAdd: Deadline Task request detected.");
-		} else if (keyword[0] != string::npos && keyword[1] != string::npos && keyword[2] == string::npos) {
-			// Timed task.
-			//_logger.push_back("Log: CommandAdd: Timed Task request detected.");
-		} else {
-			// Invalid format.
-			//_logger.push_back("WARNING: Input does not match format for adding a task.");
-			return false;
-		}
-	}
-
-	if (input[0] == "edit") {
-		//_logger.push_back("Log: CommandEdit");
-		int keyword[2];
-
-		keyword[0] = inputString.find(" change ");
-		keyword[1] = inputString.find( "title ");
-
-		if (keyword[0] == string::npos || keyword[1] == string::npos) {
-			//_logger.push_back("WARNING: Input does not match format for editing a task.");
-			return false;
-		}
-		//_logger.push_back("Log: CommandEdit: Title change request detected.");
-	}
-
-	// Seems that all the requirements check out! Our input is valid!
-	//_logger.push_back("Log: checkInputValidity(): END");
-	return true;
-}
-
 string MariaInterpreter::replaceText(string inputString, string oldText, string newText, bool firstInstanceOnly) {
 	regex term(oldText);
 
@@ -502,16 +446,38 @@ int MariaInterpreter::getDayOfWeek(string text) {
 	return -1;
 }
 
-bool MariaInterpreter::isStringMatch(string text, string expr) {
-	regex expression(expr);
+bool MariaInterpreter::isStringMatch(string text, string expr, bool ignoreCasing) {
+	regex* expression;
 
-	return regex_match(text, expression);
+	if (ignoreCasing) {
+		expression = new regex(expr, regex_constants::icase);
+	} else {
+		expression = new regex(expr);
+	}
+
+	bool result = regex_match(text, *expression);
+
+	delete expression;
+	expression = NULL;
+
+	return result;
 }
 
-bool MariaInterpreter::doesStringContain(string text, string expr) {
-	regex expression(expr);
+bool MariaInterpreter::doesStringContain(string text, string expr, bool ignoreCasing) {
+	regex* expression;
 
-	return regex_search(text, expression);
+	if (ignoreCasing) {
+		expression = new regex(expr, regex_constants::icase);
+	} else {
+		expression = new regex(expr);
+	}
+
+	bool result = regex_search(text, *expression);
+
+	delete expression;
+	expression = NULL;
+
+	return result;
 }
 
 void MariaInterpreter::getDate(string input, int &day, int &month, int &year) {

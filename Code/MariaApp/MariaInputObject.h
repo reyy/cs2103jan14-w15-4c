@@ -43,6 +43,7 @@ public:
 	void setOptionID(int newOptionID);
 	void setStartTime(MariaTime* newStartTime);
 	void setEndTime(MariaTime* newEndTime);
+	void setEditTime(MariaTime* newEditTime);
 	void setAddType(AddType newAddType);
 	void setEditType(EditType newEditType);
 	void setStateType(MariaStateManager::STATE_TYPE newStateType);
@@ -55,6 +56,7 @@ public:
 	int getOptionID() const;
 	MariaTime* getStartTime() const;
 	MariaTime* getEndTime() const;
+	MariaTime* getEditTime() const;
 	AddType getAddType() const;
 	EditType getEditType() const;
 	MariaStateManager::STATE_TYPE getStateType() const;
@@ -72,4 +74,5 @@ private:
 	int _optionID;
 	MariaTime* _startTime;
 	MariaTime* _endTime;
+	MariaTime* _editTime;
 };

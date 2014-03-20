@@ -42,13 +42,7 @@ private:
 #endif
 	map<string, MariaInputObject::CommandType>* commandKeywordList;
 
-	/// Gets a CommandType flag depending on the user's input.
-	/// The command keyword would also be removed from the inputString.
-	///
-	/// @param	inputString	User's input.
-	///
-	/// @return	The command's flag will be returned on valid input. Invalid flag otherwise.
-	MariaInputObject::CommandType getCommandType(string &inputString);
+	MariaInputObject::EditType getEditType(vector<string> &tokenizedInput);
 
 	/// Gets the task's title from the user's input.
 	/// The title would also be removed from the inputString.
@@ -59,20 +53,12 @@ private:
 	//string getTitle(string &inputString);
 	string getTitle(vector<string> &tokenizedInput);
 
-	string getEditField(string &inputString);
+	string getEditField(vector<string> &tokenizedInput);
 
 	vector<MariaTime*> parseDateTimeString(vector<string> &tokenizedInput);
 	MariaTime* parseDateTime(vector<string> dateTimeList, bool hasDate, bool hasTime);
 	void parseDate(string text, int &year, int &month, int &day);
 	void parseTime(string text, int &hour, int &min);
-
-	/// Checks the validity of the user's input depending on
-	/// the presence of certain keywords, number of words and so on.
-	///
-	/// @param	User's input.
-	///
-	/// @return	True if valid. False otherwise.
-	bool checkInputValidity(string inputString);
 
 	/// Replaces oldText in the inputString with newText.
 	///
@@ -100,8 +86,8 @@ private:
 	bool isStringDayFormat(string text);
 	bool isStringDateFormat(string text);
 	int getDayOfWeek(string text);
-	bool isStringMatch(string text, string expr);
-	bool doesStringContain(string text, string expr);
+	bool isStringMatch(string text, string expr, bool ignoreCasing = true);
+	bool doesStringContain(string text, string expr, bool ignoreCasing = true);
 
 	void getDate(string input, int &day, int &month, int &year);
 	void getTime(string input, int &hour, int &min);
