@@ -53,5 +53,47 @@ namespace MariaTest {
 			program->sortTasks();
 			Assert::AreEqual((*program->taskList)[4]->getTitle(),(string)"1");
 		}
+
+		TEST_METHOD(Task_UndoOnce) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+			program->addUndo((*program->taskList)[0]);
+			(*program->taskList)[0]->setTitle("New Title");
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title",(*program->taskList)[0]->getTitle());
+		}
+
+		TEST_METHOD(Task_UndoMultiple) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+
+			program->addUndo((*program->taskList)[0]);
+			(*program->taskList)[0]->setTitle("New Title 1");
+
+			program->addUndo((*program->taskList)[0]);
+			(*program->taskList)[0]->setTitle("New Title 2");
+
+			program->undoLast();
+			Assert::AreEqual((string)"New Title 1",(*program->taskList)[0]->getTitle());
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title",(*program->taskList)[0]->getTitle());
+		}
+
+		TEST_METHOD(Task_UndoDelete) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+			MariaTask * temp = program->findTask("Original Title")[0];
+
+			program->addUndo(temp/*(*program->taskList)[0]*/);
+			temp/*(*program->taskList)[0]*/->setTitle("New Title 1");
+
+			program->addUndo(temp/*(*program->taskList)[0]*/);
+			program->archiveTask((*program->taskList)[0]);
+
+			program->undoLast();
+			Assert::AreEqual((string)"New Title 1",(*program->taskList)[0]->getTitle());
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title",(*program->taskList)[0]->getTitle());
+		}
 	};
 }

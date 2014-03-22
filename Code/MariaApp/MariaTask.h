@@ -24,6 +24,7 @@ public:
 	MariaTime* getStart();
 	MariaTime* getEnd();
 	double getDuration();
+	MariaTask* getClone();
 	
 	void setTitle(string);
 	void setDescription(string);

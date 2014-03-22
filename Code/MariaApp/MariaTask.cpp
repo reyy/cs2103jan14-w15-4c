@@ -18,6 +18,8 @@ MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTi
 }
 
 MariaTask::~MariaTask(void) {
+	delete start;
+	delete end;
 }
 
 MariaTask::TaskType MariaTask::getType() {
@@ -42,6 +44,21 @@ MariaTime* MariaTask::getEnd() {
 
 double MariaTask::getDuration() {
 	return difftime(end->get(), start->get());
+}
+
+MariaTask* MariaTask::getClone() {
+	MariaTime *clonedStart = NULL;
+	MariaTime *clonedEnd = NULL;
+
+	if(start != NULL) {
+		new MariaTime(start->get());
+	}
+	if(end != NULL) {
+		new MariaTime(end->get());
+	}
+
+	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd);
+	return clonedTask;
 }
 
 string MariaTask::getTimeFromNow() {

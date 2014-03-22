@@ -7,6 +7,8 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 		taskList = new vector<MariaTask*>();
 	}
 	sortTasks();
+
+	undoList = new vector<pair<MariaTask**,MariaTask*>*>();
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
@@ -14,6 +16,11 @@ MariaTaskManager::~MariaTaskManager(void) {
 		delete t;
 	}
 	delete taskList;
+
+	for(pair<MariaTask**,MariaTask*>* t: (*this->undoList)) {
+		delete t;
+	}
+	delete undoList;
 }
 
 MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end) {
@@ -115,7 +122,7 @@ string MariaTaskManager::lowercaseString(string text) {
 	return toReturn;
 }
 
-void MariaTaskManager::sortTasks(){
+void MariaTaskManager::sortTasks() {
 	vector<MariaTask*> floatingTasks = getAllTasks(MariaTask::FLOATING);
 	vector<MariaTask*> deadlineTasks = getAllTasks(MariaTask::DEADLINE);
 	vector<MariaTask*> timedTasks = getAllTasks(MariaTask::TIMED);
@@ -129,6 +136,44 @@ void MariaTaskManager::sortTasks(){
 	taskList->insert(taskList->end(), timedTasks.begin(), timedTasks.end());
 }
 
-bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2){
+bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2) {
 	return ((*t1) < (*t2));
+}
+
+bool MariaTaskManager::undoLast() {
+	if(undoList->empty()) {
+		return false;
+	}
+	MariaTask* taskPointer = *(undoList->back())->first;
+	//auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
+	try/*if((undoList->back())->first != NULL)*/ {
+		delete *(undoList->back())->first; //delete current task
+		*(undoList->back())->first = undoList->back()->second; //set pointer in taskList to old task
+	} catch(exception)/*else*/ {
+		//task was not in list, add back
+		taskList->push_back(undoList->back()->second);
+		sortTasks();
+	}
+	undoList->pop_back();
+	return true;
+}
+
+void MariaTaskManager::addUndo(MariaTask* task) {
+	MariaTask **taskPointer = NULL;
+	for(int i = 0; i<taskList->size(); i++) {
+		if(task == (*taskList)[i]){
+			taskPointer = &(*taskList)[i];
+			break;
+		}
+	}
+
+	assert(taskPointer != NULL);
+
+	MariaTask *oldTask = task->getClone();
+
+	while(undoList->size() >= UNDO_LIMIT) {
+		undoList->erase(undoList->begin());
+	}
+
+	undoList->push_back(new pair<MariaTask**, MariaTask*>(taskPointer, oldTask));
 }
