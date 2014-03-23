@@ -145,21 +145,33 @@ bool MariaTaskManager::undoLast() {
 		return false;
 	}
 	MariaTask* taskPointer = *(undoList->back())->first;
+	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
 	
 	if(it != taskList->end()) {
-		delete taskPointer; //delete current task
-		*(undoList->back())->first = undoList->back()->second; //set pointer in taskList to old task
+		if(oldTask == NULL) { 
+			//last action = addTask
+			delete taskPointer;
+			taskList->erase(it);
+		} else { 
+			//last action = editTask
+			delete taskPointer; //delete current task
+			*(undoList->back())->first = oldTask; //set pointer in taskList to old task
+		}
 	} else {
-		taskList->push_back(undoList->back()->second);
+		//last action = deleteTask
+		taskList->push_back(oldTask);
 		sortTasks();
 	}
 	undoList->pop_back();
 	return true;
 }
 
-void MariaTaskManager::addUndo(MariaTask* task) {
+void MariaTaskManager::notifyAction(MariaTask* task, bool isAddTask) {
+	
+	MariaTask *oldTask = NULL;
 	MariaTask **taskPointer = NULL;
+	
 	for(int i = 0; i<taskList->size(); i++) {
 		if(task == (*taskList)[i]){
 			taskPointer = &(*taskList)[i];
@@ -169,7 +181,9 @@ void MariaTaskManager::addUndo(MariaTask* task) {
 
 	assert(taskPointer != NULL);
 
-	MariaTask *oldTask = task->getClone();
+	if(!isAddTask) {
+		oldTask = task->getClone();
+	} 
 
 	while(undoList->size() >= UNDO_LIMIT) {
 		undoList->erase(undoList->begin());

@@ -32,7 +32,7 @@ public:
 #endif
 	vector<MariaTask*> *taskList;
 	vector<pair<MariaTask**, MariaTask*>*> *undoList;
-	void addUndo(MariaTask* task);
+	void notifyAction(MariaTask* task, bool isAddTask = false);
 
 	string lowercaseString(string text);
 	void sortTasks();
