@@ -75,12 +75,12 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 					timeList = this->parseDateTimeString(tokenizedInput);
 
 					if (timeList.size() == 0) {
-						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 					} else if (timeList.size() == 1) {
-						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 						inputObject->setEndTime(timeList[0]);
 					} else if (timeList.size() == 2) {
-						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
 						inputObject->setStartTime(timeList[0]);
 						inputObject->setEndTime(timeList[1]);
 					}
@@ -104,8 +104,15 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 				}
 				break;
 			case MariaInputObject::COMMAND_TYPE::SHOW:
-				if (isStringMatch(tokenizedInput[0], "all")) {
+				if (tokenizedInput.size() == 0) {
+					tokenizedInput.push_back("today");
+					timeList = this->parseDateTimeString(tokenizedInput);
+					inputObject->setEndTime(timeList[0]);
+				} else if (tokenizedInput.size() == 1 && isStringMatch(tokenizedInput[0], "all")) {
 					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_ALL);
+				} else if (tokenizedInput.size() == 1 && (isStringToday(tokenizedInput[0]) || isStringTomorrow(tokenizedInput[0]))) {
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+					timeList = this->parseDateTimeString(tokenizedInput);
 				} else {
 					timeList = this->parseDateTimeString(tokenizedInput);
 

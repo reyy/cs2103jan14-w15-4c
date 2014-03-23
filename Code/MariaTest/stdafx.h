@@ -15,3 +15,4 @@
 #include "../MariaApp/MariaTask.h"
 #include "../MariaApp/MariaTaskManager.h"
 #include "../MariaApp/MariaFileManager.h"
+#include "../MariaApp/MariaInterpreter.h"

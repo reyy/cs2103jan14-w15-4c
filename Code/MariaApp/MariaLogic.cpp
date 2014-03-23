@@ -77,8 +77,34 @@ bool MariaLogic::processCommand(std::string inputText) {
 			temp->setLoadingDone();
 			temp->setQuitAfterLoadingTrue();
 			mariaStateManager->transitState();
-		} else if(input->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD) {
-			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), input->getStartTime(), input->getEndTime());
+		} else if(input->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_FLOATING) {
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
+			if(toAdd != NULL) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
+
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '" + inputText + "'");
+			}
+		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_DEADLINE) {
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, new MariaTime(*input->getEndTime()));
+			if(toAdd != NULL) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
+
+				//Check if the current state is the home state, do a live add.
+				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
+					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is problem adding '" + inputText + "'");
+			}
+		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_TIMED) {
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), new MariaTime(*input->getStartTime()), new MariaTime(*input->getEndTime()));
 			if(toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
 
@@ -110,6 +136,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 						//TO DO, transit to edit state.
+						listOfTasks[0]->setTitle(input->getEditField());
 						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 						mariaStateManager->transitState();
 					}
@@ -142,6 +169,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 						//TO DO, transit to edit state.
+						listOfTasks[0]->setStart(new MariaTime(*input->getEditTime()));
 						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 						mariaStateManager->transitState();
 					}
@@ -174,6 +202,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 						//TO DO, transit to edit state.
+						listOfTasks[0]->setEnd(new MariaTime(*input->getEditTime()));
 						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 						mariaStateManager->transitState();
 					}
@@ -267,6 +296,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 		}
 	}
 
+	delete input;
+	input = NULL;
+
 	//todo: call interpreter to generate task & pass to task manager
 	return true;
 }
@@ -293,6 +325,10 @@ void __cdecl MariaLogic::doShowHideWrapper(void* mariaLogic) {
 }
 
 int main(int argc, char *argv[]) {
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtDumpMemoryLeaks();
+#endif
 	MariaLogic *mariaLogic = new MariaLogic(argc, argv);
 
 	int returnCode = QApplication::exec();
