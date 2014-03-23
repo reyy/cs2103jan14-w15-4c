@@ -1,10 +1,13 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include "MariaTime.h"
+#include "MariaUndoObserver.h"
+
 using namespace std;
 
-class MariaTask{
+class MariaTask : public MariaTaskInterface {
 public:
 	typedef enum {
 		FLOATING, 
@@ -13,7 +16,7 @@ public:
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
-	MariaTask(string title, string description, MariaTime* start, MariaTime* end);
+	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL);
 	~MariaTask();
 	
 	
@@ -24,6 +27,7 @@ public:
 	MariaTime* getStart();
 	MariaTime* getEnd();
 	double getDuration();
+	MariaTask* getClone();
 	
 	void setTitle(string);
 	void setDescription(string);
@@ -34,10 +38,15 @@ public:
 
 	bool operator<(MariaTask rhs);
 
+	static void initObserver(MariaUndoObserver*);
+	
+
 private:
 	TaskType	type;
 	string		title;
 	string		description;
 	MariaTime*	start;
 	MariaTime*	end;
+
+	static MariaUndoObserver *observer;
 };

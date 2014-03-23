@@ -51,6 +51,13 @@ MariaLogic::~MariaLogic(void) {
 	delete mariaUI;
 }
 
+bool MariaLogic::processUndo() {
+	if(mariaTaskManager->undoLast()) {
+		return true;
+	}
+	return false;
+}
+
 bool MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");

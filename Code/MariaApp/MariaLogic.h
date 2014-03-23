@@ -17,7 +17,9 @@ public:
 	~MariaLogic(void);
 
 	bool processCommand(std::string inputText);
+	bool processUndo();
 	void terminateProgram();
+
 public slots:
 	void doShowHide();
 	

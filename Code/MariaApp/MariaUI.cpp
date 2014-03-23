@@ -102,8 +102,13 @@ void MariaUI::resizeEvent(QResizeEvent* event) {
 
 void MariaUI::keyReleaseEvent(QKeyEvent* keyevent) {
 	int keyPressed = keyevent->key();
-
-	if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
+	if(keyevent->key() == Qt::Key_Z && keyevent->modifiers().testFlag(Qt::ControlModifier)) {
+		if(_mariaLogic->processUndo()) {
+			getCommandBar()->getTextbox()->setQuestionText("Undo was sucessful");
+		} else {
+			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
+		}
+	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
 	} else {
 		//todo: tick / question if keyword detected

@@ -18,6 +18,8 @@ MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTi
 }
 
 MariaTask::~MariaTask(void) {
+	//delete start;
+	//delete end;
 }
 
 MariaTask::TaskType MariaTask::getType() {
@@ -44,6 +46,21 @@ double MariaTask::getDuration() {
 	return difftime(end->get(), start->get());
 }
 
+MariaTask* MariaTask::getClone() {
+	MariaTime *clonedStart = NULL;
+	MariaTime *clonedEnd = NULL;
+
+	if(start != NULL) {
+		new MariaTime(start->get());
+	}
+	if(end != NULL) {
+		new MariaTime(end->get());
+	}
+
+	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd);
+	return clonedTask;
+}
+
 string MariaTask::getTimeFromNow() {
 	if(type == DEADLINE) {
 		return getEnd()->getTimeFromNow();
@@ -54,6 +71,9 @@ string MariaTask::getTimeFromNow() {
 }
 
 void MariaTask::setTitle(string title) {
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	this->title = title;
 }
 
@@ -96,3 +116,15 @@ bool MariaTask::operator<(MariaTask rhs) {
 	}
 	
 }
+
+//void MariaTask::initObserver(notifyAction observerFunc) {
+//	//notifyObserver = (observerFunc);
+//}
+
+void MariaTask::initObserver(MariaUndoObserver* observer){
+	//MariaTask::observer = observer;
+	//MariaUndoObserver* observer2 = observer;
+	//this->observer = observer;
+	MariaTask::observer = observer;
+}
+MariaUndoObserver *MariaTask::observer = NULL;
