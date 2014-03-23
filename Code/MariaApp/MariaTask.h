@@ -3,15 +3,12 @@
 #include <functional>
 #include <string>
 #include "MariaTime.h"
-#include "MariaTaskManager.h"
+#include "MariaUndoObserver.h"
+
 using namespace std;
 
-
-
-class MariaTask{
+class MariaTask : public MariaTaskInterface {
 public:
-	typedef void (MariaTaskManager::*notifyAction)(MariaTask*, bool);
-	typedef std::function<void(MariaTask*, bool)> observerFunction;
 	typedef enum {
 		FLOATING, 
 		DEADLINE, 
@@ -19,7 +16,7 @@ public:
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
-	MariaTask(string title, string description, MariaTime* start, MariaTime* end);
+	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL);
 	~MariaTask();
 	
 	
@@ -40,8 +37,9 @@ public:
 	void refreshTaskType();
 
 	bool operator<(MariaTask rhs);
-	static void initObserver(notifyAction observerFunc);
-	static notifyAction notifyObserver;
+
+	static void initObserver(MariaUndoObserver*);
+	
 
 private:
 	TaskType	type;
@@ -50,4 +48,5 @@ private:
 	MariaTime*	start;
 	MariaTime*	end;
 
+	static MariaUndoObserver *observer;
 };

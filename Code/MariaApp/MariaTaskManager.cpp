@@ -9,8 +9,9 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 	sortTasks();
 
 	undoList = new vector<pair<MariaTask**,MariaTask*>*>();
-
-	MariaTask::notifyObserver = &notifyAction; // std::bind(&notifyAction, NULL, false);
+	MariaTask::initObserver(this);
+	//MariaTask::initObserver(this);
+//	MariaTask::notifyObserver = &notifyAction; // std::bind(&notifyAction, NULL, false);
 	//MariaTask::initObserver(std::bind(this->notifyAction));
 }
 
@@ -28,9 +29,13 @@ MariaTaskManager::~MariaTaskManager(void) {
 
 MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end) {
 	MariaTask *tempTask = new MariaTask(name, start, end);
+	tempTask->initObserver(this);
 	taskList->push_back(tempTask);
 
 	sortTasks();
+
+	this->notifyAction(tempTask, true);
+
 	return tempTask;
 }
 
@@ -102,6 +107,8 @@ vector<MariaTask*> MariaTaskManager::getAllTasks(MariaTask::TaskType type) {
 
 bool MariaTaskManager::archiveTask(MariaTask* task){
 	assert(task!=NULL);
+
+	this->notifyAction(task);
 	
 	auto it = std::find(taskList->begin(), taskList->end(), task);
 
@@ -170,13 +177,13 @@ bool MariaTaskManager::undoLast() {
 	return true;
 }
 
-void MariaTaskManager::notifyAction(MariaTask* task, bool isAddTask) {
+void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 	
 	MariaTask *oldTask = NULL;
 	MariaTask **taskPointer = NULL;
 	
 	for(int i = 0; i<taskList->size(); i++) {
-		if(task == (*taskList)[i]){
+		if(((MariaTask*)task) == (*taskList)[i]){
 			taskPointer = &(*taskList)[i];
 			break;
 		}
@@ -185,7 +192,7 @@ void MariaTaskManager::notifyAction(MariaTask* task, bool isAddTask) {
 	assert(taskPointer != NULL);
 
 	if(!isAddTask) {
-		oldTask = task->getClone();
+		oldTask = ((MariaTask*)task)->getClone();
 	} 
 
 	while(undoList->size() >= UNDO_LIMIT) {

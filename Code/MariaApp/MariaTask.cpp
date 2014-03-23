@@ -18,8 +18,8 @@ MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTi
 }
 
 MariaTask::~MariaTask(void) {
-	delete start;
-	delete end;
+	//delete start;
+	//delete end;
 }
 
 MariaTask::TaskType MariaTask::getType() {
@@ -71,7 +71,9 @@ string MariaTask::getTimeFromNow() {
 }
 
 void MariaTask::setTitle(string title) {
-	notifyObserver(this, false);
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	this->title = title;
 }
 
@@ -115,6 +117,14 @@ bool MariaTask::operator<(MariaTask rhs) {
 	
 }
 
-void MariaTask::initObserver(notifyAction observerFunc) {
-	//notifyObserver = (observerFunc);
+//void MariaTask::initObserver(notifyAction observerFunc) {
+//	//notifyObserver = (observerFunc);
+//}
+
+void MariaTask::initObserver(MariaUndoObserver* observer){
+	//MariaTask::observer = observer;
+	//MariaUndoObserver* observer2 = observer;
+	//this->observer = observer;
+	MariaTask::observer = observer;
 }
+MariaUndoObserver *MariaTask::observer = NULL;

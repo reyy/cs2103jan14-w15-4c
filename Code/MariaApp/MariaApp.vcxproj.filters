@@ -128,6 +128,7 @@
     <ClInclude Include="MariaUIStateDisplay.h">
       <Filter>User Interface\States</Filter>
     </ClInclude>
+    <ClInclude Include="MariaUndoObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MariaStateManager.h" />
