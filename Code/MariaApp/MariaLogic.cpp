@@ -53,6 +53,7 @@ MariaLogic::~MariaLogic(void) {
 
 bool MariaLogic::processUndo() {
 	if(mariaTaskManager->undoLast()) {
+		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 		return true;
 	}
 	return false;
@@ -247,6 +248,11 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			}
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::UNDO) {
+			if(processUndo()) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Undo was sucessful");
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
+			}
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::GO_HOME) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
 			mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
