@@ -1,9 +1,7 @@
 #include "MariaInputObject.h"
 
 MariaInputObject::MariaInputObject() {
-	_commandType = CommandInvalid;
-	_addType = AddNone;
-	_editType = EditNone;
+	_commandType = INVALID;
 
 	_startTime = NULL;
 	_endTime = NULL;
@@ -35,7 +33,7 @@ void MariaInputObject::setOriginalInput(string originalInput) {
 	_originalInput = originalInput;
 }
 
-void MariaInputObject::setCommandType(CommandType newCommandType) {
+void MariaInputObject::setCommandType(COMMAND_TYPE newCommandType) {
 	_commandType = newCommandType;
 }
 
@@ -63,14 +61,6 @@ void MariaInputObject::setEditTime(MariaTime* newEditTime) {
 	_editTime = newEditTime;
 }
 
-void MariaInputObject::setAddType(AddType newAddType) {
-	_addType = newAddType;
-}
-
-void MariaInputObject::setEditType(EditType newEditType) {
-	_editType = newEditType;
-}
-
 void MariaInputObject::setStateType(MariaStateManager::STATE_TYPE newStateType) {
 	_stateType = newStateType;
 }
@@ -83,7 +73,7 @@ string MariaInputObject::getOriginalInput() const {
 	return _originalInput;
 }
 
-MariaInputObject::CommandType MariaInputObject::getCommandType() const {
+MariaInputObject::COMMAND_TYPE MariaInputObject::getCommandType() const {
 	return _commandType;
 }
 
@@ -109,14 +99,6 @@ MariaTime* MariaInputObject::getEndTime() const {
 
 MariaTime* MariaInputObject::getEditTime() const {
 	return _editTime;
-}
-
-MariaInputObject::AddType MariaInputObject::getAddType() const {
-	return _addType;
-}
-
-MariaInputObject::EditType MariaInputObject::getEditType() const {
-	return _editType;
 }
 
 MariaStateManager::STATE_TYPE MariaInputObject::getStateType() const {

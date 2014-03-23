@@ -23,7 +23,7 @@ using namespace std;
 
 class MariaInterpreter{
 public:
-	MariaInterpreter(map<string, MariaInputObject::CommandType>* inputCommandList = NULL);
+	MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE>* inputCommandList = NULL);
 	~MariaInterpreter(void);
 
 	/// Takes in the user's input, works its magic on it
@@ -40,9 +40,10 @@ public:
 #else
 private:
 #endif
-	map<string, MariaInputObject::CommandType>* commandKeywordList;
+	map<string, MariaInputObject::COMMAND_TYPE>* commandKeywordList;
 
-	MariaInputObject::EditType getEditType(vector<string> &tokenizedInput);
+	MariaInputObject::COMMAND_TYPE getAddType(vector<MariaTime*> &timeList);
+	MariaInputObject::COMMAND_TYPE getEditType(vector<string> &tokenizedInput);
 
 	/// Gets the task's title from the user's input.
 	/// The title would also be removed from the inputString.

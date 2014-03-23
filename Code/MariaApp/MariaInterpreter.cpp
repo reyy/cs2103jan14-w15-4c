@@ -1,27 +1,34 @@
 #include "MariaInterpreter.h"
 
-MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::CommandType> *inputCommandList) {
+MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE> *inputCommandList) {
 	commandKeywordList = inputCommandList;
 	if (commandKeywordList == NULL) {
-		commandKeywordList = new map<string, MariaInputObject::CommandType>();
+		commandKeywordList = new map<string, MariaInputObject::COMMAND_TYPE>();
 	}
 
 	// Create our keyword association to the command.
 	//TODO: Put this into an ini file.
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("add", MariaInputObject::CommandAdd));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("create", MariaInputObject::CommandAdd));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("edit", MariaInputObject::CommandEdit));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("update", MariaInputObject::CommandEdit));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("show", MariaInputObject::CommandShowAll));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("view", MariaInputObject::CommandShowAll));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("delete", MariaInputObject::CommandDelete));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("remove", MariaInputObject::CommandDelete));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("clear", MariaInputObject::CommandDeleteAll));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("home", MariaInputObject::CommandGoToHome));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("up", MariaInputObject::CommandGoUp));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("down", MariaInputObject::CommandGoDown));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("exit", MariaInputObject::CommandExit));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("quit", MariaInputObject::CommandExit));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("add", MariaInputObject::COMMAND_TYPE::ADD));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("create", MariaInputObject::COMMAND_TYPE::ADD));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("edit", MariaInputObject::COMMAND_TYPE::EDIT));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("update", MariaInputObject::COMMAND_TYPE::EDIT));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("show", MariaInputObject::COMMAND_TYPE::SHOW));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("view", MariaInputObject::COMMAND_TYPE::SHOW));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("complete", MariaInputObject::COMMAND_TYPE::MARK_DONE));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("done", MariaInputObject::COMMAND_TYPE::MARK_DONE));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("incomplete", MariaInputObject::COMMAND_TYPE::MARK_UNDONE));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("uncomplete", MariaInputObject::COMMAND_TYPE::MARK_UNDONE));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("undone", MariaInputObject::COMMAND_TYPE::MARK_UNDONE));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("delete", MariaInputObject::COMMAND_TYPE::DELETE_TASK));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("remove", MariaInputObject::COMMAND_TYPE::DELETE_TASK));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("clear", MariaInputObject::COMMAND_TYPE::DELETE_ALL));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("undo", MariaInputObject::COMMAND_TYPE::UNDO));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("home", MariaInputObject::COMMAND_TYPE::GO_HOME));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("settings", MariaInputObject::COMMAND_TYPE::GO_SETTINGS));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::GO_UP));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::GO_DOWN));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("exit", MariaInputObject::COMMAND_TYPE::EXIT));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("quit", MariaInputObject::COMMAND_TYPE::EXIT));
 }
 
 MariaInterpreter::~MariaInterpreter(void){
@@ -44,7 +51,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	}
 
 	vector<string> tokenizedInput = tokenizeString(inputString);
-	map<string, MariaInputObject::CommandType>::iterator commandKeyword;
+	map<string, MariaInputObject::COMMAND_TYPE>::iterator commandKeyword;
 	vector<MariaTime*> timeList;
 
 	if (currentState == MariaStateManager::STATE_TYPE::HOME) {
@@ -61,34 +68,71 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 			//TODO: Remove the need for this
 			tokenizedInput.erase(tokenizedInput.begin());
 
-			// Time to get the title.
-			inputObject->setTitle(this->getTitle(tokenizedInput));
-
 			switch (inputObject->getCommandType()) {
-			case MariaInputObject::CommandAdd:
-				timeList = this->parseDateTimeString(tokenizedInput);
+			case MariaInputObject::COMMAND_TYPE::ADD:
+				if (tokenizedInput.size() > 0) {
+					inputObject->setTitle(this->getTitle(tokenizedInput));
+					timeList = this->parseDateTimeString(tokenizedInput);
 
-				if (timeList.size() == 0) {
-					inputObject->setAddType(MariaInputObject::AddType::AddFloating);
-				} else if (timeList.size() == 1) {
-					inputObject->setAddType(MariaInputObject::AddType::AddDeadline);
-					inputObject->setEndTime(timeList[0]);
-				} else if (timeList.size() == 2) {
-					inputObject->setAddType(MariaInputObject::AddType::AddTimed);
-					inputObject->setStartTime(timeList[0]);
-					inputObject->setEndTime(timeList[1]);
-				}
-				break;
-			case MariaInputObject::CommandEdit:
-				inputObject->setEditType(this->getEditType(tokenizedInput));
-
-				if (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0])) {
-					inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
+					if (timeList.size() == 0) {
+						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+					} else if (timeList.size() == 1) {
+						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
+						inputObject->setEndTime(timeList[0]);
+					} else if (timeList.size() == 2) {
+						//inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
+						inputObject->setStartTime(timeList[0]);
+						inputObject->setEndTime(timeList[1]);
+					}
 				} else {
-					inputObject->setEditField(this->getEditField(tokenizedInput));
+					// There isn't any title
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_ADD);
 				}
 				break;
-			case MariaInputObject::CommandDelete:
+			case MariaInputObject::COMMAND_TYPE::EDIT:
+				if (tokenizedInput.size() > 0) {
+					inputObject->setTitle(this->getTitle(tokenizedInput));
+					inputObject->setCommandType(this->getEditType(tokenizedInput));
+
+					if (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0])) {
+						inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
+					} else {
+						inputObject->setEditField(this->getEditField(tokenizedInput));
+					}
+				} else {
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_EDIT);
+				}
+				break;
+			case MariaInputObject::COMMAND_TYPE::SHOW:
+				if (isStringMatch(tokenizedInput[0], "all")) {
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_ALL);
+				} else {
+					timeList = this->parseDateTimeString(tokenizedInput);
+
+					if (timeList.size() <= 1) {
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+						inputObject->setEndTime(timeList[0]);
+					} else if (timeList.size() == 2) {
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+						inputObject->setStartTime(timeList[0]);
+						inputObject->setEndTime(timeList[1]);
+					}
+				}
+				break;
+			case MariaInputObject::COMMAND_TYPE::MARK_DONE:
+			case MariaInputObject::COMMAND_TYPE::MARK_UNDONE:
+				inputObject->setTitle(this->getTitle(tokenizedInput));
+				break;
+			case MariaInputObject::COMMAND_TYPE::DELETE_TASK:
+				if (tokenizedInput.size() > 0) {
+					if (isStringMatch(tokenizedInput[0], "all")) {
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
+					} else {
+						inputObject->setTitle(this->getTitle(tokenizedInput));
+					}
+				} else {
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_DELETE);
+				}
 				break;
 			default:
 				break;
@@ -144,7 +188,9 @@ string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 			title = stitchString(tokenizedInput, 0, i);
 			removeTokens(tokenizedInput, 0, i);
 			return title;
-		} else if (isStringMatch(tokenizedInput[i], "change(title|start|end)")) {
+		} else if (isStringMatch(tokenizedInput[i], "change") &&
+			i < tokenizedInput.size() - 1 &&
+			isStringMatch(tokenizedInput[i+1], "title|start|end")) {
 			title = stitchString(tokenizedInput, 0, i);
 			removeTokens(tokenizedInput, 0, i);
 			return title;
@@ -155,21 +201,23 @@ string MariaInterpreter::getTitle(vector<string> &tokenizedInput) {
 	return title;
 }
 
-MariaInputObject::EditType MariaInterpreter::getEditType(vector<string> &tokenizedInput) {
-	MariaInputObject::EditType editType = MariaInputObject::EditNone;
+MariaInputObject::COMMAND_TYPE MariaInterpreter::getAddType(vector<MariaTime*> &timeList) {
+	return MariaInputObject::COMMAND_TYPE::ADD;
+}
 
-	if (isStringMatch(tokenizedInput[0], "changetitle")) {
-		editType = MariaInputObject::EditTitle;
-		removeTokens(tokenizedInput, 0, 1);
-	} else if (isStringMatch(tokenizedInput[0], "changestart")) {
-		editType = MariaInputObject::EditStartTime;
-		removeTokens(tokenizedInput, 0, 1);
-	} else if (isStringMatch(tokenizedInput[0], "changeend")) {
-		editType = MariaInputObject::EditEndTime;
-		removeTokens(tokenizedInput, 0, 1);
+MariaInputObject::COMMAND_TYPE MariaInterpreter::getEditType(vector<string> &tokenizedInput) {
+	if (isStringMatch(tokenizedInput[1], "title")) {
+		removeTokens(tokenizedInput, 0, 2);
+		return MariaInputObject::COMMAND_TYPE::EDIT_TITLE;
+	} else if (isStringMatch(tokenizedInput[1], "start")) {
+		removeTokens(tokenizedInput, 0, 2);
+		return MariaInputObject::COMMAND_TYPE::EDIT_START_TIME;
+	} else if (isStringMatch(tokenizedInput[1], "end")) {
+		removeTokens(tokenizedInput, 0, 2);
+		return MariaInputObject::COMMAND_TYPE::EDIT_END_TIME;
 	}
 
-	return editType;
+	return MariaInputObject::COMMAND_TYPE::EDIT;
 }
 
 string MariaInterpreter::getEditField(vector<string> &tokenizedInput) {

@@ -13,7 +13,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandInvalid);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::INVALID);
 
 			delete output;
 			output = NULL;
@@ -30,8 +30,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandAdd);
-			Assert::IsTrue(output->getAddType() == MariaInputObject::AddFloating);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			delete output;
@@ -50,8 +49,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandAdd);
-			Assert::IsTrue(output->getAddType() == MariaInputObject::AddDeadline);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
 
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
@@ -81,8 +79,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandAdd);
-			Assert::IsTrue(output->getAddType() == MariaInputObject::AddTimed);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
 
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
@@ -114,14 +111,13 @@ namespace MariaTest {
 		TEST_METHOD(Interpreter_EditTitle) {
 			MariaInterpreter* program = new MariaInterpreter();
 
-			string input = "edit Do some homework changetitle Eat dinner";
+			string input = "edit Do some homework change title Eat dinner";
 			string expectedTitle = "Do some homework";
 			string expectedEditField = "Eat dinner";
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandEdit);
-			Assert::IsTrue(output->getEditType() == MariaInputObject::EditTitle);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 			Assert::AreEqual(expectedEditField, output->getEditField());
 
@@ -132,14 +128,13 @@ namespace MariaTest {
 		TEST_METHOD(Interpreter_EditStartTime) {
 			MariaInterpreter* program = new MariaInterpreter();
 
-			string input = "edit Lunch with James changestart 22/03/2014 1400";
+			string input = "edit Lunch with James change start 22/03/2014 1400";
 			string expectedTitle = "Lunch with James";
 			MariaTime* expectedEditTime = new MariaTime(2014, 3, 22, 14, 0, 0);
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandEdit);
-			Assert::IsTrue(output->getEditType() == MariaInputObject::EditStartTime);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 			Assert::AreEqual(expectedEditTime->getYear(), output->getEditTime()->getYear());
 			Assert::AreEqual(expectedEditTime->getMonth(), output->getEditTime()->getMonth());
@@ -154,14 +149,13 @@ namespace MariaTest {
 		TEST_METHOD(Interpreter_EditEndTime) {
 			MariaInterpreter* program = new MariaInterpreter();
 
-			string input = "edit Breakfast at Tiffany changeend 15.02.2015 1130";
+			string input = "edit Breakfast at Tiffany change end 15.02.2015 1130";
 			string expectedTitle = "Breakfast at Tiffany";
 			MariaTime* expectedEditTime = new MariaTime(2015, 2, 15, 11, 30, 0);
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandEdit);
-			Assert::IsTrue(output->getEditType() == MariaInputObject::EditEndTime);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 			Assert::AreEqual(expectedEditTime->getYear(), output->getEditTime()->getYear());
 			Assert::AreEqual(expectedEditTime->getMonth(), output->getEditTime()->getMonth());
@@ -298,7 +292,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandExit);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EXIT);
 
 			delete program;
 			program = NULL;
