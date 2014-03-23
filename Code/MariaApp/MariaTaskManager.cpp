@@ -10,9 +10,6 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 
 	undoList = new vector<pair<MariaTask**,MariaTask*>*>();
 	MariaTask::initObserver(this);
-	//MariaTask::initObserver(this);
-//	MariaTask::notifyObserver = &notifyAction; // std::bind(&notifyAction, NULL, false);
-	//MariaTask::initObserver(std::bind(this->notifyAction));
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
