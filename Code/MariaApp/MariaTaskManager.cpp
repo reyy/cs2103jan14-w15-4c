@@ -145,12 +145,12 @@ bool MariaTaskManager::undoLast() {
 		return false;
 	}
 	MariaTask* taskPointer = *(undoList->back())->first;
-	//auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
-	try/*if((undoList->back())->first != NULL)*/ {
-		delete *(undoList->back())->first; //delete current task
+	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
+	
+	if(it != taskList->end()) {
+		delete taskPointer; //delete current task
 		*(undoList->back())->first = undoList->back()->second; //set pointer in taskList to old task
-	} catch(exception)/*else*/ {
-		//task was not in list, add back
+	} else {
 		taskList->push_back(undoList->back()->second);
 		sortTasks();
 	}

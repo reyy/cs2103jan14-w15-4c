@@ -84,10 +84,10 @@ namespace MariaTest {
 			program->addTask("Original Title");
 			MariaTask * temp = program->findTask("Original Title")[0];
 
-			program->addUndo(temp/*(*program->taskList)[0]*/);
-			temp/*(*program->taskList)[0]*/->setTitle("New Title 1");
+			program->addUndo(temp);
+			temp->setTitle("New Title 1");
 
-			program->addUndo(temp/*(*program->taskList)[0]*/);
+			program->addUndo(temp);
 			program->archiveTask((*program->taskList)[0]);
 
 			program->undoLast();
@@ -95,5 +95,6 @@ namespace MariaTest {
 			program->undoLast();
 			Assert::AreEqual((string)"Original Title",(*program->taskList)[0]->getTitle());
 		}
+
 	};
 }
