@@ -37,7 +37,6 @@ public:
 	MariaInputObject();
 	~MariaInputObject();
 
-	void setValidity(bool valid);
 	void setOriginalInput(string originalInput);
 	void setCommandType(COMMAND_TYPE newCommandType);
 	void setTitle(string newTitle);
@@ -48,7 +47,6 @@ public:
 	void setEditTime(MariaTime* newEditTime);
 	void setStateType(MariaStateManager::STATE_TYPE newStateType);
 
-	bool isValid() const;
 	string getOriginalInput() const;
 	COMMAND_TYPE getCommandType() const;
 	string getTitle() const;
@@ -63,7 +61,6 @@ private:
 	COMMAND_TYPE _commandType;
 	MariaStateManager::STATE_TYPE _stateType;
 
-	bool _validInput;
 	string _originalInput;
 	string _title;
 	string _editField;

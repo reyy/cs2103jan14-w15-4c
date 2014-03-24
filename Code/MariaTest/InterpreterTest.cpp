@@ -30,7 +30,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			delete output;
@@ -49,7 +49,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
@@ -69,6 +69,22 @@ namespace MariaTest {
 			program = NULL;
 		}
 
+		TEST_METHOD(Interpreter_AddDeadlineTask_Negative) {
+			MariaInterpreter* program = new MariaInterpreter();
+
+			string input = "add by 15/02/2014 23:59";
+
+			MariaInputObject* output = program->parseInput(input);
+
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::INVALID);
+
+			delete output;
+			output = NULL;
+
+			delete program;
+			program = NULL;
+		}
+
 		TEST_METHOD(Interpreter_AddTimedTask) {
 			MariaInterpreter* program = new MariaInterpreter();
 
@@ -79,7 +95,7 @@ namespace MariaTest {
 
 			MariaInputObject* output = program->parseInput(input);
 
-			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_TIMED);
 
 			Assert::AreEqual(expectedTitle, output->getTitle());
 

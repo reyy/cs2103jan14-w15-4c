@@ -25,10 +25,6 @@ MariaInputObject::~MariaInputObject() {
 	}
 }
 
-void MariaInputObject::setValidity(bool valid) {
-	_validInput = valid;
-}
-
 void MariaInputObject::setOriginalInput(string originalInput) {
 	_originalInput = originalInput;
 }
@@ -63,10 +59,6 @@ void MariaInputObject::setEditTime(MariaTime* newEditTime) {
 
 void MariaInputObject::setStateType(MariaStateManager::STATE_TYPE newStateType) {
 	_stateType = newStateType;
-}
-
-bool MariaInputObject::isValid() const {
-	return _validInput;
 }
 
 string MariaInputObject::getOriginalInput() const {

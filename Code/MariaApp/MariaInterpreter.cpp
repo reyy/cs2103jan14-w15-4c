@@ -45,7 +45,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	//assert(currentState == MariaStateManager::STATE_TYPE::HOME);
 
 	if (inputString.size() == 0) {
-		inputObject->setValidity(false);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::INVALID);
 		// Empty input!
 		return inputObject;
 	}
@@ -53,6 +53,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	vector<string> tokenizedInput = tokenizeString(inputString);
 	map<string, MariaInputObject::COMMAND_TYPE>::iterator commandKeyword;
 	vector<MariaTime*> timeList;
+	string title = "";
 
 	if (currentState == MariaStateManager::STATE_TYPE::HOME) {
 		// Check for command keyword.
@@ -60,7 +61,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 
 		if (commandKeyword == commandKeywordList->end()) {
 			// Command keyword not recognized.
-			inputObject->setValidity(false);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::INVALID);
 		} else {
 			// Command keyword recognized! Set it!
 			inputObject->setCommandType(commandKeyword->second);
@@ -71,7 +72,14 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 			switch (inputObject->getCommandType()) {
 			case MariaInputObject::COMMAND_TYPE::ADD:
 				if (tokenizedInput.size() > 0) {
-					inputObject->setTitle(this->getTitle(tokenizedInput));
+					title = this->getTitle(tokenizedInput);
+
+					if (title.size() == 0) {
+						inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::INVALID);
+						return inputObject;
+					}
+					inputObject->setTitle(title);
+
 					timeList = this->parseDateTimeString(tokenizedInput);
 
 					if (timeList.size() == 0) {
@@ -156,23 +164,28 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 				inputObject->setOptionID(atoi(tokenizedInput[0].c_str()));
 			} else {
 				// Nope. NaN LOL.
-				inputObject->setValidity(false);
+				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::INVALID);
+				if (tokenizedInput.size() > 0) {
+				}
 			}
 		} else {
 			// Command keyword recognized.
 			inputObject->setCommandType(commandKeyword->second);
 
+			tokenizedInput.erase(tokenizedInput.begin());
+
 			// Check if the first word after the command keyword is an integer.
-			if (isInteger(tokenizedInput[1])) {
-				inputObject->setOptionID(atoi(tokenizedInput[1].c_str()));
+			if (isInteger(tokenizedInput[0])) {
+				inputObject->setOptionID(atoi(tokenizedInput[0].c_str()));
 			} else {
 				// Nope. But it may be the title.
-				//inputObject->setTitle(this->getTitle(inputString));
+				if (tokenizedInput.size() > 0) {
+					inputObject->setTitle(this->getTitle(tokenizedInput));
+				}
 			}
 		}
 	}
 
-	inputObject->setValidity(true);
 	return inputObject;
 }
 
@@ -282,6 +295,8 @@ MariaTime* MariaInterpreter::parseDateTime(vector<string> dateTimeList, bool has
 			toReturn->setYear(year);
 			toReturn->setMonth(month);
 			toReturn->setDay(day);
+			toReturn->setHour(23);
+			toReturn->setMin(59);
 		} else if (hasTime) {
 			parseTime(dateTimeList[0], hour, min);
 
@@ -302,8 +317,13 @@ MariaTime* MariaInterpreter::parseDateTime(vector<string> dateTimeList, bool has
 			toReturn->setDay(toReturn->getDay()+1);
 
 			parseTime(dateTimeList[1], hour, min);
-			toReturn->setHour(hour);
-			toReturn->setMin(min);
+			toReturn->setHour(23);
+			toReturn->setMin(59);
+
+			MariaTime* temp = toReturn;
+			toReturn = new MariaTime(*temp);
+			delete temp;
+			temp = NULL;
 		} else {
 			parseDate(dateTimeList[0], year, month, day);
 			parseTime(dateTimeList[1], hour, min);
