@@ -120,7 +120,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			string toEditTitle = input->getTitle();
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
-				int numberToEdit = atoi(toEditTitle.c_str());
+				int numberToEdit = input->getOptionID();
 				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
 				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
 				//Will crash if the number exceeds the array.
@@ -230,7 +230,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			string toDeleteTitle = input->getTitle();
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
-				int numberToDelete = atoi(toDeleteTitle.c_str());
+				int numberToDelete = input->getOptionID();
 				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
 				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
 				//Will crash if the number exceeds the array.
@@ -249,10 +249,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 				if (listOfTasks.size() == 1) {
 					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' is delete!");
-						((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseUITask(listOfTasks[0]);
 						mariaTaskManager->archiveTask(listOfTasks[0]);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' is delete!");
+						((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseUITask(listOfTasks[0]);
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -266,15 +266,15 @@ bool MariaLogic::processCommand(std::string inputText) {
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::DELETE_ALL) {
 			//Check if the current state is the home state, do a live add.
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks are deleted.");
-				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseAllUITask();
-
 				// TODO: replace this part to delete all
 				vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
 				for (int i = 0; i < listOfTasks.size(); i++ ) {
 					mariaTaskManager->archiveTask(listOfTasks[i]);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks are deleted.");
+				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseAllUITask();
 			}
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::UNDO) {
 			if(processUndo()) {
