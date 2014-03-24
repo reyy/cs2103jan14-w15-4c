@@ -17,8 +17,10 @@ public:
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE_TITLE;
 	static const float FONT_SIZE_DESCRIPTION;
+	static const float FONT_SIZE_TITLE_CONTRACTED;
 	static const float TASK_HEIGHT;
 	static const float TASK_HEIGHT_EXPANDED;
+	static const float TASK_HEIGHT_CONTRACTED;
 	static const float DESCRIPTION_X_OFFSET;
 	static const float DESCRIPTION_Y_OFFSET;
 	static const string MESSAGE_DEADLINETASK_DUE;
@@ -29,7 +31,8 @@ public:
 
 	typedef enum{
 		NORMAL, 
-		EXPANDED
+		EXPANDED,
+		CONTRACTED
 	} DISPLAY_TYPE;
 
 private:
@@ -45,10 +48,13 @@ private:
 	QLabel *_typeOfTask;
 	QPixmap *_taskTypeIconHandler;
 	float _width;
-
 	
 	QTimer *_updatePositionTimer;
 	QTimer *_updateTimeTextTimer;
+
+	void setDisplayTitle();
+	void setTimeTitle();
+	void setDescription();
 
 protected slots:
 	bool updatePosition();

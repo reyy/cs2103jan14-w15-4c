@@ -13,6 +13,9 @@ public:
 	static const float TASK_STARTHEIGHT_SCALE;
 	static const float TASKBAR_STARTHEIGHT_SCALE;
 	static const int MAX_ITEM_IN_PAGE = 20;
+	static const float TITLE_WIDTH;
+	static const float TITLE_HEIGHT;
+	static const float TITLE_HEIGHT_SCALE;
 
 	typedef enum {
 		DAY, 

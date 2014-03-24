@@ -5,6 +5,9 @@
 
 const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
 const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.2;
+const float MariaUIStateShow::TITLE_WIDTH = 120.0;
+const float MariaUIStateShow::TITLE_HEIGHT = 98.0;
+const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.1;
 
 MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, VIEW_TYPE currentViewType, MariaTime targetTime) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
 	_currentViewType = currentViewType;
@@ -43,7 +46,7 @@ void MariaUIStateShow::initBeginState() {
 void MariaUIStateShow::initActiveState() {
 	vector<MariaTask*> tempList = _taskManager->findTask("");
 	for(MariaTask* temp : tempList) {
-		addUITask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
+		addUITask(temp, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 	}
 }
 
@@ -52,7 +55,7 @@ void MariaUIStateShow::initEndState() {
 }
 
 bool MariaUIStateShow::timerBeginState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + 80, 120, 98));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	return false;
 }
 
@@ -61,7 +64,7 @@ bool MariaUIStateShow::timerActiveState() {
 }
 
 bool MariaUIStateShow::timerEndState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + 80, 120, 98));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	return false;
 }
 
