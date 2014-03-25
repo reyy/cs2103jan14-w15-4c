@@ -49,6 +49,18 @@ vector<MariaTask*> MariaTaskManager::findTask(std::string searchString) {
 	return returnList;
 }
 
+vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end) {
+	vector<MariaTask*> returnList;
+
+	for(MariaTask* temp : *taskList) {
+		if(temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
+			returnList.push_back(temp);
+		}
+	}
+
+	return returnList;
+}
+
 vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type) {
 	vector<MariaTask*> returnList;
 
@@ -73,24 +85,6 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 }
 
 vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type) {
-	vector<MariaTask*> returnList;
-
-	for(MariaTask* temp : *taskList) {
-		if(temp->getType() == type) {
-			returnList.push_back(temp);
-		}
-	}
-
-	return returnList;
-}
-
-vector<MariaTask*> MariaTaskManager::getAllTasks() {
-	assert(taskList!=NULL);
-
-	return *taskList;
-}
-
-vector<MariaTask*> MariaTaskManager::getAllTasks(MariaTask::TaskType type) {
 	assert(taskList!=NULL);
 	vector<MariaTask*> returnList;
 
@@ -100,6 +94,12 @@ vector<MariaTask*> MariaTaskManager::getAllTasks(MariaTask::TaskType type) {
 		}
 	}
 	return returnList;
+}
+
+vector<MariaTask*> MariaTaskManager::getAllTasks() {
+	assert(taskList!=NULL);
+
+	return *taskList;
 }
 
 bool MariaTaskManager::archiveTask(MariaTask* task){
@@ -130,9 +130,9 @@ string MariaTaskManager::lowercaseString(string text) {
 }
 
 void MariaTaskManager::sortTasks() {
-	vector<MariaTask*> floatingTasks = getAllTasks(MariaTask::FLOATING);
-	vector<MariaTask*> deadlineTasks = getAllTasks(MariaTask::DEADLINE);
-	vector<MariaTask*> timedTasks = getAllTasks(MariaTask::TIMED);
+	vector<MariaTask*> floatingTasks = findTask(MariaTask::FLOATING);
+	vector<MariaTask*> deadlineTasks = findTask(MariaTask::DEADLINE);
+	vector<MariaTask*> timedTasks = findTask(MariaTask::TIMED);
 	std::sort(floatingTasks.begin(), floatingTasks.end(), &compareTasks);
 	std::sort(deadlineTasks.begin(), deadlineTasks.end(), &compareTasks);
 	std::sort(timedTasks.begin(), timedTasks.end(), &compareTasks);

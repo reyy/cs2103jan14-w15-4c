@@ -14,6 +14,7 @@ private:
 	void setEndDestination();
 	bool updatePosition();
 	friend class MariaStateManager;
+
 protected:
 	QMainWindow* _qmainWindow;
 	bool _transitionAuto;

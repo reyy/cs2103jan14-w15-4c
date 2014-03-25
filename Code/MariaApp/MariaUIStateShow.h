@@ -17,16 +17,9 @@ public:
 	static const float TITLE_HEIGHT;
 	static const float TITLE_HEIGHT_SCALE;
 
-	typedef enum {
-		DAY, 
-		MONTH, 
-		YEAR
-	} VIEW_TYPE;
-
 private:
 	QLabel *_titleLabel;
-	VIEW_TYPE _currentViewType;
-	MariaTime _targetTime;
+	vector<MariaTask*> _listOfTasks;
 
 	void initBeginState();
 	void initActiveState();
@@ -34,8 +27,9 @@ private:
 	bool timerBeginState();
 	bool timerActiveState();
 	bool timerEndState();
+
 public:
-	MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, VIEW_TYPE currentViewType, MariaTime targetTime);
+	MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string title, vector<MariaTask*> listOfTasks);
 	~MariaUIStateShow();
 	
 	void updateGUI();

@@ -61,6 +61,8 @@ bool MariaLogic::processUndo() {
 
 bool MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
+	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
+
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 
 	if(input->getCommandType() == MariaInputObject::COMMAND_TYPE::INVALID) {
@@ -81,10 +83,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
 			if(toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-
-				//Check if the current state is the home state, do a live add.
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
 			} else {
@@ -94,10 +94,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, new MariaTime(*input->getEndTime()));
 			if(toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-
-				//Check if the current state is the home state, do a live add.
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
 			} else {
@@ -107,10 +105,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), new MariaTime(*input->getStartTime()), new MariaTime(*input->getEndTime()));
 			if(toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-
-				//Check if the current state is the home state, do a live add.
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-					((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
 			} else {
@@ -121,31 +117,26 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
 				int numberToEdit = input->getOptionID();
-				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
-				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
-				//Will crash if the number exceeds the array.
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
 				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 					//TO DO, transit to edit state.
 					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 					toEditTask->getMariaTask()->setTitle(input->getEditField());
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-
+					
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
 					mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
-					mariaStateManager->transitState();
-					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Edit: DONE!");
-					mariaStateManager->runActiveUpdate();
+					mariaStateManager->transitState();					
 				}
 			} else {
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
 
 				if (listOfTasks.size() == 1) {
-					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-						//TO DO, transit to edit state.
 						listOfTasks[0]->setTitle(input->getEditField());
-						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
-						mariaStateManager->transitState();
-						mariaStateManager->runActiveUpdate();
+						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
+						tempObj->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -161,31 +152,26 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
 				int numberToEdit = input->getOptionID();
-				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
-				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
-				//Will crash if the number exceeds the array.
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
 				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
-					//TO DO, transit to edit state.
 					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 					toEditTask->getMariaTask()->setStart(new MariaTime(*input->getEditTime()));
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-					mariaStateManager->runActiveUpdate();
 
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
 					mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 					mariaStateManager->transitState();
-					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Edit: DONE!");
 				}
 			} else {
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
 
 				if (listOfTasks.size() == 1) {
-					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-						//TO DO, transit to edit state.
 						listOfTasks[0]->setStart(new MariaTime(*input->getEditTime()));
-						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
-						mariaStateManager->transitState();
-						mariaStateManager->runActiveUpdate();
+						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
+						tempObj->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -201,31 +187,26 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
 				int numberToEdit = input->getOptionID();
-				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
-				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
-				//Will crash if the number exceeds the array.
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
 				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
-					//TO DO, transit to edit state.
 					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 					toEditTask->getMariaTask()->setEnd(new MariaTime(*input->getEditTime()));
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-					mariaStateManager->runActiveUpdate();
-
+					
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done.");
 					mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 					mariaStateManager->transitState();
-					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Edit: DONE!");
 				}
 			} else {
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
 
 				if (listOfTasks.size() == 1) {
-					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
-						//TO DO, transit to edit state.
 						listOfTasks[0]->setEnd(new MariaTime(*input->getEditTime()));
-						mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
-						mariaStateManager->transitState();
-						mariaStateManager->runActiveUpdate();
+						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
+						tempObj->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -239,11 +220,37 @@ bool MariaLogic::processCommand(std::string inputText) {
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_DATE) {
 			// Show today, tomorrow, date
 			// Date object is obtained through input->getEndTime();
+			//Miki data object cannot be reference. Crashes here.
+			MariaTime startTime=*(input->getEndTime());
+			startTime.setHour(0);
+			startTime.setMin(0);
+			MariaTime endTime=*(input->getEndTime());
+			endTime.setHour(23);
+			endTime.setMin(59);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(&startTime,&endTime);
+
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have on " + MariaTime::convertToDateString(&endTime) + ".");
+			mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaTime::convertToDateString(&startTime), listOfTasks));
+			mariaStateManager->transitState();
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE) {
 			// Show from start date to end date
+			//Miki data object cannot be reference. Crashes here.
+			MariaTime startTime=*(input->getStartTime());
+			startTime.setHour(0);
+			startTime.setMin(0);
+			MariaTime endTime=*(input->getEndTime());
+			endTime.setHour(23);
+			endTime.setMin(59);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(&startTime,&endTime);
+			
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have from " + MariaTime::convertToDateString(&startTime) + " to " + MariaTime::convertToDateString(&endTime) + ".");
+			mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaTime::convertToDateString(&startTime), listOfTasks));
+			mariaStateManager->transitState();
 		} else if(input->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_ALL) {
-			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here's the calendar.");
-			mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaUIStateShow::VIEW_TYPE::YEAR, MariaTime::getCurrentTime()));
+			vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
+
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here are all the tasks.");
+			mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, "", listOfTasks));
 			mariaStateManager->transitState();
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::MARK_DONE) {
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::MARK_UNDONE) {
@@ -252,9 +259,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
 				int numberToDelete = input->getOptionID();
-				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)mariaStateManager->getCurrentStateObject();
-				//TO DO get total task current DOES NOT return the correct upper bound, it doesn't check if the number is valid.
-				//Will crash if the number exceeds the array.
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
+
 				if(numberToDelete > 0 && numberToDelete <= tempObj->getTotalUITask()) {
 					MariaUITask* toDeleteTask = tempObj->eraseUITask(numberToDelete-1);
 					mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
@@ -268,12 +274,11 @@ bool MariaLogic::processCommand(std::string inputText) {
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle);
 
 				if (listOfTasks.size() == 1) {
-					//Check if the current state is the home state, do a live add.
 					if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 						mariaTaskManager->archiveTask(listOfTasks[0]);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' has been deleted!");
-						((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseUITask(listOfTasks[0]);
+						((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -295,7 +300,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks have been deleted.");
-				((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->eraseAllUITask();
+				((MariaUIStateHome*)currentObj)->eraseAllUITask();
 			}
 		} else if (input->getCommandType() == MariaInputObject::COMMAND_TYPE::UNDO) {
 			if(processUndo()) {

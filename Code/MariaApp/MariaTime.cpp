@@ -3,6 +3,7 @@
 const string MariaTime::timeSeparator = ":";
 const string MariaTime::timeMorning = " AM";
 const string MariaTime::timeEvening = " PM";
+const string MariaTime::dateSeparator = " ";
 
 const char * const MariaTime::DAYS[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 const char * const MariaTime::MONTHS[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November" , "December"};
@@ -150,7 +151,7 @@ MariaTime MariaTime::getCurrentTime() {
 	return toReturn;
 }
 
-string MariaTime::convertTimeToString(MariaTime *time) {
+string MariaTime::convertToTimeString(MariaTime *time) {
 	string toReturn;
 
 	if(time->getHour() == 0 || time->getHour() == 12 ) {
@@ -186,6 +187,13 @@ string MariaTime::convertTimeToString(MariaTime *time) {
 	return toReturn;
 }
 
+string MariaTime::convertToDateString(MariaTime *time) {
+	string toReturn;
+	toReturn+=to_string(time->getDay())+dateSeparator;
+	toReturn+=MONTHS[time->getMonth()]+dateSeparator;
+	toReturn+=to_string(time->getYear());
+	return toReturn;
+}
 
 int MariaTime::timeDifference(MariaTime *end, MariaTime *start) {
 	return (int)difftime(end->get(), start->get());

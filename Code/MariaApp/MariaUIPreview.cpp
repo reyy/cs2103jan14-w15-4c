@@ -65,7 +65,7 @@ string MariaUIPreview::generateTodayText() {
 				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), taskListNow.at(0)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
 				} else {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_AT.c_str(), taskListNow.at(0)->getTitle().c_str(), MariaTime::convertTimeToString(taskListNow.at(0)->getStart()).c_str());
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_AT.c_str(), taskListNow.at(0)->getTitle().c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
 				toReturn+=buffer;
 			}
@@ -74,7 +74,7 @@ string MariaUIPreview::generateTodayText() {
 				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), taskListNow.at(0)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
 				} else {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_AT.c_str(), taskListNow.at(0)->getTitle().c_str(), MariaTime::convertTimeToString(taskListNow.at(0)->getStart()).c_str());
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_AT.c_str(), taskListNow.at(0)->getTitle().c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
 				toReturn+=buffer;
 			}
@@ -101,7 +101,7 @@ string MariaUIPreview::generateTodayText() {
 				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
 					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
 				} else {
-					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_AT.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), MariaTime::convertTimeToString(taskListDeadLine.at(0)->getEnd()).c_str());
+					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_AT.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
 				}
 				toReturn+=buffer;
 			}
@@ -116,7 +116,7 @@ string MariaUIPreview::generateTodayText() {
 					if(withinTheHour < 60 * 60 && withinTheHour > 1) {
 						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
 					} else {
-						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), MariaTime::convertTimeToString(taskListDeadLine.at(0)->getEnd()).c_str());
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
 					}
 					toReturn+=buffer;
 				}
@@ -141,10 +141,10 @@ string MariaUIPreview::generateTomorrowText() {
 
 	if(taskList.size()>0) {
 		if(taskList.size()==1) {
-			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertTimeToString(taskList.at(0)->getStart()).c_str());
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertToTimeString(taskList.at(0)->getStart()).c_str());
 			toReturn+=buffer;
 		} else {
-			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskList.size(), MariaTime::convertTimeToString(taskList.at(0)->getStart()).c_str());
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskList.size(), MariaTime::convertToTimeString(taskList.at(0)->getStart()).c_str());
 			toReturn+=buffer;
 		}
 	} else {
@@ -163,7 +163,7 @@ string MariaUIPreview::generateTomorrowText() {
 		}
 
 		if(taskListDeadLine.size() == 1) {
-			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertTimeToString(taskListDeadLine.at(0)->getEnd()).c_str());
+			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
 			toReturn+=buffer;
 		} else {
 			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW_MUTIPLE.c_str(), taskListDeadLine.size());

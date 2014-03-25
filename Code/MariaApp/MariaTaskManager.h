@@ -16,9 +16,9 @@ public:
 
 	MariaTask* addTask(string name, MariaTime* start = NULL, MariaTime* end = NULL);
 	vector<MariaTask*> findTask(string searchString);
+	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end);
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type);
 	vector<MariaTask*> findTask(MariaTask::TaskType type);
-	vector<MariaTask*> getAllTasks(MariaTask::TaskType);
 	vector<MariaTask*> getAllTasks();
 
 	bool undoLast();

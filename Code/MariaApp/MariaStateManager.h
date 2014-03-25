@@ -60,7 +60,15 @@ public:
 	void clearQueuedState();
 	MariaStateObject* getCurrentStateObject();
 
-	//Recall the activeUpdate timer again incase state needs some update.
+	/*
+	Recall the activeUpdate timer for the current MariaStateObject again.
+	This function is used when the activeUpdate function needs to be called
+	again.
+	
+	Note: Custom functions (e.g. MariaUIStateDisplay) does not update through this function.
+	They have to be called manually by their respective update functions unless they are also
+	part of activeUpdate.
+	*/
 	bool runActiveUpdate();
 };
 

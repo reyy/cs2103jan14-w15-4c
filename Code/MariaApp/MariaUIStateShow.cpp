@@ -9,9 +9,14 @@ const float MariaUIStateShow::TITLE_WIDTH = 120.0;
 const float MariaUIStateShow::TITLE_HEIGHT = 98.0;
 const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.1;
 
-MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, VIEW_TYPE currentViewType, MariaTime targetTime) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
-	_currentViewType = currentViewType;
-	_targetTime = targetTime;
+MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string title, vector<MariaTask*> listOfTasks) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
+	_listOfTasks = listOfTasks;
+
+	_titleLabel = new QLabel(_qmainWindow);
+	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
+	_titleLabel->setAlignment(Qt::AlignCenter);
+	_titleLabel->setText(QString::fromStdString(title));
+	_titleLabel->hide();
 }
 
 MariaUIStateShow::~MariaUIStateShow() {
@@ -23,29 +28,11 @@ void MariaUIStateShow::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
 	((MariaUI*)_qmainWindow)->setBackgroundColor(116, 30, 168);
 
-	_titleLabel = new QLabel(_qmainWindow);
-	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
-	_titleLabel->setAlignment(Qt::AlignCenter);
-	switch(_currentViewType) {
-	case DAY:
-		_titleLabel->setText(MariaTime::DAYS[_targetTime.getDayWeek()]);
-		break;
-	case MONTH:
-		_titleLabel->setText(MariaTime::MONTHS[_targetTime.getMonth()]);
-		break;
-	case YEAR:
-		_titleLabel->setText(QString::number(_targetTime.getYear()));
-		break;
-	default:
-		_titleLabel->setText("");
-		break;
-	}
 	_titleLabel->show();
 }
 
 void MariaUIStateShow::initActiveState() {
-	vector<MariaTask*> tempList = _taskManager->findTask("");
-	for(MariaTask* temp : tempList) {
+	for(MariaTask* temp : _listOfTasks) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 	}
 }
