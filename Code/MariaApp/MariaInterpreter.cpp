@@ -42,7 +42,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	MariaInputObject* inputObject = new MariaInputObject();
 
 	// Check that we are in the correct state.
-	//assert(currentState == MariaStateManager::STATE_TYPE::HOME);
+	assert(currentState == MariaStateManager::STATE_TYPE::HOME || currentState == MariaStateManager::STATE_TYPE::CONFLICT);
 
 	if (inputString.size() == 0) {
 		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::INVALID);
@@ -66,7 +66,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 			// Command keyword recognized! Set it!
 			inputObject->setCommandType(commandKeyword->second);
 
-			//TODO: Remove the need for this
 			tokenizedInput.erase(tokenizedInput.begin());
 
 			switch (inputObject->getCommandType()) {
@@ -92,9 +91,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 						inputObject->setStartTime(timeList[0]);
 						inputObject->setEndTime(timeList[1]);
 					}
-				} else {
-					// There isn't any title
-					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_ADD);
 				}
 				break;
 			case MariaInputObject::COMMAND_TYPE::EDIT:
@@ -102,10 +98,18 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 					inputObject->setTitle(this->getTitle(tokenizedInput));
 					inputObject->setCommandType(this->getEditType(tokenizedInput));
 
-					if (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0])) {
-						inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
-					} else {
-						inputObject->setEditField(this->getEditField(tokenizedInput));
+					if (tokenizedInput.size() > 0) {
+						switch (inputObject->getCommandType()) {
+						case MariaInputObject::COMMAND_TYPE::EDIT_TITLE:
+							inputObject->setEditField(this->getEditField(tokenizedInput));
+							break;
+						case MariaInputObject::COMMAND_TYPE::EDIT_START_TIME:
+						case MariaInputObject::COMMAND_TYPE::EDIT_END_TIME:
+							if (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0])) {
+								inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
+							}
+							break;
+						}
 					}
 				} else {
 					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_EDIT);
@@ -122,6 +126,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 					timeList = this->parseDateTimeString(tokenizedInput);
 				} else {
+					//TODO: Check if the string here is even valid
 					timeList = this->parseDateTimeString(tokenizedInput);
 
 					if (timeList.size() <= 1) {
@@ -174,14 +179,30 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 
 			tokenizedInput.erase(tokenizedInput.begin());
 
-			// Check if the first word after the command keyword is an integer.
-			if (isInteger(tokenizedInput[0])) {
-				inputObject->setOptionID(atoi(tokenizedInput[0].c_str()));
-			} else {
-				// Nope. But it may be the title.
-				if (tokenizedInput.size() > 0) {
+			switch (inputObject->getCommandType()) {
+			case MariaInputObject::COMMAND_TYPE::EDIT:
+				if (tokenizedInput.size() > 0 && isInteger(tokenizedInput[0])) {
+					inputObject->setOptionID(atoi(tokenizedInput[0].c_str()));
+					tokenizedInput.erase(tokenizedInput.begin());
+
+					inputObject->setCommandType(this->getEditType(tokenizedInput));
+
+					if (tokenizedInput.size() > 0 && (isDate(tokenizedInput[0]) || isTime(tokenizedInput[0]))) {
+						inputObject->setEditTime(parseDateTimeString(tokenizedInput)[0]);
+					} else if (tokenizedInput.size() > 0) {
+						inputObject->setEditField(this->getEditField(tokenizedInput));
+					}
+				} else {
+					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_EDIT);
+				}
+				break;
+			case MariaInputObject::COMMAND_TYPE::DELETE_TASK:
+				if (tokenizedInput.size() > 0 && isInteger(tokenizedInput[0])) {
+					inputObject->setOptionID(atoi(tokenizedInput[0].c_str()));
+				} else {
 					inputObject->setTitle(this->getTitle(tokenizedInput));
 				}
+				break;
 			}
 		}
 	}
@@ -226,6 +247,10 @@ MariaInputObject::COMMAND_TYPE MariaInterpreter::getAddType(vector<MariaTime*> &
 }
 
 MariaInputObject::COMMAND_TYPE MariaInterpreter::getEditType(vector<string> &tokenizedInput) {
+	if (tokenizedInput.size() < 2) {
+		return MariaInputObject::COMMAND_TYPE::GO_EDIT;
+	}
+
 	if (isStringMatch(tokenizedInput[1], "title")) {
 		removeTokens(tokenizedInput, 0, 2);
 		return MariaInputObject::COMMAND_TYPE::EDIT_TITLE;
