@@ -17,6 +17,8 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 			break;
 		}catch(exception e){
 			//todo: do something about failed file
+			MessageBox(NULL, L"M.A.R.I.A. is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
+			quit();
 		}
 	}
 	mariaUI = new MariaUI(this);
@@ -26,21 +28,14 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	mariaStateManager->queueState(MariaStateManager::LOADING, temp);
 	temp->setDisplayText("Loading");
 	temp->setLoadingDone();
-	mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
-	//mariaUI->setState(MariaUI::INTRO);
-	//mariaUI->getLoading()->setDisplayText("Loading");
-	//Put loading intensive stuffs in-between changing state to intro and to other state.
-	//mariaUI->setState(MariaUI::HOME);
 
-	//Below are things that you can edit.
-	//mariaUI->setBackgroundColor("#ff88ff");
+
+	mariaStateManager->queueState(MariaStateManager::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
 	mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
-	//mariaUI->getStatus()->setStatus(MariaUIStatus::WAIT);
 	mariaUI->getCommandBar()->getTextbox()->setSuggestText("create Meeting tomorrow for discussion");
 
 	
 	_beginthread( &MariaLogic::doShowHideWrapper, 0, this);
-	//CreateThread( NULL, 0, (doShowHide), NULL, 0, NULL);
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -54,6 +49,9 @@ MariaLogic::~MariaLogic(void) {
 bool MariaLogic::processUndo() {
 	if(mariaTaskManager->undoLast()) {
 		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		if(typeid(mariaStateManager->getCurrentStateObject()) == typeid(MariaUIStateDisplay)) {
+			((MariaUIStateDisplay*)(mariaStateManager->getCurrentStateObject()))->updateUITask();
+		}
 		return true;
 	}
 	return false;

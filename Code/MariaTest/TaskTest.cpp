@@ -90,5 +90,11 @@ namespace MariaTest {
 			delete program;
 		}
 
+		TEST_METHOD(Task_UndoNothing) {
+			MariaTaskManager* program = new MariaTaskManager();
+			Assert::IsFalse(program->undoLast());
+			delete program;
+		}
+
 	};
 }

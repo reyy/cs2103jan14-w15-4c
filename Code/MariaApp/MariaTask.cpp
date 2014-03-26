@@ -78,17 +78,28 @@ void MariaTask::setTitle(string title) {
 }
 
 void MariaTask::setDescription(string description) {
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	this->description = description;
 }
 
 void MariaTask::setStart(MariaTime* start) {
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	delete this->start;
 	this->start = start;
+	refreshTaskType();
 }
 
 void MariaTask::setEnd(MariaTime* end) {
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	delete this->end;
 	this->end = end;
+	refreshTaskType();
 }
 
 void MariaTask::refreshTaskType() {
