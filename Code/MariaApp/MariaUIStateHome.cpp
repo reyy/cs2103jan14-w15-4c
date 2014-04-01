@@ -6,7 +6,7 @@
 const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.24;
 const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE = 0.65;
 
-MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, MariaTaskManager *taskManager) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
+MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, MariaTaskManager *taskManager) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
 	_clock = new MariaUIClock(_qmainWindow);
 	_preview = new MariaUIPreview(_qmainWindow, _taskManager);
 }
@@ -48,6 +48,7 @@ void MariaUIStateHome::initEndState() {
 bool MariaUIStateHome::timerBeginState() {
 	_clock->updateGUI(getPosition());
 	_preview->updateGUI(getPosition());
+	updatePageTitleGUI();
 	return false;
 }
 
@@ -58,6 +59,7 @@ bool MariaUIStateHome::timerActiveState() {
 bool MariaUIStateHome::timerEndState() {
 	_clock->updateGUI(getPosition());
 	_preview->updateGUI(getPosition());
+	updatePageTitleGUI();
 	return false;
 }
 

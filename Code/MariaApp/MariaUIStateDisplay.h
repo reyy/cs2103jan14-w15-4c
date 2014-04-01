@@ -11,10 +11,15 @@ class MariaTaskManager;
 class MariaUIStateDisplay : public MariaStateObject {
 public:
 	static const int TEXTBOX_X_OFFSET = 30;
+	static const float TITLE_Y_OFFSET;
+	static const float TITLE_WIDTH;
+	static const float TITLE_HEIGHT;
+	static const float FONT_SIZE;
 
 protected:
 	QMainWindow *_qmainWindow;
 	MariaTaskManager *_taskManager;
+	int _maxTaskDisplay;
 
 private:
 	std::vector<MariaUITask*> _taskStack;
@@ -22,9 +27,10 @@ private:
 
 	float _taskStartHeight;
 	int _page;
+	QLabel *_pageText;
 
 public:
-	MariaUIStateDisplay(QMainWindow* qmainWindow, MariaTaskManager *taskManager, float taskStartHeight);
+	MariaUIStateDisplay(QMainWindow* qmainWindow, MariaTaskManager *taskManager, float taskStartHeight, int maxTaskDisplay);
 	~MariaUIStateDisplay();
 
 	MariaUITask* addUITask(MariaTask *task, MariaUITask::DISPLAY_TYPE type);
@@ -40,7 +46,10 @@ public:
 
 	void setPage(int page);
 	int getPage();
+	bool isPageValid(int page);
 	void updatePage();
+	void updateTitleText();
+	void updatePageTitleGUI();
 
 	//Inheritable function to update GUI if there is any UITask operations.
 	virtual void updateGUI();

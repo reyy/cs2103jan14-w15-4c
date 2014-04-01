@@ -8,6 +8,7 @@
 class MariaUITask : QWidget{
 	Q_OBJECT
 public:
+	static const int AMOUNT_OF_TASK_TYPE = 3;
 	static const int TEXTBOX_X_OFFSET = 30;
 	static const int BULLET_SPACE = 20;
 	static const int TIME_UPDATE_FREQUENCY = 1000;
@@ -16,13 +17,16 @@ public:
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float FONT_SIZE_TITLE;
+	static const float FONT_SIZE_TIME;
 	static const float FONT_SIZE_DESCRIPTION;
 	static const float FONT_SIZE_TITLE_CONTRACTED;
 	static const float TASK_HEIGHT;
+	static const float TASK_HEIGHT_FLOATING;
 	static const float TASK_HEIGHT_EXPANDED;
 	static const float TASK_HEIGHT_CONTRACTED;
 	static const float DESCRIPTION_X_OFFSET;
 	static const float DESCRIPTION_Y_OFFSET;
+	static const float TIME_Y_OFFSET;
 	static const string MESSAGE_DEADLINETASK_DUE;
 	static const string MESSAGE_DEADLINETASK_OVERDUE;
 	static const string MESSAGE_TIMEDTASK_BEFORE;
@@ -46,8 +50,9 @@ private:
 	QLabel *_desciptionText;
 	QLabel *_timeText;
 	QLabel *_typeOfTask;
-	QPixmap *_taskTypeIconHandler;
+	QPixmap *_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE];
 	float _width;
+	MariaTask::TaskType _taskType;
 	
 	QTimer *_updatePositionTimer;
 	QTimer *_updateTimeTextTimer;
@@ -55,6 +60,7 @@ private:
 	void setDisplayTitle();
 	void setTimeTitle();
 	void setDescription();
+	void loadImages();
 
 protected slots:
 	bool updatePosition();
