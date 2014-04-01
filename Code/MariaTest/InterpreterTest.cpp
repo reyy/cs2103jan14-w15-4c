@@ -213,6 +213,7 @@ namespace MariaTest {
 			program = NULL;
 		}
 
+		//Test check if parse dat is working with different separators.
 		TEST_METHOD(Interpreter_ParseDate) {
 			MariaInterpreter* program = new MariaInterpreter();
 
@@ -270,6 +271,7 @@ namespace MariaTest {
 			program = NULL;
 		}
 
+		//Test dates that are out of the boundary. Test whether if parsse Time corrects it.
 		TEST_METHOD(Interpreter_ParseDateBoundary) {
 			MariaInterpreter* program = new MariaInterpreter();
 
@@ -333,6 +335,7 @@ namespace MariaTest {
 			program = NULL;
 		}
 
+		//Test whether if time ranges work with different separators.
 		TEST_METHOD(Interpreter_ParseTime) {
 			MariaInterpreter* program = new MariaInterpreter();
 
@@ -364,6 +367,7 @@ namespace MariaTest {
 			program = NULL;
 		}
 
+		//Test the boundary whether if time ranges given are out of the expected range.
 		TEST_METHOD(Interpreter_ParseTimeBoundary) {
 			MariaInterpreter* program = new MariaInterpreter();
 

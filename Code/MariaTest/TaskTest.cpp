@@ -40,6 +40,7 @@ namespace MariaTest {
 			delete program;
 		}
 
+		//Test case for undoing an 'edit task'
 		TEST_METHOD(Task_UndoOnce) {
 			MariaTaskManager* program = new MariaTaskManager();
 			program->addTask("Original Title");
@@ -49,6 +50,7 @@ namespace MariaTest {
 			delete program;
 		}
 
+		//Test case for undoing multiple 'edit task's
 		TEST_METHOD(Task_UndoMultiple) {
 			MariaTaskManager* program = new MariaTaskManager();
 			program->addTask("Original Title");
@@ -64,6 +66,7 @@ namespace MariaTest {
 			delete program;
 		}
 
+		//Test case for undoing a 'delete task'
 		TEST_METHOD(Task_UndoDelete) {
 			MariaTaskManager* program = new MariaTaskManager();
 			program->addTask("Original Title");
@@ -79,6 +82,7 @@ namespace MariaTest {
 			delete program;
 		}
 
+		//test case for undoing an 'add task'
 		TEST_METHOD(Task_UndoAdd) {
 			MariaTaskManager* program = new MariaTaskManager();
 			program->addTask("Original Title");
@@ -90,6 +94,7 @@ namespace MariaTest {
 			delete program;
 		}
 
+		//Empty boundary test case for undo
 		TEST_METHOD(Task_UndoNothing) {
 			MariaTaskManager* program = new MariaTaskManager();
 			Assert::IsFalse(program->undoLast());

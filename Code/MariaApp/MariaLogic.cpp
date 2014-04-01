@@ -143,6 +143,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 			if (listOfTasks.size() == 1) {
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 					listOfTasks[0]->setTitle(input->getEditField());
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 					MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
 					tempObj->updateUITask();
@@ -182,6 +183,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				//still enable updating but no visual cues.
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 					listOfTasks[0]->setStart(new MariaTime(*input->getEditTime()));
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 					MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
@@ -222,6 +224,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				//still enable updating but no visual cues.
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 					listOfTasks[0]->setEnd(new MariaTime(*input->getEditTime()));
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 					MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
