@@ -185,8 +185,8 @@ string MariaUIPreview::generateSuggestionText(bool force) {
 		if(_generatedSuggestionTask == NULL||force) {
 			_generatedSuggestionTask = taskList.at(rand() % taskList.size());
 		}
-		//TODO link creation date to sprint_f
-		string dateCreated = "Unknown";
+
+		string dateCreated = MariaTime::convertToDateString(_generatedSuggestionTask->getCreated());
 		sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), _generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
 		toReturn+=buffer;
 	} else {

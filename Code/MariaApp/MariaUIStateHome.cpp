@@ -39,6 +39,11 @@ void MariaUIStateHome::initActiveState() {
 	for(MariaTask* temp : tempList) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
 	}
+
+	//Flip to the first page.
+	setPage(0);
+	updatePage();
+	updateTitleText();
 }
 
 void MariaUIStateHome::initEndState() {

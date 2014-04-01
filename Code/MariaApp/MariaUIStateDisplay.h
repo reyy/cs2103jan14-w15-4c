@@ -43,8 +43,9 @@ public:
 	void eraseAllUITask();
 	void clearUITask();
 	int getTotalUITask();
-
+	
 	void setPage(int page);
+	void setPageEnd();
 	int getPage();
 	bool isPageValid(int page);
 	void updatePage();

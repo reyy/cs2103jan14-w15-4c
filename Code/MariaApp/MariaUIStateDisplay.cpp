@@ -64,9 +64,12 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 
 	_taskStack.push_back(temp);
 	
-	updateGUI();
+	//Push the page to the last to show the new item added.
+	setPageEnd();
+	updatePage();
 	updateTitleText();
-
+	updateGUI();
+	
 	return temp;
 }
 
@@ -177,6 +180,10 @@ int MariaUIStateDisplay::getTotalUITask() {
 
 void MariaUIStateDisplay::setPage(int page) {
 	_page = page;
+}
+
+void MariaUIStateDisplay::setPageEnd() {
+	_page = ceil(getTotalUITask() / _maxTaskDisplay);
 }
 
 int MariaUIStateDisplay::getPage() {
