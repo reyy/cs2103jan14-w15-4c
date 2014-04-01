@@ -4,6 +4,7 @@ MariaTask::MariaTask(string title, MariaTime* start, MariaTime* end) {
 	this->title = title;
 	this->start = start;
 	this->end = end;
+	this->isDone = false;
 
 	this->created = new MariaTime(MariaTime::getCurrentTime());
 	
@@ -15,6 +16,7 @@ MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTi
 	this->description = description;
 	this->start = start;
 	this->end = end;
+	this->isDone = false;
 
 	this->created = new MariaTime(MariaTime::getCurrentTime());
 	
@@ -48,6 +50,10 @@ MariaTime* MariaTask::getEnd() {
 
 MariaTime* MariaTask::getCreated() {
 	return created;
+}
+
+bool MariaTask::getIsDone() {
+	return isDone;
 }
 
 double MariaTask::getDuration() {
@@ -113,6 +119,10 @@ void MariaTask::setEnd(MariaTime* end) {
 void MariaTask::setCreated(MariaTime* created) {
 	delete this->created;
 	this->created = created;
+}
+
+void MariaTask::setIsDone(bool isDone) {
+	this->isDone = isDone;
 }
 
 void MariaTask::refreshTaskType() {

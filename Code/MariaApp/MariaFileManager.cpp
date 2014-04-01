@@ -1,14 +1,19 @@
 #include "MariaFileManager.h"
 
 const string MariaFileManager::INPUT_FILE = "DEFAULT.SAV";
+
 const string MariaFileManager::TASK_OPEN_FIELD = "[Task]";
 const string MariaFileManager::TASK_TITLE_FIELD = "\t[Title]";
 const string MariaFileManager::TASK_DESC_FIELD = "\t[Desc]";
 const string MariaFileManager::TASK_STARTTIME_FIELD = "\t[Start]";
 const string MariaFileManager::TASK_ENDTIME_FIELD = "\t[End]";
 const string MariaFileManager::TASK_CREATED_FIELD = "\t[Created]";
+const string MariaFileManager::TASK_ISDONE_FIELD = "\t[Done]";
 const string MariaFileManager::TASK_CLOSE_FIELD = "[End Task]";
+
 const string MariaFileManager::TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
+const string MariaFileManager::TASK_COMPLETED = "Done";
+const string MariaFileManager::TASK_NOT_COMPLETED = "Not Done";
 
 MariaFileManager::MariaFileManager(void) {
 	
@@ -99,6 +104,8 @@ MariaTask* MariaFileManager::stringToTask(string inputText[]) {
 			newTask->setEnd(stringToTime(value));
 		} else if (field == TASK_CREATED_FIELD) {
 			newTask->setCreated(stringToTime(value));
+		} else if (field == TASK_ISDONE_FIELD) {
+			newTask->setIsDone(stringToBool(value));
 		}
 		
 	}
@@ -114,6 +121,16 @@ MariaTime* MariaFileManager::stringToTime(string inputText) {
 	}
 }
 
+bool MariaFileManager::stringToBool(string inputText) {
+	if(inputText == TASK_COMPLETED) {
+		return true;
+	} else if(inputText == TASK_NOT_COMPLETED) {
+		return false;
+	} else {
+		throw exception("Corrupted File!");
+	}
+}
+
 string MariaFileManager::taskToString(MariaTask *task) {
 	
 	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE + 
@@ -122,6 +139,7 @@ string MariaFileManager::taskToString(MariaTask *task) {
 							TASK_STARTTIME_FIELD + timeToString(task->getStart())	 + NEW_LINE + 
 							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		 + NEW_LINE + 
 							TASK_CREATED_FIELD	 + timeToString(task->getCreated())	 + NEW_LINE +
+							TASK_ISDONE_FIELD	 + boolToString(task->getIsDone())	 + NEW_LINE +
 							TASK_CLOSE_FIELD + NEW_LINE;
 
 	return returnString;
@@ -132,6 +150,14 @@ string MariaFileManager::timeToString(MariaTime* inputTime) {
 		return "";
 	} else {
 		return inputTime->get(TIME_FORMAT);
+	}
+}
+
+string MariaFileManager::boolToString(bool input) {
+	if(input) {
+		return TASK_COMPLETED;
+	} else {
+		return TASK_NOT_COMPLETED;
 	}
 }
 

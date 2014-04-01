@@ -20,21 +20,23 @@ public:
 	~MariaTask();
 	
 	
-	TaskType getType();
-	string getTitle();
-	string getDescription();
-	string getTimeFromNow();
-	MariaTime* getStart();
-	MariaTime* getEnd();
-	MariaTime* getCreated();
-	double getDuration();
-	MariaTask* getClone();
+	TaskType	getType();
+	string		getTitle();
+	string		getDescription();
+	string		getTimeFromNow();
+	MariaTime*	getStart();
+	MariaTime*	getEnd();
+	MariaTime*	getCreated();
+	double		getDuration();
+	MariaTask*	getClone();
+	bool		getIsDone();
 	
 	void setTitle(string);
 	void setDescription(string);
 	void setStart(MariaTime*);
 	void setEnd(MariaTime*);
 	void setCreated(MariaTime*);
+	void setIsDone(bool);
 
 	void refreshTaskType();
 
@@ -50,6 +52,7 @@ private:
 	MariaTime*	start;
 	MariaTime*	end;
 	MariaTime*	created;
+	bool		isDone;
 
 	static MariaUndoObserver *observer;
 };
