@@ -110,6 +110,10 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent) {
 		}
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+	} else if(keyPressed == Qt::Key_Up) {
+		_mariaLogic->processCommand("up");
+	} else if(keyPressed == Qt::Key_Down) {
+		_mariaLogic->processCommand("down");
 	} else {
 		//todo: tick / question if keyword detected
 		if(_commandBar->getTextbox()->getUserInput() == "") {
