@@ -4,16 +4,16 @@
 #include "MariaTaskManager.h"
 
 const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
-const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.2;
-const float MariaUIStateShow::TITLE_WIDTH = 120.0;
-const float MariaUIStateShow::TITLE_HEIGHT = 98.0;
-const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.1;
+const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.23;
+const float MariaUIStateShow::TITLE_WIDTH = 220.0;
+const float MariaUIStateShow::TITLE_HEIGHT = 38.0;
+const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.15;
 
-MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string title, vector<MariaTask*> listOfTasks) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE) {
+MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string title, vector<MariaTask*> listOfTasks) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
 	_listOfTasks = listOfTasks;
 
 	_titleLabel = new QLabel(_qmainWindow);
-	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
+	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;border: 1px solid rgba(200, 200, 200, 255);");
 	_titleLabel->setAlignment(Qt::AlignCenter);
 	_titleLabel->setText(QString::fromStdString(title));
 	_titleLabel->hide();
@@ -42,7 +42,7 @@ void MariaUIStateShow::initEndState() {
 }
 
 bool MariaUIStateShow::timerBeginState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	return false;
 }
 
@@ -51,7 +51,7 @@ bool MariaUIStateShow::timerActiveState() {
 }
 
 bool MariaUIStateShow::timerEndState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-60, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	return false;
 }
 
