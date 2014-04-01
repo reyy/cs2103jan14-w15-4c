@@ -118,23 +118,38 @@ string MariaTime::getTimeFromNow() {
 	if(difference < 0) {
 		return "";
 	}else if(difference > 60*60*24*30) {
-		return to_string((int)difference / ( 60*60*24*30)) + " Months";
+		int value = (int)difference / ( 60*60*24*30);
+		if(value == 1) {
+			return to_string(value) + " month";
+		} else {
+			return to_string(value) + " months";
+		}
 	}else if(difference > 60*60*24*7) {
-		return to_string((int)difference / ( 60*60*24*7)) + " Weeks";
+		int value = (int)difference / ( 60*60*24*7);
+		if(value == 1) {
+			return to_string(value) + " week";
+		} else {
+			return to_string(value) + " weeks";
+		}
 	}else if(difference > 60*60*24) {
-		return to_string((int)difference / ( 60*60*24)) + " Days";
+		int value = (int)difference / ( 60*60*24);
+		if(value == 1) {
+			return to_string(value) + " day";
+		} else {
+			return to_string(value) + " days";
+		}
 	} else {
 		string returnString;
 		if(((int)difference % 60) >0 ) {
-			returnString += to_string((int)difference % 60) + " Secs";
+			returnString += to_string((int)difference % 60) + " sec";
 		}
 		difference /= 60;
 		if(((int)difference % 60) >0 ) {
-			returnString = to_string((int)difference % 60) + " Mins " + returnString;
+			returnString = to_string((int)difference % 60) + " min " + returnString;
 		}
 		difference /= 60;
 		if(((int)difference % 24) >0 ) {
-			returnString = to_string((int)difference % 24) + " Hrs " + returnString;
+			returnString = to_string((int)difference % 24) + " hr " + returnString;
 		}
 		return returnString;
 	}
