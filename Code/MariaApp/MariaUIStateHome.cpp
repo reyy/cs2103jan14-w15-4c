@@ -27,7 +27,15 @@ void MariaUIStateHome::initBeginState() {
 }
 
 void MariaUIStateHome::initActiveState() {
-	vector<MariaTask*> tempList = _taskManager->findTask("");
+	//Manually set start and end time to show the next 7 days.
+	MariaTime* startTime = &MariaTime::getCurrentTime();
+	startTime->setHour(0);
+	startTime->setMin(0);
+	MariaTime* endTime =  &MariaTime::getCurrentTime();
+	endTime->setDay(startTime->getDay()+7);
+	endTime->setHour(23);
+	endTime->setMin(59);
+	vector<MariaTask*> tempList = _taskManager->findTask(startTime,endTime);
 	for(MariaTask* temp : tempList) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
 	}
