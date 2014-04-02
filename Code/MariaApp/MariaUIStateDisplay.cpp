@@ -23,6 +23,7 @@ MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, MariaTaskMana
 
 MariaUIStateDisplay::~MariaUIStateDisplay() {
 	clearUITask();
+	delete _pageText;
 }
 
 void MariaUIStateDisplay::updateUITaskNumber() {
@@ -194,7 +195,7 @@ int MariaUIStateDisplay::getPage() {
 }
 
 bool MariaUIStateDisplay::isPageValid(int page) {
-	if(page >= 0 && page <= ceil(getTotalUITask() / _maxTaskDisplay)) {
+	if(page >= 0 && page <= ceil((getTotalUITask()-1) / _maxTaskDisplay)) {
 		return true;
 	} else {
 		return false;

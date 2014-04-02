@@ -114,9 +114,9 @@ string MariaUIPreview::generateTodayText() {
 				
 				if(withinTheHour >= 0 ) {//Check if event has passed.
 					if(withinTheHour < 60 * 60 && withinTheHour > 1) {
-						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), taskListDeadLine.at(i)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
 					} else {
-						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), taskListDeadLine.at(0)->getTitle().c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), taskListDeadLine.at(i)->getTitle().c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(i)->getEnd()).c_str());
 					}
 					toReturn+=buffer;
 				}

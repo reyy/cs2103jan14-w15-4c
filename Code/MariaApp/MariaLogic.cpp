@@ -147,6 +147,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
 					tempObj->updateUITask();
+					tempObj->updatePage();
 				}
 			} else if (listOfTasks.size() == 0) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
