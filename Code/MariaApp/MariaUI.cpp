@@ -28,8 +28,10 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 }
 
 MariaUI::~MariaUI() {
+	delete trayIcon;
 	delete _btClose;	
 	delete _commandBar;
+	delete _bkgColorUpdateTimer;
 }
 
 void MariaUI::initWindow() {
@@ -71,7 +73,7 @@ void MariaUI::initBackgroundColor(int r, int g, int b) {
 	_targetBkgColor.setBlue(b);
 
 	_bkgColorUpdateTimer = new QTimer(this);
- connect(_bkgColorUpdateTimer, SIGNAL(timeout()), this, SLOT(updateBackgroundColor()));
+	connect(_bkgColorUpdateTimer, SIGNAL(timeout()), this, SLOT(updateBackgroundColor()));
 	updateBackgroundColor();
 }
 
