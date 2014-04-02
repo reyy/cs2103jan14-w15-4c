@@ -38,8 +38,8 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 	int currentPosition = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
 
 	int range = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
-	if(range > 5) {
-		range = 5;
+	if(range > _maxTaskDisplay) {
+		range = _maxTaskDisplay;
 	}
 	
 	float compoundPosition = 0.0;
@@ -51,7 +51,7 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 	if(currentPosition < 0) {
 		yOffset -= _qmainWindow->height();
 	}
-	if(currentPosition > 4) {
+	if(currentPosition >= _maxTaskDisplay) {
 		yOffset += _qmainWindow->height();
 	}
 
