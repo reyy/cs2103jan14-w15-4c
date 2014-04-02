@@ -68,7 +68,7 @@ void MariaUIClock::updateClock() {
 	}
 	_currentTime->setText(tempString);
 	_currentDate->setText(QString::number(currentTime.getDay()) + " " + QString(MariaTime::MONTHS[currentTime.getMonth()-1]) + " " + QString::number(currentTime.getYear()));
-	_currentDay->setText(QString(MariaTime::DAYS[currentTime.getDayWeek()]));
+	_currentDay->setText(QString(MariaTime::DAYS[currentTime.getDayWeek()-1]));
 }
 
 void MariaUIClock::startUpdating() {
