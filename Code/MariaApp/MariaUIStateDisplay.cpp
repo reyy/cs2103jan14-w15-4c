@@ -67,7 +67,6 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 	//Push the page to the last to show the new item added.
 	setPageEnd();
 	updatePage();
-	updateTitleText();
 	updateGUI();
 	
 	return temp;
@@ -112,35 +111,34 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
 	_taskStack.erase(_taskStack.begin() + index);
 
 	updateUITask();
+	updatePage();
+	updateGUI();
 	return temp;
 }
 
 MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
 	MariaUITask* temp = NULL;
-	float compoundPosition = 0.0;
 	for (int i = 0; i < _taskStack.size(); i++ ) {
 		if (_taskStack[i]->getMariaTask() == task) {
 			temp = _taskStack[i];
 			_taskDisposeStack.push_back(temp);
-			temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStartHeight + compoundPosition));
+			temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
 			temp->stopUpdatingTime();
 			_taskStack.erase(_taskStack.begin() + i);
 			break;
-		} else {
-			compoundPosition += _taskStack.at(i)->getTaskHeight();
 		}
 	}
 
 	updateUITask();
+	updatePage();
+	updateGUI();
 	return temp;
 }
 
 void MariaUIStateDisplay::eraseAllUITask() {
-	float compoundPosition = 0.0;
 	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
-		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStartHeight + compoundPosition));
+		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
 		_taskStack.at(i)->stopUpdatingTime();
-		compoundPosition += _taskStack.at(i)->getTaskHeight();
 	}
 
 	while (_taskStack.size()>0) {
@@ -148,6 +146,7 @@ void MariaUIStateDisplay::eraseAllUITask() {
 		_taskStack.erase(_taskStack.begin());
 	}
 	
+	updatePage();
 	updateGUI();
 }
 
@@ -170,7 +169,7 @@ void MariaUIStateDisplay::clearUITask() {
 		_taskDisposeStack.pop_back();
 	}
 
-	
+	updatePage();
 	updateGUI();
 }
 
@@ -183,13 +182,16 @@ void MariaUIStateDisplay::setPage(int page) {
 }
 
 void MariaUIStateDisplay::setPageEnd() {
-	_page = ceil(getTotalUITask() / _maxTaskDisplay);
+	if(getTotalUITask() == 0) {
+		_page = 0;
+	} else {
+		_page = ((getTotalUITask()-1) / _maxTaskDisplay);
+	}
 }
 
 int MariaUIStateDisplay::getPage() {
 	return _page;
 }
-
 
 bool MariaUIStateDisplay::isPageValid(int page) {
 	if(page >= 0 && page <= ceil(getTotalUITask() / _maxTaskDisplay)) {
