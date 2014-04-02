@@ -55,7 +55,7 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, MariaStateMan
 	vector<MariaTime*> timeList;
 	string title = "";
 
-	if (currentState == MariaStateManager::STATE_TYPE::HOME || currentState == MariaStateManager::STATE_TYPE::SHOW) {
+	if (currentState == MariaStateManager::STATE_TYPE::HOME) {
 		// Check for command keyword.
 		commandKeyword = commandKeywordList->find(lowercaseString(tokenizedInput[0]));
 

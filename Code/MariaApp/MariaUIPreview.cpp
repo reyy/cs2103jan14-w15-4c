@@ -184,11 +184,11 @@ string MariaUIPreview::generateSuggestionText(bool force) {
 	if(taskList.size() > 0) {
 		if(_generatedSuggestionTask == NULL||force) {
 			_generatedSuggestionTask = taskList.at(rand() % taskList.size());
+		} else {
+			string dateCreated = MariaTime::convertToDateString(_generatedSuggestionTask->getCreated());
+			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), _generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
+			toReturn+=buffer;
 		}
-
-		string dateCreated = MariaTime::convertToDateString(_generatedSuggestionTask->getCreated());
-		sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), _generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
-		toReturn+=buffer;
 	} else {
 		_generatedSuggestionTask = NULL;
 	}
