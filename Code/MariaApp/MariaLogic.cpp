@@ -279,7 +279,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
 
 		mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here are all the tasks.");
-		mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, "", listOfTasks));
+		mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, "All Tasks", listOfTasks));
 		mariaStateManager->transitState();
 	}
 	break;

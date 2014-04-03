@@ -33,9 +33,6 @@ void MariaUIStateDisplay::updateUITaskNumber() {
 }
 
 MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLAY_TYPE type) {
-	MariaUITask *temp = new MariaUITask(_qmainWindow, task, _qmainWindow->width(), type);
-
-	
 	int currentPosition = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
 
 	int range = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
@@ -56,9 +53,17 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 		yOffset += _qmainWindow->height();
 	}
 
-	temp->setPosition(QPointF(_qmainWindow->width(), _taskStartHeight + compoundPosition + yOffset));
-	temp->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
-	temp->show();
+	MariaUITask *temp = new MariaUITask(_qmainWindow, task, _qmainWindow->width(), type);
+	
+	if(currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
+		temp->setPosition(QPointF(_qmainWindow->width(), _taskStartHeight + compoundPosition + yOffset));
+		temp->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
+		temp->activate();
+	} else {
+		temp->setPosition(QPointF(0.0, _taskStartHeight + yOffset));
+		temp->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
+	}
+
 	if(task->getType() != MariaTask::FLOATING) {
 		temp->startUpdatingTime();
 	}
@@ -66,7 +71,7 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 	_taskStack.push_back(temp);
 	
 	//Push the page to the last to show the new item added.
-	setPageEnd();
+//	setPageEnd();
 	updatePage();
 	updateGUI();
 	
@@ -111,6 +116,8 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
 	temp->stopUpdatingTime();
 	_taskStack.erase(_taskStack.begin() + index);
 
+	setPage(index/_maxTaskDisplay);
+	updateTitleText();
 	updateUITask();
 	updatePage();
 	updateGUI();
@@ -126,10 +133,12 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
 			temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
 			temp->stopUpdatingTime();
 			_taskStack.erase(_taskStack.begin() + i);
+			setPage(i/_maxTaskDisplay);
 			break;
 		}
 	}
-
+	
+	updateTitleText();
 	updateUITask();
 	updatePage();
 	updateGUI();
@@ -147,6 +156,8 @@ void MariaUIStateDisplay::eraseAllUITask() {
 		_taskStack.erase(_taskStack.begin());
 	}
 	
+	setPage(0);
+	updateTitleText();
 	updatePage();
 	updateGUI();
 }
@@ -170,6 +181,7 @@ void MariaUIStateDisplay::clearUITask() {
 		_taskDisposeStack.pop_back();
 	}
 
+	updateTitleText();
 	updatePage();
 	updateGUI();
 }
@@ -214,10 +226,13 @@ void MariaUIStateDisplay::updatePage() {
 		if(currentPosition >= _maxTaskDisplay) {
 			yOffset += _qmainWindow->height();
 		}
-
-		_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
+		
 		if(yOffset == 0.0) {
+			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
+			_taskStack.at(i)->activate();
 			compoundPosition += _taskStack.at(i)->getTaskHeight();
+		} else {
+			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
 		}
 	}
 	updateTitleText();

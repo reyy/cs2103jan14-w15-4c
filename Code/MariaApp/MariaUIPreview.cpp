@@ -21,7 +21,7 @@ const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_REMAINING_TIME = "%s is due i
 const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was created since %s, was it done yet?";
 
 const float MariaUIPreview::START_HEIGHT_SCALE = 0.3;
-const float MariaUIPreview::MESSAGE_HEIGHT = 320;
+const float MariaUIPreview::MESSAGE_HEIGHT = 220;
 
 MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow,MariaTaskManager *taskManager) {
 	_qmainWindow=qmainWindow;

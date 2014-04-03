@@ -34,6 +34,7 @@ void MariaUIStateConflict::initEndState() {
 }
 
 bool MariaUIStateConflict::timerBeginState() {
+	updatePageTitleGUI();
 	return false;
 }
 
@@ -42,6 +43,7 @@ bool MariaUIStateConflict::timerActiveState() {
 }
 
 bool MariaUIStateConflict::timerEndState() {
+	updatePageTitleGUI();
 	return false;
 }
 

@@ -41,6 +41,8 @@ public:
 
 private:
 	QMainWindow * _qmainWindow;
+	bool _active;
+
 	QPointF _destination;
 	QPointF _position;
 	
@@ -83,6 +85,13 @@ public:
 	void hide();
 
 	float getTaskHeight();
+
+	//Create all the necessary images.
+	void activate();
+	//Destroy all the dependencies.
+	void deactivate();
+
+	bool isActivated();
 
 	MariaTask * getMariaTask();
 };
