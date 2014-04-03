@@ -19,6 +19,7 @@ class MariaUI : QMainWindow {
 	 Q_OBJECT
 
 public:
+	static const int AMOUNT_OF_TASK_TYPE = 3;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const int WINDOW_DEFAULT_SIZE_X = 480;
@@ -42,12 +43,15 @@ private:
 	QColor _bkgColor;
 	QColor _targetBkgColor;
 	QSystemTrayIcon *trayIcon;
+	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE];
 
 
 	//Load images used in application.
 	void initWindow();
 	void initButtons();
 	void initBackgroundColor(int r, int g, int b);
+	static void loadImages();
+	static void unloadImages();
 
 public slots:
 	void quitAction();
@@ -67,7 +71,7 @@ public:
 	void setExpand(bool value);
 	bool getExpand();
 	void setBackgroundColor(int r, int g, int b);
-
+	static QPixmap* getImageHandler(int index);
 	MariaUICommandBar* getCommandBar();
 
 signals:	

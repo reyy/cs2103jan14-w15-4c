@@ -3,12 +3,12 @@
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
 #include <string>
+#include "MariaUI.h"
 #include "MariaTask.h"
 
 class MariaUITask : QWidget{
 	Q_OBJECT
 public:
-	static const int AMOUNT_OF_TASK_TYPE = 3;
 	static const int TEXTBOX_X_OFFSET = 30;
 	static const int BULLET_SPACE = 20;
 	static const int TIME_UPDATE_FREQUENCY = 1000;
@@ -50,7 +50,6 @@ private:
 	QLabel *_desciptionText;
 	QLabel *_timeText;
 	QLabel *_typeOfTask;
-	QPixmap *_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE];
 	float _width;
 	MariaTask::TaskType _taskType;
 	
@@ -60,7 +59,6 @@ private:
 	void setDisplayTitle();
 	void setTimeTitle();
 	void setDescription();
-	void loadImages();
 
 protected slots:
 	bool updatePosition();

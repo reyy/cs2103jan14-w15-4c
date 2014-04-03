@@ -2,7 +2,7 @@
 #include "MariaUITask.h"
 #include "MariaTime.h"
 
-const float MariaUITask::FLOW_FACTOR = 0.05;
+const float MariaUITask::FLOW_FACTOR = 0.1;
 const float MariaUITask::VALUE_THRESHOLD = 1.0;
 const float MariaUITask::FONT_SIZE_TITLE = 16.0;
 const float MariaUITask::FONT_SIZE_TIME = 12.0;
@@ -54,8 +54,6 @@ MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, float width,
 		break;
 	}
 
-	loadImages();
-
 	_updatePositionTimer = new QTimer(this);
 	connect(_updatePositionTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
 	_updatePositionTimer->start(1);
@@ -97,9 +95,6 @@ MariaUITask::~MariaUITask() {
 	}
 
 	if(_typeOfTask != NULL) {
-		delete _taskTypeIconHandler[2];
-		delete _taskTypeIconHandler[1];
-		delete _taskTypeIconHandler[0];
 		delete _typeOfTask;
 	}
 }
@@ -123,6 +118,10 @@ void MariaUITask::setDisplayTitle() {
 		_displayTitle->setStyleSheet("color:#000000; padding-left: " + QString::number(BULLET_SPACE + TEXTBOX_X_OFFSET) + "px; background-color:rgba(255, 255, 255, 255);border: 1px solid rgba(200, 200, 200, 255);font-size:" + QString::number(FONT_SIZE_TITLE) + "px;");
 		break;
 	}
+
+	_typeOfTask = new QLabel(_qmainWindow);
+	_typeOfTask->setPixmap(*(MariaUI::getImageHandler(_taskType)));
+	_typeOfTask->hide();
 }
 
 void MariaUITask::setTimeTitle() {
@@ -138,16 +137,6 @@ void MariaUITask::setDescription() {
 	_desciptionText->setAlignment(Qt::AlignLeft);
 	_desciptionText->setWordWrap(true);
 	_desciptionText->hide();
-}
-
-void MariaUITask::loadImages() {
-	_taskTypeIconHandler[0] = new QPixmap("./Resources/ui_task_type_floating.png");
-	_taskTypeIconHandler[1] = new QPixmap("./Resources/ui_task_type_deadline.png");
-	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
-	
-	_typeOfTask = new QLabel(_qmainWindow);
-	_typeOfTask->setPixmap(*_taskTypeIconHandler[_taskType]);
-	_typeOfTask->hide();
 }
 
 bool MariaUITask::updatePosition() {
@@ -173,7 +162,7 @@ bool MariaUITask::updatePosition() {
 				_timeText->setGeometry(QRect(_position.x() + TIMESTAMP_X_OFFSET, _position.y()+TASK_HEIGHT-TIME_Y_OFFSET-FONT_SIZE_TIME, _width, TASK_HEIGHT_CONTRACTED));
 				break;
 			}
-			_typeOfTask->setGeometry(QRect(_position.x() + TEXTBOX_X_OFFSET + BULLET_X_OFFSET, _position.y() + BULLET_Y_OFFSET, _taskTypeIconHandler[_taskType]->width(), _taskTypeIconHandler[_taskType]->height()));
+			_typeOfTask->setGeometry(QRect(_position.x() + TEXTBOX_X_OFFSET + BULLET_X_OFFSET, _position.y() + BULLET_Y_OFFSET, (MariaUI::getImageHandler(_taskType))->width(), (MariaUI::getImageHandler(_taskType))->height()));
 			return true;
 	} else {
 		if(_updatePositionTimer->isActive()) {
@@ -239,7 +228,7 @@ QPointF MariaUITask::getDestination() {
 
 bool MariaUITask::updateDetails() {
 	if(_taskReference != NULL) {
-		_typeOfTask->setPixmap(*_taskTypeIconHandler[_taskType]);
+		_typeOfTask->setPixmap(*(MariaUI::getImageHandler(_taskType)));
 		if(_displayTitle!= NULL) {
 			_displayTitle->setText(QString::fromStdString(_taskReference->getTitle()));
 		}

@@ -11,6 +11,8 @@ const float MariaUI::WINDOW_DEFAULT_COLOR_R = 186;
 const float MariaUI::WINDOW_DEFAULT_COLOR_G = 199;
 const float MariaUI::WINDOW_DEFAULT_COLOR_B = 22;
 
+QPixmap *MariaUI::_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE]={};
+
 MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
 	_mariaLogic = mariaLogic;
 
@@ -24,10 +26,13 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
 	trayIcon->setToolTip("M.A.R.I.A.");
 
+	loadImages();
+
 	QObject::connect(this, SIGNAL(triggerShowHideEvent()), this, SLOT(showHideEvent()));
 }
 
 MariaUI::~MariaUI() {
+	unloadImages();
 	delete trayIcon;
 	delete _btClose;	
 	delete _commandBar;
@@ -75,6 +80,18 @@ void MariaUI::initBackgroundColor(int r, int g, int b) {
 	_bkgColorUpdateTimer = new QTimer(this);
 	connect(_bkgColorUpdateTimer, SIGNAL(timeout()), this, SLOT(updateBackgroundColor()));
 	updateBackgroundColor();
+}
+
+void MariaUI::loadImages() {	
+	_taskTypeIconHandler[0] = new QPixmap("./Resources/ui_task_type_floating.png");
+	_taskTypeIconHandler[1] = new QPixmap("./Resources/ui_task_type_deadline.png");
+	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
+}
+
+void MariaUI::unloadImages() {	
+	delete _taskTypeIconHandler[2];
+	delete _taskTypeIconHandler[1];
+	delete _taskTypeIconHandler[0];
 }
 
 void MariaUI::quitAction() {
@@ -163,6 +180,10 @@ void MariaUI::setBackgroundColor(int r, int g, int b) {
 	if(!_bkgColorUpdateTimer->isActive()) {
 		_bkgColorUpdateTimer->start(50);
 	}
+}
+
+QPixmap* MariaUI::getImageHandler(int index) {
+	return _taskTypeIconHandler[index];
 }
 
 MariaUICommandBar * MariaUI::getCommandBar() {
