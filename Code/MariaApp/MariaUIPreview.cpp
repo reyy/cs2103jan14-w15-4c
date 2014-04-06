@@ -54,8 +54,8 @@ string MariaUIPreview::generateTodayText() {
 	char buffer[STRING_BUFFER_SIZE];
 
 	//Today's Task.
-	vector<MariaTask*> taskListNow = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED);
-	vector<MariaTask*> taskListAll = _taskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED);
+	vector<MariaTask*> taskListNow = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED, false);
+	vector<MariaTask*> taskListAll = _taskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED, false);
 	
 	if(taskListNow.size() > 0) {
 		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &now);
@@ -87,7 +87,7 @@ string MariaUIPreview::generateTodayText() {
 	}
 
 	//Today's Deadline.
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE);
+	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE, false);
 
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
@@ -137,7 +137,7 @@ string MariaUIPreview::generateTomorrowText() {
 	char buffer[STRING_BUFFER_SIZE];
 	
 	//Tomorrow's Task
-	vector<MariaTask*> taskList = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED);
+	vector<MariaTask*> taskList = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED, false);
 
 	if(taskList.size()>0) {
 		if(taskList.size()==1) {
@@ -155,7 +155,7 @@ string MariaUIPreview::generateTomorrowText() {
 	}
 
 	//Tomorrow's Deadline
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE);
+	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
 
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
@@ -177,7 +177,7 @@ string MariaUIPreview::generateTomorrowText() {
 string MariaUIPreview::generateSuggestionText(bool force) {
 	string toReturn;
 
-	vector<MariaTask*> taskList = _taskManager->findTask(MariaTask::TaskType::FLOATING);
+	vector<MariaTask*> taskList = _taskManager->findTask(MariaTask::TaskType::FLOATING, false);
 
 	char buffer[STRING_BUFFER_SIZE];
 

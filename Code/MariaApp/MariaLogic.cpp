@@ -52,6 +52,10 @@ bool MariaLogic::processUndo() {
 		if(typeid(mariaStateManager->getCurrentStateObject()) == typeid(MariaUIStateDisplay)) {
 			((MariaUIStateDisplay*)(mariaStateManager->getCurrentStateObject()))->updateUITask();
 		}
+
+		if(!mariaTaskManager->comparePreviousQuery()) {
+			int a=0;
+		}
 		return true;
 	}
 	return false;

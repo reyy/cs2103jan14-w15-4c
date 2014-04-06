@@ -12,7 +12,8 @@ public:
 	typedef enum {
 		FLOATING, 
 		DEADLINE, 
-		TIMED
+		TIMED,
+		INVALID
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);

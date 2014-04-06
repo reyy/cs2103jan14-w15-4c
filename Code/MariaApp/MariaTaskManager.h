@@ -15,12 +15,13 @@ public:
 	~MariaTaskManager(void);
 
 	MariaTask* addTask(string name, MariaTime* start = NULL, MariaTime* end = NULL);
-	vector<MariaTask*> findTask(string searchString);
-	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end);
-	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type);
-	vector<MariaTask*> findTask(MariaTask::TaskType type);
+	vector<MariaTask*> findTask(string searchString, bool addToHistory = true);
+	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, bool addToHistory = true);
+	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type, bool addToHistory = true);
+	vector<MariaTask*> findTask(MariaTask::TaskType type, bool addToHistory = true);
 	vector<MariaTask*> getAllTasks();
 
+	bool comparePreviousQuery();
 	bool undoLast();
 
 	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!
@@ -34,6 +35,18 @@ public:
 #endif
 	vector<MariaTask*> *taskList;
 	vector<pair<MariaTask**, MariaTask*>*> *undoList;
+
+	vector<MariaTask*> *previousQueryResult;
+	string previousSearchString;
+	MariaTime *previousStart;
+	MariaTime *previousEnd;
+	MariaTask::TaskType previousType;
+
+	void deletePreviousQuery();
+	void storePreviousQuery(string);
+	void storePreviousQuery(MariaTask::TaskType);
+	void storePreviousQuery(MariaTime*, MariaTime*);
+	void storePreviousQuery(MariaTime*, MariaTime*, MariaTask::TaskType);
 	
 
 	string lowercaseString(string text);
