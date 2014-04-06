@@ -34,7 +34,7 @@ private:
 public:
 #endif
 	vector<MariaTask*> *taskList;
-	vector<pair<MariaTask**, MariaTask*>*> *undoList;
+	vector<pair<MariaTask*, MariaTask*>*> *undoList;
 
 	vector<MariaTask*> *queryResult;
 	string previousSearchString;

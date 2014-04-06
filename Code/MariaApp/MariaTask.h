@@ -38,6 +38,7 @@ public:
 	void setEnd(MariaTime*);
 	void setCreated(MariaTime*);
 	void setIsDone(bool);
+	void setAll(MariaTask*);
 
 	void refreshTaskType();
 

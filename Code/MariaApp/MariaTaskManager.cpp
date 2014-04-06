@@ -8,7 +8,7 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 	}
 	sortTasks();
 
-	undoList = new vector<pair<MariaTask**,MariaTask*>*>();
+	undoList = new vector<pair<MariaTask*,MariaTask*>*>();
 	MariaTask::initObserver(this);
 
 	previousStart = NULL;
@@ -22,7 +22,7 @@ MariaTaskManager::~MariaTaskManager(void) {
 	}
 	delete taskList;
 
-	for(pair<MariaTask**,MariaTask*>* t: (*this->undoList)) {
+	for(pair<MariaTask*,MariaTask*>* t: (*this->undoList)) {
 		delete t;
 	}
 	delete undoList;
@@ -253,23 +253,38 @@ MariaTask* MariaTaskManager::undoLast() {
 		return NULL;
 	}
 	MariaTask* toReturn = NULL;
-	MariaTask* taskPointer = *(undoList->back())->first;
+	MariaTask* taskPointer = (undoList->back())->first;
 	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
 	
 	if(it != taskList->end()) {
-		toReturn = *(undoList->back())->first;
+		toReturn = (undoList->back())->first;
 		if(oldTask == NULL) { 
 			//last action = addTask
 			delete taskPointer;
 			taskList->erase(it);
 		} else { 
 			//last action = editTask
-			delete taskPointer; //delete current task
-			*(undoList->back())->first = oldTask; //set pointer in taskList to old task
+			/*delete taskPointer; //delete current task
+			taskList->erase(it);
+			for(pair<MariaTask*,MariaTask*> *p : *undoList) {
+				if(p->first == taskPointer) {
+					p->first = oldTask;
+				}
+			}
+			taskList->push_back(oldTask);
+			sortTasks();*/
+			taskPointer->setAll(oldTask);
+			delete oldTask;
+			//(undoList->back())->first = oldTask; //set pointer in taskList to old task
 		}
 	} else {
 		//last action = deleteTask
+		for(pair<MariaTask*,MariaTask*> *p : *undoList) {
+			if(p->first == taskPointer) {
+				p->first = oldTask;
+			}
+		}
 		taskList->push_back(oldTask);
 		sortTasks();
 
@@ -282,14 +297,15 @@ MariaTask* MariaTaskManager::undoLast() {
 void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 	
 	MariaTask *oldTask = NULL;
-	MariaTask **taskPointer = NULL;
+	MariaTask *taskPointer = NULL;
 	
 	for(int i = 0; i<taskList->size(); i++) {
 		if(((MariaTask*)task) == (*taskList)[i]){
-			taskPointer = &(*taskList)[i];
+			taskPointer = (*taskList)[i];
 			break;
 		}
 	}
+	//taskPointer = (MariaTask*)task;
 
 	assert(taskPointer != NULL);
 
@@ -301,5 +317,5 @@ void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 		undoList->erase(undoList->begin());
 	}
 
-	undoList->push_back(new pair<MariaTask**, MariaTask*>(taskPointer, oldTask));
+	undoList->push_back(new pair<MariaTask*, MariaTask*>(taskPointer, oldTask));
 }

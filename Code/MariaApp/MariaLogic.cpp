@@ -47,14 +47,15 @@ MariaLogic::~MariaLogic(void) {
 }
 
 bool MariaLogic::processUndo() {
+	if(mariaStateManager->getCurrentState() != MariaStateManager::STATE_TYPE::HOME) {
+		return false; //temporary disable undo everywhere except home
+	}
+
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
-	
 	MariaTask* changed = mariaTaskManager->undoLast();
+
 	if(changed) {
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());/*
-		if(typeid(mariaStateManager->getCurrentStateObject()) == typeid(MariaUIStateDisplay)) {
-			((MariaUIStateDisplay*)(mariaStateManager->getCurrentStateObject()))->updateUITask();
-		}*/
+		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 
 		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
 		if(taskCountDifference < 0) {
@@ -63,6 +64,8 @@ bool MariaLogic::processUndo() {
 		} else if (taskCountDifference > 0) {
 			((MariaUIStateHome*)currentObj)->addUITask(changed, MariaUITask::DISPLAY_TYPE::NORMAL);
 		}
+		mariaTaskManager->compareToPreviousQuery();
+		((MariaUIStateHome*)currentObj)->updateUITask();
 		return true;
 	}
 	return false;
@@ -155,7 +158,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaStateManager->transitState();					
 			}
 		} else {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
 
 			if (listOfTasks.size() == 1) {
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
@@ -194,7 +197,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaStateManager->transitState();
 			}
 		} else {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
 
 			if (listOfTasks.size() == 1) {
 				//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
@@ -235,7 +238,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaStateManager->transitState();
 			}
 		} else {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
 
 			if (listOfTasks.size() == 1) {
 				//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
@@ -269,7 +272,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		MariaTime* endTime = new MariaTime(*input->getEndTime());
 		endTime->setHour(23);
 		endTime->setMin(59);
-		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime);
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime, false);
 
 		mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have on " + MariaTime::convertToDateString(endTime) + ".");
 		mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaTime::convertToDateString(startTime), listOfTasks));
@@ -285,7 +288,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		MariaTime* endTime = new MariaTime(*input->getEndTime());
 		endTime->setHour(23);
 		endTime->setMin(59);
-		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime);
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime, false);
 			
 		mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have from " + MariaTime::convertToDateString(startTime) + " to " + MariaTime::convertToDateString(endTime) + ".");
 		mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaTime::convertToDateString(startTime), listOfTasks));
@@ -323,14 +326,16 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaStateManager->transitState();
 			}
 		} else {
-			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle, false);
 
 			if (listOfTasks.size() == 1) {
 				if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME) {
 					mariaTaskManager->archiveTask(listOfTasks[0]);
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' has been deleted!");
-					((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+					if(mariaTaskManager->compareToPreviousQuery()) {
+						((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+					}
 				}
 			} else if (listOfTasks.size() == 0) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
