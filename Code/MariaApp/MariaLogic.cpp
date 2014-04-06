@@ -48,16 +48,20 @@ MariaLogic::~MariaLogic(void) {
 
 bool MariaLogic::processUndo() {
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
-
-	if(mariaTaskManager->undoLast()) {
+	
+	MariaTask* changed = mariaTaskManager->undoLast();
+	if(changed) {
 		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());/*
 		if(typeid(mariaStateManager->getCurrentStateObject()) == typeid(MariaUIStateDisplay)) {
 			((MariaUIStateDisplay*)(mariaStateManager->getCurrentStateObject()))->updateUITask();
 		}*/
 
-		if(!mariaTaskManager->sameAsPreviousQuery()) {
+		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
+		if(taskCountDifference < 0) {
 			//refresh GUI!
-			//((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+			((MariaUIStateHome*)currentObj)->eraseUITask(changed);
+		} else if (taskCountDifference > 0) {
+			((MariaUIStateHome*)currentObj)->addUITask(changed, MariaUITask::DISPLAY_TYPE::NORMAL);
 		}
 		return true;
 	}
@@ -92,7 +96,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
 		if(toAdd != NULL) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && !mariaTaskManager->sameAsPreviousQuery()) {
+			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 				((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 			} else {
 				//maybe go to show all so the user can see it has been added?
@@ -107,7 +111,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, new MariaTime(*input->getEndTime()));
 		if(toAdd != NULL) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && !mariaTaskManager->sameAsPreviousQuery()) {
+			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 				((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 			} else {
 				//maybe go to show all so the user can see it has been added?
@@ -122,7 +126,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), new MariaTime(*input->getStartTime()), new MariaTime(*input->getEndTime()));
 		if(toAdd != NULL) {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && !mariaTaskManager->sameAsPreviousQuery()) {
+			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 				((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 			} else {
 				//maybe go to show all so the user can see it has been added?

@@ -160,9 +160,9 @@ bool MariaTaskManager::archiveTask(MariaTask* task) {
 	
 }
 
-bool MariaTaskManager::sameAsPreviousQuery() {
+int MariaTaskManager::compareToPreviousQuery() {
 	if(queryResult == NULL) {
-		return true;
+		return false;
 	}
 	vector<MariaTask*> previousQueryResult = vector<MariaTask*>(*queryResult);
 
@@ -176,11 +176,7 @@ bool MariaTaskManager::sameAsPreviousQuery() {
 		findTask(previousStart, previousEnd);
 	}
 
-	if(previousQueryResult.size() != queryResult->size()) {
-		return false;
-	}
-
-	return true;	
+	return queryResult->size() - previousQueryResult.size();
 }
 
 void MariaTaskManager::deletePreviousQuery() {
@@ -252,15 +248,17 @@ bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2) {
 	return ((*t1) < (*t2));
 }
 
-bool MariaTaskManager::undoLast() {
+MariaTask* MariaTaskManager::undoLast() {
 	if(undoList->empty()) {
-		return false;
+		return NULL;
 	}
+	MariaTask* toReturn = NULL;
 	MariaTask* taskPointer = *(undoList->back())->first;
 	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
 	
 	if(it != taskList->end()) {
+		toReturn = *(undoList->back())->first;
 		if(oldTask == NULL) { 
 			//last action = addTask
 			delete taskPointer;
@@ -274,9 +272,11 @@ bool MariaTaskManager::undoLast() {
 		//last action = deleteTask
 		taskList->push_back(oldTask);
 		sortTasks();
+
+		toReturn = oldTask;
 	}
 	undoList->pop_back();
-	return true;
+	return toReturn;
 }
 
 void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
