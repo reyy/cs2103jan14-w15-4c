@@ -408,6 +408,9 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
+	// Empty out the input box first.
+	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
+
 	// Attempt to parse the input.
 	try {
 		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
@@ -473,6 +476,84 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 		}
 		break;
 
+		case MariaInputObject::COMMAND_TYPE::SEARCH: {
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
+
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is the result of the search for '" + input->getTitle() + "'.");
+			mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, input->getTitle(), listOfTasks));
+			mariaStateManager->transitState();
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::DELETE_TASK: {
+			string toDeleteTitle = input->getTitle();
+
+			if (mariaStateManager->getCurrentState() == STATE_TYPE::CONFLICT) {
+				int numberToDelete = input->getOptionID();
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
+
+				if (numberToDelete > 0 && numberToDelete <= tempObj->getTotalUITask()) {
+					MariaUITask* toDeleteTask = tempObj->eraseUITask(numberToDelete-1);
+					mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Resolved! Anything else?");
+					mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
+					mariaStateManager->transitState();
+				}
+			} else {
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle);
+
+				if (listOfTasks.size() == 1) {
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+						mariaTaskManager->archiveTask(listOfTasks[0]);
+						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' has been deleted!");
+						((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+					}
+				} else if (listOfTasks.size() == 0) {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
+				} else {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar tasks, which one should I remove?");
+
+					mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, mariaTaskManager, toDeleteTitle));
+					mariaStateManager->transitState();
+				}
+			}
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::DELETE_ALL: {
+			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+				vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
+				for (int i = 0; i < listOfTasks.size(); i++ ) {
+					mariaTaskManager->archiveTask(listOfTasks[i]);
+				}
+				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("All tasks have been deleted.");
+				((MariaUIStateHome*)currentObj)->eraseAllUITask();
+			}
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::MARK_DONE: {
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::MARK_UNDONE: {
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::UNDO: {
+			if(processUndo()) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Undo was sucessful");
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
+			}
+		}
+		break;
+
 		case MariaInputObject::COMMAND_TYPE::GO_HOME: {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
@@ -506,7 +587,6 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 	}
 
 	// Set the UI according to a successful input.
-	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 	mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::OK);
 
 	// Clean up.

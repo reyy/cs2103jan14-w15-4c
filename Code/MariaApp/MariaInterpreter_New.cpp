@@ -1,8 +1,10 @@
 #include "MariaInterpreter_New.h"
 
 const string MariaInterpreter_New::MESSAGE_INVALID_COMMAND = "Invalid command detected.";
+const string MariaInterpreter_New::MESSAGE_INVALID_OPTION = "Invalid option.";
 const string MariaInterpreter_New::MESSAGE_NO_ACTIVITY_TITLE = "No activity title detected.";
 const string MariaInterpreter_New::MESSAGE_NO_INPUT = "No input detected.";
+const string MariaInterpreter_New::MESSAGE_NO_OPTION = "No option selected.";
 
 MariaInterpreter_New::MariaInterpreter_New(map<string, MariaInputObject::COMMAND_TYPE>* inputCommandList) {
 	commandKeywordList = inputCommandList;
@@ -17,6 +19,7 @@ MariaInterpreter_New::MariaInterpreter_New(map<string, MariaInputObject::COMMAND
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("update", MariaInputObject::COMMAND_TYPE::EDIT));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("show", MariaInputObject::COMMAND_TYPE::SHOW));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("view", MariaInputObject::COMMAND_TYPE::SHOW));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("search", MariaInputObject::COMMAND_TYPE::SEARCH));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("complete", MariaInputObject::COMMAND_TYPE::MARK_DONE));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("done", MariaInputObject::COMMAND_TYPE::MARK_DONE));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("incomplete", MariaInputObject::COMMAND_TYPE::MARK_UNDONE));
@@ -69,22 +72,34 @@ MariaInputObject* MariaInterpreter_New::parseInput(string input, STATE_TYPE curr
 
 	switch (commandKeyword->second) {
 	case MariaInputObject::COMMAND_TYPE::ADD:
-		parseAdd(input, toReturn);
+		parseAdd(input, toReturn, currentState);
 		break;
 
 	case MariaInputObject::COMMAND_TYPE::SHOW:
-		parseShow(input, toReturn);
+		parseShow(input, toReturn, currentState);
+		break;
+
+	case MariaInputObject::COMMAND_TYPE::SEARCH:
+		parseSearch(input, toReturn, currentState);
 		break;
 
 	case MariaInputObject::COMMAND_TYPE::DELETE_TASK:
-		parseDelete(input, toReturn);
+		parseDelete(input, toReturn, currentState);
+		break;
+
+	case MariaInputObject::COMMAND_TYPE::MARK_DONE:
+		parseMarkDone(input, toReturn, currentState);
+		break;
+
+	case MariaInputObject::COMMAND_TYPE::MARK_UNDONE:
+		parseMarkUndone(input, toReturn, currentState);
 		break;
 	}
 
 	return toReturn;
 }
 
-void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject) {
+void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
 	if (hasDateTime(input)) {
@@ -95,11 +110,10 @@ void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject)
 	}
 }
 
-void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject) {
+void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
 	if (input.size() == 0) {
-		// Show today.
 		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
 	} else if (isStringEqual(input, "all")) {
@@ -113,16 +127,63 @@ void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject
 	} else if (hasDate(input)) {
 		// Need to check if there are 1 or more dates.
 	} else {
+		throw exception(MESSAGE_INVALID_COMMAND.c_str());
 	}
 }
 
-void MariaInterpreter_New::parseDelete(string input, MariaInputObject* inputObject) {
+void MariaInterpreter_New::parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
 	if (input.size() == 0) {
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
-	} else if (isStringEqual(input, "all")) {
-		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
+	} else {
+		inputObject->setTitle(input);
+	}
+}
+
+void MariaInterpreter_New::parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
+	assert(inputObject != NULL);
+
+	switch (currentState) {
+	case STATE_TYPE::CONFLICT:
+		if (input.size() == 0) {
+			throw exception(MESSAGE_NO_OPTION.c_str());
+		} else {
+			if (isInteger(input)) {
+				inputObject->setOptionID(atoi(input.c_str()));
+			} else {
+				throw exception(MESSAGE_INVALID_OPTION.c_str());
+			}
+		}
+		break;
+
+	default:
+		if (input.size() == 0) {
+			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+		} else if (isStringEqual(input, "all")) {
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
+		} else {
+			inputObject->setTitle(input);
+		}
+		break;
+	}
+}
+
+void MariaInterpreter_New::parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
+	assert(inputObject != NULL);
+
+	if (input.size() == 0) {
+		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+	} else {
+		inputObject->setTitle(input);
+	}
+}
+
+void MariaInterpreter_New::parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
+	assert(inputObject != NULL);
+
+	if (input.size() == 0) {
+		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 	} else {
 		inputObject->setTitle(input);
 	}
@@ -171,6 +232,11 @@ bool MariaInterpreter_New::hasTomorrow(string text) {
 	regex tomorrowExpression("(by|from|to)[ ]tomorrow", regex_constants::icase);
 
 	return regex_search(text, tomorrowExpression);
+}
+
+bool MariaInterpreter_New::isInteger(string text) {
+	return !text.empty() &&
+		text.find_first_not_of("0123456789") == string::npos;
 }
 
 bool MariaInterpreter_New::isStringEqual(string text, string expr, bool ignoreCasing) {

@@ -26,8 +26,10 @@ class MariaInterpreter_New {
 public:
 	// Warning Messages
 	static const string MESSAGE_INVALID_COMMAND;
+	static const string MESSAGE_INVALID_OPTION;
 	static const string MESSAGE_NO_ACTIVITY_TITLE;
 	static const string MESSAGE_NO_INPUT;
+	static const string MESSAGE_NO_OPTION;
 
 
 	MariaInterpreter_New(map<string, MariaInputObject::COMMAND_TYPE>* inputCommandList = NULL);
@@ -38,9 +40,12 @@ public:
 private:
 	map<string, MariaInputObject::COMMAND_TYPE>* commandKeywordList;
 
-	void parseAdd(string input, MariaInputObject* inputObject);
-	void parseShow(string input, MariaInputObject* inputObject);
-	void parseDelete(string input, MariaInputObject* inputObject);
+	void parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 
 	bool hasDate(string text);
 	bool hasDateTime(string text);
@@ -49,6 +54,7 @@ private:
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
+	bool isInteger(string text);
 	bool isStringEqual(string text, string expr, bool ignoreCasing = true);
 	string lowercaseString(string text);
 	void removeTokens(vector<string> &input, int startPos, int endPos);
