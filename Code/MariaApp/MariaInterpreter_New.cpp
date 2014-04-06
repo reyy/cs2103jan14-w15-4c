@@ -127,6 +127,7 @@ void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject
 	} else if (hasDate(input)) {
 		// Need to check if there are 1 or more dates.
 	} else {
+		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_INVALID_COMMAND.c_str());
 	}
 }
@@ -135,6 +136,7 @@ void MariaInterpreter_New::parseSearch(string input, MariaInputObject* inputObje
 	assert(inputObject != NULL);
 
 	if (input.size() == 0) {
+		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 	} else {
 		inputObject->setTitle(input);
@@ -147,6 +149,7 @@ void MariaInterpreter_New::parseDelete(string input, MariaInputObject* inputObje
 	switch (currentState) {
 	case STATE_TYPE::CONFLICT:
 		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
 			throw exception(MESSAGE_NO_OPTION.c_str());
 		} else {
 			if (isInteger(input)) {
@@ -159,6 +162,7 @@ void MariaInterpreter_New::parseDelete(string input, MariaInputObject* inputObje
 
 	default:
 		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
 			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 		} else if (isStringEqual(input, "all")) {
 			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
@@ -173,6 +177,7 @@ void MariaInterpreter_New::parseMarkDone(string input, MariaInputObject* inputOb
 	assert(inputObject != NULL);
 
 	if (input.size() == 0) {
+		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 	} else {
 		inputObject->setTitle(input);
@@ -183,6 +188,7 @@ void MariaInterpreter_New::parseMarkUndone(string input, MariaInputObject* input
 	assert(inputObject != NULL);
 
 	if (input.size() == 0) {
+		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 	} else {
 		inputObject->setTitle(input);
@@ -198,15 +204,20 @@ bool MariaInterpreter_New::hasDate(string text) {
 	return (isDatePresent || isDayOfWeekPresent || isTodayPresent || isTomorrowPresent);
 }
 
+bool MariaInterpreter_New::hasTime(string text) {
+	regex timeExpression("([01]?[0-9]|2[0-3])([.:][0-5][0-9])?([.:]([0-5][0-9]))?(\\s*[AaPp][Mm])?", regex_constants::icase);
+
+	return regex_search(text, timeExpression);
+}
+
 bool MariaInterpreter_New::hasDateTime(string text) {
 	bool isDatePresent = hasDateFormat(text);
 	bool isDayOfWeekPresent = hasDayOfWeek(text);
 	bool isTodayPresent = hasToday(text);
 	bool isTomorrowPresent = hasTomorrow(text);
+	bool isTimePresent = hasTime(text);
 
-	//TODO: Add Time.
-
-	return (isDatePresent || isDayOfWeekPresent || isTodayPresent || isTomorrowPresent);
+	return (isDatePresent || isDayOfWeekPresent || isTodayPresent || isTomorrowPresent || isTimePresent);
 }
 
 bool MariaInterpreter_New::hasDateFormat(string text) {

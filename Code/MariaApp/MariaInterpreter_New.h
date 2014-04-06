@@ -48,6 +48,7 @@ private:
 	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 
 	bool hasDate(string text);
+	bool hasTime(string text);
 	bool hasDateTime(string text);
 	bool hasDateFormat(string text);
 	bool hasDayOfWeek(string text);
