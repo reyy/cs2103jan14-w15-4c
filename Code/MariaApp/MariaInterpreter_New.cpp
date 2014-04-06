@@ -2,6 +2,7 @@
 
 const string MariaInterpreter_New::MESSAGE_INVALID_COMMAND = "Invalid command detected.";
 const string MariaInterpreter_New::MESSAGE_INVALID_OPTION = "Invalid option.";
+const string MariaInterpreter_New::MESSAGE_INVALID_DATE_TIME = "Invalid date/time detected.";
 const string MariaInterpreter_New::MESSAGE_NO_ACTIVITY_TITLE = "No activity title detected.";
 const string MariaInterpreter_New::MESSAGE_NO_INPUT = "No input detected.";
 const string MariaInterpreter_New::MESSAGE_NO_OPTION = "No option selected.";
@@ -103,11 +104,88 @@ void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject,
 	assert(inputObject != NULL);
 
 	if (hasDateTime(input)) {
-		int apple = 5;
+		// Check if the substring after the last by/from/to contains a valid date/time.
+		if (hasDateTime(extractFromBackOfString(input, " from ")) && hasDateTime(extractFromBackOfString(input, " to "))) {
+			parseAddTimedTask(input, inputObject);
+		} else if (hasDateTime(extractFromBackOfString(input, " by "))) {
+			parseAddDeadlineTask(input, inputObject);
+		} else {
+			// Something's wrong with the string but nevermind. We'll just put it as a floating task.
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+			inputObject->setTitle(input);
+		}
 	} else {
 		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 		inputObject->setTitle(input);
 	}
+}
+
+void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* inputObject) {
+	string dateTimeString = extractFromBackOfString(input, " by ");
+
+	if (dateTimeString.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	dateTimeString = trimWhiteSpace(dateTimeString);
+	vector<string> tokenizedDateTime = tokenizeString(dateTimeString);
+	removeTokens(tokenizedDateTime, 0, 1);
+
+	int year, month, day, hour, min;
+	// Flags to ensure that only the very last of each is captured.
+	// Extra dates are ignored.
+	bool hasDateString = false;
+	bool hasTimeString = false;
+
+	for (int i = tokenizedDateTime.size() - 1; i >= 0; i--) {
+		if (hasTime(tokenizedDateTime[i])) {
+			// parseTime(tokenizedDateTime[i], hour, min);
+		} else if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "tomorrow") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay() + 1;
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+
+			// do that minus magic thingy
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int inputDayOfWeek = getDayOfWeek(tokenizedDateTime[i]);
+			int differenceInDays = inputDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				day += (7 - abs(differenceInDays));
+			} else {
+				day += differenceInDays;
+			}
+
+			// Also check if the preceding token is "next".
+			// If it is, add a week to this day.
+			hasDateString = true;
+		}
+	}
+
+	if (hasDateString && !hasTimeString) {
+		// What's a good default time??
+	} else if (!hasDateString && hasTimeString) {
+		// Check if the time wanted has already passed. If so, go to next day.
+	} else if (!hasDateString && !hasTimeString) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	inputObject->setEndTime(new MariaTime(year, month, day, hour, min));
+}
+
+void MariaInterpreter_New::parseAddTimedTask(string input, MariaInputObject* inputObject) {
 }
 
 void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
@@ -205,7 +283,7 @@ bool MariaInterpreter_New::hasDate(string text) {
 }
 
 bool MariaInterpreter_New::hasTime(string text) {
-	regex timeExpression("([01]?[0-9]|2[0-3])([.:][0-5][0-9])?([.:]([0-5][0-9]))?(\\s*[AaPp][Mm])?", regex_constants::icase);
+	regex timeExpression("([01]?[0-9]|2[0-3])([.:][0-5][0-9])?(\\s*[AaPp][Mm])?", regex_constants::icase);
 
 	return regex_search(text, timeExpression);
 }
@@ -243,6 +321,40 @@ bool MariaInterpreter_New::hasTomorrow(string text) {
 	regex tomorrowExpression("(by|from|to)[ ]tomorrow", regex_constants::icase);
 
 	return regex_search(text, tomorrowExpression);
+}
+
+string MariaInterpreter_New::extractFromBackOfString(string text, string delimiter) {
+	size_t occ1 = text.find(delimiter);
+	size_t occ2;
+
+	if (occ1 != string::npos) {
+		do {
+			occ2 = text.find(delimiter.c_str(), occ1+1, delimiter.size());
+
+			if (occ2 != string::npos) {
+				occ1 = occ2;
+			} else {
+				return text.substr(occ1);
+			}
+		} while (occ2 != string::npos);
+	}
+	return "";
+}
+
+int MariaInterpreter_New::getDayOfWeek(string text) {
+	regex dayExpression("mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day", regex_constants::icase);
+	smatch matches;
+	const string dayExpressionArray[7] = { "mon(day)?", "tues?(day)?", "wed(nesday)?", "thur?s?(day)?", "fri(day)?", "sat(urday)?", "(sun)?day"};
+
+	if (regex_match(text, matches, dayExpression)) {
+		for (int i = 0; i < 7; i++) {
+			if (isStringEqual(matches[0], dayExpressionArray[i])) {
+				return i+1;
+			}
+		}
+	}
+
+	return -1;
 }
 
 bool MariaInterpreter_New::isInteger(string text) {

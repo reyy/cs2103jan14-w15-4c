@@ -27,6 +27,7 @@ public:
 	// Warning Messages
 	static const string MESSAGE_INVALID_COMMAND;
 	static const string MESSAGE_INVALID_OPTION;
+	static const string MESSAGE_INVALID_DATE_TIME;
 	static const string MESSAGE_NO_ACTIVITY_TITLE;
 	static const string MESSAGE_NO_INPUT;
 	static const string MESSAGE_NO_OPTION;
@@ -41,6 +42,8 @@ private:
 	map<string, MariaInputObject::COMMAND_TYPE>* commandKeywordList;
 
 	void parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseAddDeadlineTask(string input, MariaInputObject* inputObject);
+	void parseAddTimedTask(string input, MariaInputObject* inputObject);
 	void parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 	void parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 	void parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
@@ -55,6 +58,8 @@ private:
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
+	string extractFromBackOfString(string text, string delimiter);
+	int getDayOfWeek(string text);
 	bool isInteger(string text);
 	bool isStringEqual(string text, string expr, bool ignoreCasing = true);
 	string lowercaseString(string text);
