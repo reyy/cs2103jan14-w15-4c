@@ -21,7 +21,7 @@ public:
 	vector<MariaTask*> findTask(MariaTask::TaskType type, bool addToHistory = true);
 	vector<MariaTask*> getAllTasks();
 
-	bool comparePreviousQuery();
+	bool sameAsPreviousQuery();
 	bool undoLast();
 
 	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!
@@ -36,7 +36,7 @@ public:
 	vector<MariaTask*> *taskList;
 	vector<pair<MariaTask**, MariaTask*>*> *undoList;
 
-	vector<MariaTask*> *previousQueryResult;
+	vector<MariaTask*> *queryResult;
 	string previousSearchString;
 	MariaTime *previousStart;
 	MariaTime *previousEnd;

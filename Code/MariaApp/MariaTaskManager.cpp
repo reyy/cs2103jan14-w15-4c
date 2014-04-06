@@ -13,7 +13,7 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 
 	previousStart = NULL;
 	previousEnd = NULL;
-	previousQueryResult = NULL;
+	queryResult = NULL;
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
@@ -52,10 +52,10 @@ vector<MariaTask*> MariaTaskManager::findTask(std::string searchString, bool add
 
 	if(addToHistory) {
 		storePreviousQuery(searchString);
-		if(previousQueryResult != NULL) {
-			delete previousQueryResult;
+		if(queryResult != NULL) {
+			delete queryResult;
 		}
-		previousQueryResult = new vector<MariaTask*> (returnList);
+		queryResult = new vector<MariaTask*> (returnList);
 	}
 
 	return returnList;
@@ -76,10 +76,10 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 
 	if(addToHistory) {
 		storePreviousQuery(start, end);
-		if(previousQueryResult != NULL) {
-			delete previousQueryResult;
+		if(queryResult != NULL) {
+			delete queryResult;
 		}
-		previousQueryResult = new vector<MariaTask*> (returnList);
+		queryResult = new vector<MariaTask*> (returnList);
 	}
 
 	return returnList;
@@ -107,10 +107,10 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 
 	if(addToHistory) {
 		storePreviousQuery(start, end, type);
-		if(previousQueryResult != NULL) {
-			delete previousQueryResult;
+		if(queryResult != NULL) {
+			delete queryResult;
 		}
-		previousQueryResult = new vector<MariaTask*> (returnList);
+		queryResult = new vector<MariaTask*> (returnList);
 	}
 
 	return returnList;
@@ -128,10 +128,10 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type, bool add
 
 	if(addToHistory) {
 		storePreviousQuery(type);
-		if(previousQueryResult != NULL) {
-			delete previousQueryResult;
+		if(queryResult != NULL) {
+			delete queryResult;
 		}
-		previousQueryResult = new vector<MariaTask*> (returnList);
+		queryResult = new vector<MariaTask*> (returnList);
 	}
 
 	return returnList;
@@ -160,23 +160,23 @@ bool MariaTaskManager::archiveTask(MariaTask* task) {
 	
 }
 
-bool MariaTaskManager::comparePreviousQuery() {
-	if(previousQueryResult == NULL) {
+bool MariaTaskManager::sameAsPreviousQuery() {
+	if(queryResult == NULL) {
 		return true;
 	}
-	vector<MariaTask*> newList;
+	vector<MariaTask*> previousQueryResult = vector<MariaTask*>(*queryResult);
 
 	if(previousSearchString != "") {
-		newList = findTask(previousSearchString, false);
+		findTask(previousSearchString);
 	} else if(previousStart == NULL && previousEnd == NULL) {
-		newList = findTask(previousType, false);
+		findTask(previousType);
 	} else if(previousType != MariaTask::TaskType::INVALID) {
-		newList = findTask(previousStart, previousEnd, previousType, false);
+		findTask(previousStart, previousEnd, previousType);
 	} else {
-		newList = findTask(previousStart, previousEnd, false);
+		findTask(previousStart, previousEnd);
 	}
 
-	if(newList.size() != previousQueryResult->size()) {
+	if(previousQueryResult.size() != queryResult->size()) {
 		return false;
 	}
 
@@ -207,15 +207,19 @@ void MariaTaskManager::storePreviousQuery(MariaTask::TaskType previousType) {
 }
 
 void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd){
+	MariaTime * tempStart = new MariaTime(previousStart->get());
+	MariaTime * tempEnd = new MariaTime(previousEnd->get());
 	deletePreviousQuery();
-	this->previousStart = new MariaTime(previousStart->get());
-	this->previousEnd = new MariaTime(previousEnd->get());
+	this->previousStart = tempStart;
+	this->previousEnd = tempEnd;
 }
 
 void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd, MariaTask::TaskType previousType) {
+	MariaTime * tempStart = new MariaTime(previousStart->get());
+	MariaTime * tempEnd = new MariaTime(previousEnd->get());
 	deletePreviousQuery();
-	this->previousStart = new MariaTime(previousStart->get());
-	this->previousEnd = new MariaTime(previousEnd->get());
+	this->previousStart = tempStart;
+	this->previousEnd = tempEnd;
 	this->previousType = previousType;
 }
 
