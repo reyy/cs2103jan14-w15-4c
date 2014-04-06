@@ -22,15 +22,12 @@ public:
 		MARK_DONE,
 		MARK_UNDONE,
 		DELETE_TASK,
-		DELETE_ALL,
+		DELETE_ALL,		//Pending removal
 		UNDO,
-		GO_ADD,
-		GO_EDIT,
-		GO_DELETE,
 		GO_HOME,
 		GO_SETTINGS,
-		GO_UP,
-		GO_DOWN,
+		PAGE_UP,
+		PAGE_DOWN,
 		EXIT,
 	} COMMAND_TYPE;
 

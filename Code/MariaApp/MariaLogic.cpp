@@ -9,7 +9,8 @@
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
 
-	mariaInterpreter = new MariaInterpreter();
+	//mariaInterpreter = new MariaInterpreter();
+	mariaInterpreter = new MariaInterpreter_New();
 	mariaFileManager = new MariaFileManager();
 	for(int i = 0; i < 3; i++){
 		try{
@@ -58,11 +59,22 @@ bool MariaLogic::processUndo() {
 }
 
 bool MariaLogic::processCommand(std::string inputText) {
-	MariaInputObject* input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
+	MariaInputObject* input = NULL;
+
+	//MariaInputObject* input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 	mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::OK);
+
+	try {
+		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
+	} catch (exception e) {
+		// Set the question text to be the error message.
+		mariaUI->getCommandBar()->getTextbox()->setQuestionText(e.what());
+		mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
+		return false;
+	}
 
 	//Jay: Switch case to be refactored later.
 	switch(input->getCommandType()) {
@@ -353,22 +365,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 		mariaStateManager->transitState();
 	}
 	break;
-	case MariaInputObject::COMMAND_TYPE::GO_ADD: {
-		// Transit to add screen?
-	}
-	break;
-	case MariaInputObject::COMMAND_TYPE::GO_EDIT: {
-		// Transit to edit screen?
-	}
-	break;
-	case MariaInputObject::COMMAND_TYPE::GO_DELETE: {
-		// Transit to delete screen?
-	}
-	break;
 	case MariaInputObject::COMMAND_TYPE::GO_SETTINGS: {
 	}
 	break;
-	case MariaInputObject::COMMAND_TYPE::GO_UP: {
+	case MariaInputObject::COMMAND_TYPE::PAGE_UP: {
 		MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 		if(tempObj->isPageValid(tempObj->getPage()-1)) {
 			tempObj->setPage(tempObj->getPage()-1);
@@ -379,7 +379,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		}
 	}
 	break;
-	case MariaInputObject::COMMAND_TYPE::GO_DOWN: {
+	case MariaInputObject::COMMAND_TYPE::PAGE_DOWN: {
 		MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 		if(tempObj->isPageValid(tempObj->getPage()+1)) {
 			tempObj->setPage(tempObj->getPage()+1);
@@ -401,6 +401,118 @@ bool MariaLogic::processCommand(std::string inputText) {
 	input = NULL;
 
 	//todo: call interpreter to generate task & pass to task manager
+	return true;
+}
+
+bool MariaLogic::processCommand_New(std::string inputText) {
+	MariaInputObject* input = NULL;
+	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
+
+	// Attempt to parse the input.
+	try {
+		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
+	} catch (exception& e) {
+		// Set the question text to be the error message.
+		mariaUI->getCommandBar()->getTextbox()->setQuestionText(e.what());
+		mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
+		return false;
+	}
+
+	switch (input->getCommandType()) {
+		case MariaInputObject::COMMAND_TYPE::EXIT: {
+			MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
+			mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
+			temp->setDisplayText("Saving");
+			temp->setLoadingDone();
+			temp->setQuitAfterLoadingTrue();
+			mariaStateManager->transitState();
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::ADD_FLOATING: {
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
+			if (toAdd != NULL) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
+				if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
+			}
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::SHOW_DATE: {
+			// Show today, tomorrow, date
+			// Date object is obtained through input->getEndTime();
+			//Miki data object cannot be reference. Crashes here.
+			MariaTime* startTime = input->getEndTime();
+			startTime->setHour(0);
+			startTime->setMin(0);
+			MariaTime* endTime = input->getEndTime();
+			endTime->setHour(23);
+			endTime->setMin(59);
+			vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime);
+
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have on " + MariaTime::convertToDateString(endTime) + ".");
+			mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, MariaTime::convertToDateString(startTime), listOfTasks));
+			mariaStateManager->transitState();
+
+			SAFE_DELETE(startTime);
+			SAFE_DELETE(endTime);
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::SHOW_ALL: {
+			vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
+
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Sure, here are all the tasks.");
+			mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, "All Tasks", listOfTasks));
+			mariaStateManager->transitState();
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::GO_HOME: {
+			mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
+			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
+			mariaStateManager->transitState();
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::PAGE_UP: {
+			MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+			if (tempObj->isPageValid(tempObj->getPage()-1)) {
+				tempObj->setPage(tempObj->getPage()-1);
+				tempObj->updatePage();
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going up.");
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items up there.");
+			}
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::PAGE_DOWN: {
+			MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+			if (tempObj->isPageValid(tempObj->getPage()+1)) {
+				tempObj->setPage(tempObj->getPage()+1);
+				tempObj->updatePage();
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going down.");
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items down there.");
+			}
+		}
+		break;
+	}
+
+	// Set the UI according to a successful input.
+	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
+	mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::OK);
+
+	// Clean up.
+	SAFE_DELETE(input);
+	currentObj = NULL;
+
 	return true;
 }
 

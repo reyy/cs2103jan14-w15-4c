@@ -25,8 +25,8 @@ MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE> *
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("undo", MariaInputObject::COMMAND_TYPE::UNDO));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("home", MariaInputObject::COMMAND_TYPE::GO_HOME));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("settings", MariaInputObject::COMMAND_TYPE::GO_SETTINGS));
-	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::GO_UP));
-	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::GO_DOWN));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::PAGE_UP));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::PAGE_DOWN));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("exit", MariaInputObject::COMMAND_TYPE::EXIT));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("quit", MariaInputObject::COMMAND_TYPE::EXIT));
 }
@@ -110,8 +110,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, STATE_TYPE cu
 							break;
 						}
 					}
-				} else {
-					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_EDIT);
 				}
 				break;
 			case MariaInputObject::COMMAND_TYPE::SHOW:
@@ -150,8 +148,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, STATE_TYPE cu
 					} else {
 						inputObject->setTitle(this->getTitle(tokenizedInput));
 					}
-				} else {
-					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_DELETE);
 				}
 				break;
 			default:
@@ -191,8 +187,6 @@ MariaInputObject* MariaInterpreter::parseInput(string inputString, STATE_TYPE cu
 					} else if (tokenizedInput.size() > 0) {
 						inputObject->setEditField(this->getEditField(tokenizedInput));
 					}
-				} else {
-					inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::GO_EDIT);
 				}
 				break;
 			case MariaInputObject::COMMAND_TYPE::DELETE_TASK:
@@ -285,10 +279,6 @@ MariaInputObject::COMMAND_TYPE MariaInterpreter::getAddType(vector<MariaTime*> &
 }
 
 MariaInputObject::COMMAND_TYPE MariaInterpreter::getEditType(vector<string> &tokenizedInput) {
-	if (tokenizedInput.size() < 2) {
-		return MariaInputObject::COMMAND_TYPE::GO_EDIT;
-	}
-
 	if (isStringMatch(tokenizedInput[1], "title")) {
 		removeTokens(tokenizedInput, 0, 2);
 		return MariaInputObject::COMMAND_TYPE::EDIT_TITLE;

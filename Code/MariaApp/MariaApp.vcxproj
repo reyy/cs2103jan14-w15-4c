@@ -205,6 +205,7 @@
     <ClCompile Include="MariaFileManager.cpp" />
     <ClCompile Include="MariaInputObject.cpp" />
     <ClCompile Include="MariaInterpreter.cpp" />
+    <ClCompile Include="MariaInterpreter_New.cpp" />
     <ClCompile Include="MariaLogic.cpp" />
     <ClCompile Include="MariaStateManager.cpp" />
     <ClCompile Include="MariaStateObject.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="MariaFileManager.h" />
     <ClInclude Include="MariaInputObject.h" />
     <ClInclude Include="MariaInterpreter.h" />
+    <ClInclude Include="MariaInterpreter_New.h" />
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaUIStateType.h" />
     <ClInclude Include="MariaUndoObserver.h" />

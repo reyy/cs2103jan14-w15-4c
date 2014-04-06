@@ -100,6 +100,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITextbox.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="MariaInterpreter_New.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -131,6 +134,9 @@
     <ClInclude Include="MariaUndoObserver.h" />
     <ClInclude Include="MariaUIStateType.h">
       <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaInterpreter_New.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

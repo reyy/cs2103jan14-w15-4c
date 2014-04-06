@@ -82,15 +82,15 @@ int MariaInputObject::getOptionID() const {
 }
 
 MariaTime* MariaInputObject::getStartTime() const {
-	return _startTime;
+	return new MariaTime(*_startTime);
 }
 
 MariaTime* MariaInputObject::getEndTime() const {
-	return _endTime;
+	return new MariaTime(*_endTime);
 }
 
 MariaTime* MariaInputObject::getEditTime() const {
-	return _editTime;
+	return new MariaTime(*_editTime);
 }
 
 STATE_TYPE MariaInputObject::getStateType() const {

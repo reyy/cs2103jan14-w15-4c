@@ -128,11 +128,12 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent) {
 			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
 		}
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
-		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+		//_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+		_mariaLogic->processCommand_New(_commandBar->getTextbox()->getUserInput());
 	} else if(keyPressed == Qt::Key_Up) {
-		_mariaLogic->processCommand("up");
+		_mariaLogic->processCommand_New("up");
 	} else if(keyPressed == Qt::Key_Down) {
-		_mariaLogic->processCommand("down");
+		_mariaLogic->processCommand_New("down");
 	} else {
 		//todo: tick / question if keyword detected
 		if(_commandBar->getTextbox()->getUserInput() == "") {
