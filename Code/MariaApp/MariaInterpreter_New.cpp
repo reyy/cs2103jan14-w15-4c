@@ -109,6 +109,7 @@ void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject,
 			parseAddTimedTask(input, inputObject);
 		} else if (hasDateTime(extractFromBackOfString(input, " by "))) {
 			parseAddDeadlineTask(input, inputObject);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 		} else {
 			// Something's wrong with the string but nevermind. We'll just put it as a floating task.
 			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
@@ -121,6 +122,7 @@ void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject,
 }
 
 void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* inputObject) {
+	assert(inputObject != NULL);
 	string dateTimeString = extractFromBackOfString(input, " by ");
 
 	if (dateTimeString.size() == 0) {
@@ -139,8 +141,14 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 	bool hasTimeString = false;
 
 	for (int i = tokenizedDateTime.size() - 1; i >= 0; i--) {
-		if (hasTime(tokenizedDateTime[i])) {
-			// parseTime(tokenizedDateTime[i], hour, min);
+		if (hasTime(tokenizedDateTime[i]) && !hasTimeString) {
+			try {
+				parseTime(tokenizedDateTime[i], hour, min);
+			} catch (exception& e) {
+				SAFE_DELETE(inputObject);
+				throw;
+			}
+			hasTimeString = true;
 		} else if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
 			year = MariaTime::getCurrentTime().getYear();
 			month = MariaTime::getCurrentTime().getMonth();
@@ -150,6 +158,29 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 			year = MariaTime::getCurrentTime().getYear();
 			month = MariaTime::getCurrentTime().getMonth();
 			day = MariaTime::getCurrentTime().getDay() + 1;
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = getMonth(tokenizedDateTime[i]);
+
+			// Check to see if the month is past today's date.
+			// If it is, advance by one year.
+			if (month > MariaTime::getCurrentTime().getMonth()) {
+				year++;
+			}
+
+			// Check the previous token if it is a valid day.
+			// If it isn't, just set it to 1st of whatever month this is.
+			if (i >= 1 && isInteger(tokenizedDateTime[i-1])) {
+				day = atoi(tokenizedDateTime[i-1].c_str());
+
+				// Don't know if this check is necessary. Cause of maketime.
+				if (day <= 0) {
+					day = 1;
+				} else if (day >= 32) {
+					day = 31;
+				}
+			}
 			hasDateString = true;
 		} else if (isStringEqual(tokenizedDateTime[i], "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day") && !hasDateString) {
 			year = MariaTime::getCurrentTime().getYear();
@@ -175,8 +206,15 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 
 	if (hasDateString && !hasTimeString) {
 		// What's a good default time??
+		hour = 9;
+		min = 0;
+
+		//TODO: Account for passing of day.
 	} else if (!hasDateString && hasTimeString) {
 		// Check if the time wanted has already passed. If so, go to next day.
+		year = MariaTime::getCurrentTime().getYear();
+		month = MariaTime::getCurrentTime().getMonth();
+		day = MariaTime::getCurrentTime().getDay();
 	} else if (!hasDateString && !hasTimeString) {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
@@ -273,13 +311,128 @@ void MariaInterpreter_New::parseMarkUndone(string input, MariaInputObject* input
 	}
 }
 
+void MariaInterpreter_New::parseTime(string input, int& hour, int& min) {
+	size_t colonPos = input.find(':');
+	size_t periodPos = input.find('.');
+	vector<string> workingList;
+
+	if (colonPos != string::npos) {
+		workingList = tokenizeString(input, ':');
+
+		if (workingList.size() != 2 ||
+			!isInteger(workingList[0]) ||
+			!isInteger(workingList[1])) {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+
+		hour = atoi(workingList[0].c_str());
+		min = atoi(workingList[1].c_str());
+
+		if (hour < 0 || hour > 23 || min < 0 || min > 59) {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+	} else if (periodPos != string::npos) {
+		// 9.30pm
+		workingList = tokenizeString(input, '.');
+
+		if (workingList.size() != 2 ||
+			!isInteger(workingList[0]) ||
+			(workingList[1].size() != 2 &&
+			workingList[1].size() != 4)) {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+
+		hour = atoi(workingList[0].c_str());
+
+		if (isInteger(workingList[1].substr(0, 1))) {
+			min = (atoi(workingList[1].substr(0, 1).c_str()) * 10);
+		} else {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+
+		if (isInteger(workingList[1].substr(1, 1))) {
+			min += atoi(workingList[1].substr(1, 1).c_str());
+		} else {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+
+		if (workingList[1].size() == 4) {
+			if (isStringEqual(workingList[1].substr(2, 2), "am")) {
+				if (hour > 12) {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			} else if (isStringEqual(workingList[1].substr(2, 2), "pm")) {
+				if (hour < 12) {
+					hour += 12;
+				} else {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			}
+		}
+
+		if (hour < 0 || hour > 23 || min < 0 || min > 59) {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+	} else {
+		// 9pm
+		if (input.size() == 3) {
+			if (isInteger(input.substr(0, 1))) {
+				hour = atoi(input.substr(0, 1).c_str());
+			} else {
+				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+			}
+
+			if (isStringEqual(input.substr(1, 2), "am")) {
+				if (hour > 12) {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			} else if (isStringEqual(input.substr(1, 2), "pm")) {
+				if (hour < 12) {
+					hour += 12;
+				} else {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			}
+			min = 0;
+		} else if (input.size() == 4) {
+			if (isInteger(input.substr(0, 1))) {
+				hour = atoi(input.substr(0, 1).c_str()) * 10;
+			} else {
+				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+			}
+
+			if (isInteger(input.substr(1, 1))) {
+				hour += atoi(input.substr(1, 1).c_str());
+			} else {
+				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+			}
+
+			if (isStringEqual(input.substr(2, 2), "am")) {
+				if (hour > 12) {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			} else if (isStringEqual(input.substr(2, 2), "pm")) {
+				if (hour < 12) {
+					hour += 12;
+				} else {
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+			}
+			min = 0;
+		} else {
+			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+		}
+	}
+}
+
 bool MariaInterpreter_New::hasDate(string text) {
 	bool isDatePresent = hasDateFormat(text);
 	bool isDayOfWeekPresent = hasDayOfWeek(text);
+	bool isMonthPresent = hasMonth(text);
 	bool isTodayPresent = hasToday(text);
 	bool isTomorrowPresent = hasTomorrow(text);
 
-	return (isDatePresent || isDayOfWeekPresent || isTodayPresent || isTomorrowPresent);
+	return (isDatePresent || isDayOfWeekPresent || isMonthPresent || isTodayPresent || isTomorrowPresent);
 }
 
 bool MariaInterpreter_New::hasTime(string text) {
@@ -289,13 +442,7 @@ bool MariaInterpreter_New::hasTime(string text) {
 }
 
 bool MariaInterpreter_New::hasDateTime(string text) {
-	bool isDatePresent = hasDateFormat(text);
-	bool isDayOfWeekPresent = hasDayOfWeek(text);
-	bool isTodayPresent = hasToday(text);
-	bool isTomorrowPresent = hasTomorrow(text);
-	bool isTimePresent = hasTime(text);
-
-	return (isDatePresent || isDayOfWeekPresent || isTodayPresent || isTomorrowPresent || isTimePresent);
+	return (hasDate(text) || hasTime(text));
 }
 
 bool MariaInterpreter_New::hasDateFormat(string text) {
@@ -309,6 +456,12 @@ bool MariaInterpreter_New::hasDayOfWeek(string text) {
 	regex dayOfWeekExpression("(by|from|to)[ ](next )?mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day", regex_constants::icase);
 
 	return regex_search(text, dayOfWeekExpression);
+}
+
+bool MariaInterpreter_New::hasMonth(string text) {
+	regex monthExpression("(by|from|to)[ ](0?[1-9]|[12][0-9]|3[01])[ ]jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?", regex_constants::icase);
+
+	return regex_search(text, monthExpression);
 }
 
 bool MariaInterpreter_New::hasToday(string text) {
@@ -344,11 +497,27 @@ string MariaInterpreter_New::extractFromBackOfString(string text, string delimit
 int MariaInterpreter_New::getDayOfWeek(string text) {
 	regex dayExpression("mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day", regex_constants::icase);
 	smatch matches;
-	const string dayExpressionArray[7] = { "mon(day)?", "tues?(day)?", "wed(nesday)?", "thur?s?(day)?", "fri(day)?", "sat(urday)?", "(sun)?day"};
+	const string dayExpressionArray[7] = { "mon(day)?", "tues?(day)?", "wed(nesday)?", "thur?s?(day)?", "fri(day)?", "sat(urday)?", "(sun)?day" };
 
 	if (regex_match(text, matches, dayExpression)) {
 		for (int i = 0; i < 7; i++) {
 			if (isStringEqual(matches[0], dayExpressionArray[i])) {
+				return i+1;
+			}
+		}
+	}
+
+	return -1;
+}
+
+int MariaInterpreter_New::getMonth(string text) {
+	regex monthExpression("jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?", regex_constants::icase);
+	smatch matches;
+	const string monthExpressionArray[12] = { "jan(uary)?", "feb(ruary)?", "mar(ch)?", "apr(il)?", "may", "june?", "july?", "aug(ust)?", "sept?(ember)?", "oct(tober)?", "nov(ember)?", "dec(ember)?" };
+
+	if (regex_match(text, matches, monthExpression)) {
+		for (int i = 0; i < 12; i++) {
+			if (isStringEqual(matches[0], monthExpressionArray[i])) {
 				return i+1;
 			}
 		}

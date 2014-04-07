@@ -50,16 +50,20 @@ private:
 	void parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 
+	void parseTime(string input, int& hour, int& min);
+
 	bool hasDate(string text);
 	bool hasTime(string text);
 	bool hasDateTime(string text);
 	bool hasDateFormat(string text);
 	bool hasDayOfWeek(string text);
+	bool hasMonth(string text);
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
 	string extractFromBackOfString(string text, string delimiter);
 	int getDayOfWeek(string text);
+	int getMonth(string text);
 	bool isInteger(string text);
 	bool isStringEqual(string text, string expr, bool ignoreCasing = true);
 	string lowercaseString(string text);
