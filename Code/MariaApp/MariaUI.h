@@ -19,7 +19,9 @@ class MariaUI : QMainWindow {
 	 Q_OBJECT
 
 public:
-	static const int AMOUNT_OF_TASK_TYPE = 3;
+	static const int AMOUNT_OF_IMAGES = 5;
+	static const int IMAGE_INDEX_COMPLETED = 3;
+	static const int IMAGE_INDEX_NOT_COMPLETED = 4;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const int WINDOW_DEFAULT_SIZE_X = 480;
@@ -43,7 +45,7 @@ private:
 	QColor _bkgColor;
 	QColor _targetBkgColor;
 	QSystemTrayIcon *trayIcon;
-	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE];
+	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_IMAGES];
 
 
 	//Load images used in application.

@@ -395,6 +395,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 		if(tempObj->isPageValid(tempObj->getPage()-1)) {
 			tempObj->setPage(tempObj->getPage()-1);
 			tempObj->updatePage();
+			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
+				tempObj->updateUITaskNumber();
+			}
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going up.");
 		} else {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items up there.");
@@ -406,6 +409,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 		if(tempObj->isPageValid(tempObj->getPage()+1)) {
 			tempObj->setPage(tempObj->getPage()+1);
 			tempObj->updatePage();
+			if(mariaStateManager->getCurrentState() == MariaStateManager::STATE_TYPE::CONFLICT) {
+				tempObj->updateUITaskNumber();
+			}
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going down.");
 		} else {
 			mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items down there.");

@@ -115,7 +115,7 @@ string MariaUIPreview::generateTodayText() {
 				maxTask = MAX_TASK_SHOWN;
 				toReturn += PREVIEW_DEADLINE_ITEM_TRIM;
 			}
-			for(int i = 0; i < MAX_TASK_SHOWN; i++){
+			for(int i = 0; i < maxTask; i++){
 				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &now);
 				
 				if(withinTheHour >= 0 ) {//Check if event has passed.
