@@ -7,6 +7,7 @@
 
 class MariaUIStateLoading : public MariaStateObject {
 	static const int AMOUNT_OF_DOTS = 5;
+	static const int LOGO_SPEED_RETARDER = 100;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float DISPLAY_TEXT_WIDTH;
@@ -22,12 +23,10 @@ class MariaUIStateLoading : public MariaStateObject {
 	
 	QMainWindow *_qmainWindow;
 
-	QPixmap *_imageHandleLogo;
-	QPixmap *_imageHandleDots;
-
 	QLabel *_displayText;
 	QLabel *_logo;
 	float _logoYPos;
+	int _logoImageIndex;
 
 	QLabel *_loadingDots[AMOUNT_OF_DOTS];
 	float _dotsXPos[AMOUNT_OF_DOTS];
@@ -41,6 +40,8 @@ class MariaUIStateLoading : public MariaStateObject {
 	bool timerBeginState();
 	bool timerActiveState();
 	bool timerEndState();
+
+	void animateLogo();
 public:
 	MariaUIStateLoading(QMainWindow* qmainWindow);
 	~MariaUIStateLoading();

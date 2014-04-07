@@ -88,6 +88,13 @@ void MariaUI::loadImages() {
 	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
 	_taskTypeIconHandler[3] = new QPixmap("./Resources/ui_completed.png");
 	_taskTypeIconHandler[4] = new QPixmap("./Resources/ui_not_completed.png");
+	_taskTypeIconHandler[5] = new QPixmap("./Resources/ui_maria_logo_1.png");
+	_taskTypeIconHandler[6] = new QPixmap("./Resources/ui_maria_logo_2.png");
+	_taskTypeIconHandler[7] = new QPixmap("./Resources/ui_maria_logo_3.png");
+	_taskTypeIconHandler[8] = new QPixmap("./Resources/ui_maria_logo_4.png");
+	_taskTypeIconHandler[9] = new QPixmap("./Resources/ui_maria_logo_5.png");
+	_taskTypeIconHandler[10] = new QPixmap("./Resources/ui_maria_logo_6.png");
+	_taskTypeIconHandler[11] = new QPixmap("./Resources/ui_loadingdots.png");
 }
 
 void MariaUI::unloadImages() {
