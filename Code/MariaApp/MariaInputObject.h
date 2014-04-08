@@ -27,6 +27,7 @@ public:
 		UNDO,
 		GO_HOME,
 		GO_SETTINGS,
+		GO_HELP,
 		PAGE_UP,
 		PAGE_DOWN,
 		EXIT,

@@ -21,6 +21,7 @@ MariaInterpreter_New::MariaInterpreter_New(map<string, MariaInputObject::COMMAND
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("show", MariaInputObject::COMMAND_TYPE::SHOW));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("view", MariaInputObject::COMMAND_TYPE::SHOW));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("search", MariaInputObject::COMMAND_TYPE::SEARCH));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("find", MariaInputObject::COMMAND_TYPE::SEARCH));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("complete", MariaInputObject::COMMAND_TYPE::MARK_DONE));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("done", MariaInputObject::COMMAND_TYPE::MARK_DONE));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("incomplete", MariaInputObject::COMMAND_TYPE::MARK_UNDONE));
@@ -30,8 +31,10 @@ MariaInterpreter_New::MariaInterpreter_New(map<string, MariaInputObject::COMMAND
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("remove", MariaInputObject::COMMAND_TYPE::DELETE_TASK));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("clear", MariaInputObject::COMMAND_TYPE::DELETE_ALL));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("undo", MariaInputObject::COMMAND_TYPE::UNDO));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("back", MariaInputObject::COMMAND_TYPE::GO_HOME));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("home", MariaInputObject::COMMAND_TYPE::GO_HOME));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("settings", MariaInputObject::COMMAND_TYPE::GO_SETTINGS));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("help", MariaInputObject::COMMAND_TYPE::GO_HELP));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::PAGE_UP));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::PAGE_DOWN));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("exit", MariaInputObject::COMMAND_TYPE::EXIT));
@@ -41,6 +44,21 @@ MariaInterpreter_New::MariaInterpreter_New(map<string, MariaInputObject::COMMAND
 MariaInterpreter_New::~MariaInterpreter_New(void) {
 	commandKeywordList->clear();
 	SAFE_DELETE(commandKeywordList);
+}
+
+bool MariaInterpreter_New::checkValidCommand(string input) {
+	if (input.size() == 0) {
+		return false;
+	}
+
+	vector<string> tokenizedInput = tokenizeString(input);
+	map<string, MariaInputObject::COMMAND_TYPE>::iterator commandKeyword = commandKeywordList->find(lowercaseString(tokenizedInput[0]));
+
+	if (commandKeyword == commandKeywordList->end()) {
+		return false;
+	}
+
+	return true;
 }
 
 MariaInputObject* MariaInterpreter_New::parseInput(string input, STATE_TYPE currentState) {
@@ -102,6 +120,11 @@ MariaInputObject* MariaInterpreter_New::parseInput(string input, STATE_TYPE curr
 
 void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
+
+	if (input.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+	}
 
 	int dummyVar = 0;
 
@@ -211,7 +234,7 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 
 			// Check to see if the month is past today's date.
 			// If it is, advance by one year.
-			if (month > MariaTime::getCurrentTime().getMonth()) {
+			if (month < MariaTime::getCurrentTime().getMonth()) {
 				year++;
 			}
 
@@ -372,7 +395,7 @@ void MariaInterpreter_New::parseAddTimedTask(string input, MariaInputObject* inp
 
 			// Check to see if the month is past today's date.
 			// If it is, advance by one year.
-			if (month > MariaTime::getCurrentTime().getMonth()) {
+			if (month < MariaTime::getCurrentTime().getMonth()) {
 				year++;
 			}
 
@@ -530,7 +553,7 @@ void MariaInterpreter_New::parseAddTimedTask(string input, MariaInputObject* inp
 
 			// Check to see if the month is past today's date.
 			// If it is, advance by one year.
-			if (month > MariaTime::getCurrentTime().getMonth()) {
+			if (month < MariaTime::getCurrentTime().getMonth()) {
 				year++;
 			}
 
@@ -655,7 +678,7 @@ void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject
 					break;
 				}
 			}
-		} else if (isStringEqual(input, "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
+		} else if (isStringContain(input, "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
 			int year = MariaTime::getCurrentTime().getYear();
 			int month;
 			int day;
@@ -696,7 +719,7 @@ void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject
 
 			// Check to see if the month is past today's date.
 			// If it is, advance by one year.
-			if (month > MariaTime::getCurrentTime().getMonth()) {
+			if (month < MariaTime::getCurrentTime().getMonth()) {
 				year++;
 			}
 
@@ -1073,6 +1096,22 @@ int MariaInterpreter_New::getMonth(string text) {
 bool MariaInterpreter_New::isInteger(string text) {
 	return !text.empty() &&
 		text.find_first_not_of("0123456789") == string::npos;
+}
+
+bool MariaInterpreter_New::isStringContain(string text, string expr, bool ignoreCasing) {
+	regex* expression;
+
+	if (ignoreCasing) {
+		expression = new regex(expr, regex_constants::icase);
+	} else {
+		expression = new regex(expr);
+	}
+
+	bool result = regex_search(text, *expression);
+
+	SAFE_DELETE(expression);
+
+	return result;
 }
 
 bool MariaInterpreter_New::isStringEqual(string text, string expr, bool ignoreCasing) {
