@@ -103,6 +103,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 				((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 			} else {
 				//maybe go to show all so the user can see it has been added?
+				mariaStateManager->queueState(MariaStateManager::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, mariaTaskManager, "gjjh", mariaTaskManager->findTask("",false)));
+				mariaStateManager->transitState();
 			}
 			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 		} else {
