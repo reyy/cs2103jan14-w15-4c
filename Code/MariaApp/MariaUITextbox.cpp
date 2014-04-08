@@ -19,6 +19,7 @@ MariaUITextbox::MariaUITextbox(QMainWindow *qmainWindow) {
 
 	_inputBox = new QLineEdit(_qmainWindow);
 	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;color:#000000;font-size:" + QString::number(FONT_SIZE_TYPED_TEXT) + "px;");
+	_inputBox->installEventFilter(_qmainWindow);
 
 	_suggestText = new QLabel(_qmainWindow);
 	_suggestText->setStyleSheet("background-color: rgba(0, 0, 0, 0);border:0px;color:#555555;font-size:" + QString::number(FONT_SIZE_TYPED_TEXT) + "px;");
@@ -77,4 +78,8 @@ void MariaUITextbox::updateGUI(QPointF statePosition) {
 
 void MariaUITextbox::setFocus() {
 	_inputBox->setFocus();
+}
+
+QLineEdit *  MariaUITextbox::getInputBoxReference() {
+	return _inputBox;
 }

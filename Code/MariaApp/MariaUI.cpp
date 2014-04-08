@@ -110,8 +110,8 @@ void MariaUI::quitAction() {
 void MariaUI::updateBackgroundColor() {
 
 	if(abs(_bkgColor.red()-_targetBkgColor.red())>VALUE_THRESHOLD ||
-	 abs(_bkgColor.green()-_targetBkgColor.green())>VALUE_THRESHOLD ||
-	 abs(_bkgColor.blue()-_targetBkgColor.blue())>VALUE_THRESHOLD) {
+		abs(_bkgColor.green()-_targetBkgColor.green())>VALUE_THRESHOLD ||
+		abs(_bkgColor.blue()-_targetBkgColor.blue())>VALUE_THRESHOLD) {
 			_bkgColor.setRed(_bkgColor.red() + (_targetBkgColor.red()-_bkgColor.red())*FLOW_FACTOR);
 			_bkgColor.setGreen(_bkgColor.green() + (_targetBkgColor.green()-_bkgColor.green())*FLOW_FACTOR);
 			_bkgColor.setBlue(_bkgColor.blue() + (_targetBkgColor.blue()-_bkgColor.blue())*FLOW_FACTOR);
@@ -121,18 +121,40 @@ void MariaUI::updateBackgroundColor() {
 		}
 	}
 	QString backgroundcolor = QString::number(_bkgColor.red()) + ", " + QString::number(_bkgColor.green()) + ", " + QString::number(_bkgColor.blue());
-		this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
+	this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
 }
 
 void MariaUI::resizeEvent(QResizeEvent* event) {
 	QWidget::resizeEvent(event);
 }
 
-void MariaUI::keyReleaseEvent(QKeyEvent* keyevent) {
-	int keyPressed = keyevent->key();
-	if(keyevent->key() == Qt::Key_Z && keyevent->modifiers().testFlag(Qt::ControlModifier)) {
+bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
+	if (obj == _commandBar->getTextbox()->getInputBoxReference()) {
+		if (event->type() == QEvent::KeyPress) {
+			QKeyEvent* keyPressed = static_cast<QKeyEvent*>(event);
+			if(keyPressed->key() == Qt::Key_Backspace) {
+				//-1 is required because is checks the length BEFORE backspace is applied to QLineEdit.
+				if(_commandBar->getTextbox()->getUserInput().length()-1 == 0) {
+					_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+				}
+			} else {
+				_commandBar->getTextbox()->setSuggestText("");
+				if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
+					_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
+				} else {
+					_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
+				}
+			}
+		}
+	}
+	return QMainWindow::eventFilter(obj, event);
+}
+
+void MariaUI::keyReleaseEvent(QKeyEvent* event) {
+	int keyPressed = event->key();
+	if(event->key() == Qt::Key_Z && event->modifiers().testFlag(Qt::ControlModifier)) {
 		if(_mariaLogic->processUndo()) {
-			getCommandBar()->getTextbox()->setQuestionText("Undo was sucessful");
+			getCommandBar()->getTextbox()->setQuestionText("Undo was successful");
 		} else {
 			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
 		}
@@ -144,14 +166,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* keyevent) {
 	} else if(keyPressed == Qt::Key_Down) {
 		_mariaLogic->processCommand_New("down");
 	} else {
-		//todo: tick / question if keyword detected
-		if(_commandBar->getTextbox()->getUserInput() == "") {
-			_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
-		} else {
-			_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
-			_commandBar->getTextbox()->setSuggestText("");
-		}
-		keyevent->ignore();
+		event->ignore();
 	}
 }
 

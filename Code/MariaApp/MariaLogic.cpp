@@ -72,6 +72,12 @@ bool MariaLogic::processUndo() {
 	return false;
 }
 
+bool MariaLogic::checkValidCommand(std::string inputText) {
+	//TODO: Miki, check if command valid and return true.
+
+	return true;
+}
+
 bool MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = NULL;
 

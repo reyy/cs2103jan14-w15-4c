@@ -51,7 +51,6 @@ private:
 	QSystemTrayIcon *trayIcon;
 	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_IMAGES];
 
-
 	//Load images used in application.
 	void initWindow();
 	void initButtons();
@@ -68,7 +67,8 @@ protected slots:
 
 protected:
 	void resizeEvent(QResizeEvent *event);
-	void keyReleaseEvent(QKeyEvent* keyevent);
+	bool eventFilter(QObject* obj, QEvent *event);
+	void keyReleaseEvent(QKeyEvent* event);
 
 public:
 	MariaUI(MariaLogic *mariaLogic, QWidget *parent = 0);

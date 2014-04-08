@@ -17,6 +17,7 @@ public:
 	MariaLogic(int argc, char *argv[]);
 	~MariaLogic(void);
 
+	bool checkValidCommand(std::string inputText);
 	bool processCommand(std::string inputText);
 	bool processCommand_New(std::string inputText);
 	bool processUndo();

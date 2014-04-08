@@ -33,7 +33,7 @@ private:
 	QLabel *_suggestText;
 
 	QTimer *_updateSuggestTextTimer;
-	
+
 private slots:
 	void updateSuggestText();
 
@@ -47,5 +47,6 @@ public:
 	std::string getUserInput();
 	void updateGUI(QPointF statePosition);
 	void setFocus();
+	QLineEdit * getInputBoxReference();
 };
 
