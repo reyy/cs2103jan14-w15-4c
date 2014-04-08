@@ -55,7 +55,7 @@ private:
 	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 
 	void parseTime(string input, int& hour, int& min);
-	MariaTime* parseDateTimeString(string input);
+	MariaTime* parseDateTimeString(vector<string> tokenizedInput);
 
 	bool hasDate(string text);
 	bool hasTime(string text);
