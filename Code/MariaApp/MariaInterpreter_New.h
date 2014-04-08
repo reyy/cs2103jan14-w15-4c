@@ -64,6 +64,7 @@ private:
 
 	string extractFromBackOfString(string text, string delimiter, int& delimiterPos);
 	int getDayOfWeek(string text);
+	int getLastDayOfMonth(int year, int month);
 	int getMonth(string text);
 	bool isInteger(string text);
 	bool isStringEqual(string text, string expr, bool ignoreCasing = true);

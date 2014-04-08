@@ -617,6 +617,128 @@ void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1));
 	} else if (hasDate(input)) {
 		// Need to check if there are 1 or more dates.
+		if (isStringEqual(input, "(^(0?[1-9]|[12][0-9]|3[01])[-/](0?[1-9]|1[012])[-/](19|20)?[0-9][0-9]$)")) {
+			int seperatorPos = 0;
+			char seperatorArray[2] = { '/', '-' };
+
+			for (int j = 0; j < 2; j++) {
+				seperatorPos = input.find(seperatorArray[j]);
+
+				if (seperatorPos != string::npos) {
+					vector<string> workingList = tokenizeString(input, seperatorArray[j]);
+
+					if (workingList.size() != 3) {
+						SAFE_DELETE(inputObject);
+						throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+					}
+
+					int day = atoi(workingList[0].c_str());
+					int month = atoi(workingList[1].c_str());
+					int year = atoi(workingList[2].c_str());
+
+					if (day <= 0) {
+						day = 1;
+					} else if (day >= 32) {
+						day = 31;
+					}
+
+					if (month <= 0) {
+						month = 1;
+					} else if (month >= 13) {
+						month = 12;
+					}
+
+					if (year < 100) {
+						year += 2000;
+					}
+
+					break;
+				}
+			}
+		} else if (isStringEqual(input, "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
+			int year = MariaTime::getCurrentTime().getYear();
+			int month;
+			int day;
+
+			vector<string> workingList = tokenizeString(input);
+
+			if (workingList.size() == 1) {
+				// Just show month
+				if (isStringEqual(workingList[0], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
+					month = getMonth(workingList[0]);
+				} else {
+					SAFE_DELETE(inputObject);
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+				// Need a function to get last day of month...
+				inputObject->setStartTime(new MariaTime(year, month, 1));
+				inputObject->setEndTime(new MariaTime(year, month, getLastDayOfMonth(year, month)));
+				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+			} else if (workingList.size() == 2) {
+				// Show date
+				if (isStringEqual(workingList[1], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
+					month = getMonth(workingList[1]);
+				} else {
+					SAFE_DELETE(inputObject);
+					throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+				}
+
+				day = atoi(workingList[0].c_str());
+				if (day <= 0) {
+					day = 1;
+				} else if (day >= 32) {
+					day = 31;
+				}
+
+				inputObject->setEndTime(new MariaTime(year, month, day));
+				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+			}
+
+			// Check to see if the month is past today's date.
+			// If it is, advance by one year.
+			if (month > MariaTime::getCurrentTime().getMonth()) {
+				year++;
+			}
+
+			/*// Check the previous token if it is a valid day.
+			// If it isn't, just set it to 1st of whatever month this is.
+			if (i >= 1 && isInteger(tokenizedDateTime[i-1])) {
+				day = atoi(tokenizedDateTime[i-1].c_str());
+
+				// Don't know if this check is necessary. Cause of maketime.
+				if (day <= 0) {
+					day = 1;
+				} else if (day >= 32) {
+					day = 31;
+				}
+				i--;
+			} else {
+				if (month == MariaTime::getCurrentTime().getMonth()) {
+					year++;
+				}
+				day = 1;
+			}*/
+			inputObject->setEndTime(new MariaTime(year, month, day));
+		} else if (isStringEqual(input, "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day")) {
+			int year = MariaTime::getCurrentTime().getYear();
+			int month = MariaTime::getCurrentTime().getMonth();
+			int day = MariaTime::getCurrentTime().getDay();
+
+			// do that minus magic thingy
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int inputDayOfWeek = getDayOfWeek(input);
+			int differenceInDays = inputDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				day += (7 - abs(differenceInDays));
+			} else {
+				day += differenceInDays;
+			}
+
+			// Also check if the preceding token is "next".
+			// If it is, add a week to this day.
+			inputObject->setEndTime(new MariaTime(year, month, day));
+		}
 	} else {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_INVALID_COMMAND.c_str());
@@ -667,22 +789,56 @@ void MariaInterpreter_New::parseDelete(string input, MariaInputObject* inputObje
 void MariaInterpreter_New::parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
-	if (input.size() == 0) {
-		SAFE_DELETE(inputObject);
-		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
-	} else {
-		inputObject->setTitle(input);
+	switch (currentState) {
+	case STATE_TYPE::CONFLICT:
+		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
+			throw exception(MESSAGE_NO_OPTION.c_str());
+		} else {
+			if (isInteger(input)) {
+				inputObject->setOptionID(atoi(input.c_str()));
+			} else {
+				throw exception(MESSAGE_INVALID_OPTION.c_str());
+			}
+		}
+		break;
+
+	default:
+		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
+			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+		} else {
+			inputObject->setTitle(input);
+		}
+		break;
 	}
 }
 
 void MariaInterpreter_New::parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
-	if (input.size() == 0) {
-		SAFE_DELETE(inputObject);
-		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
-	} else {
-		inputObject->setTitle(input);
+	switch (currentState) {
+	case STATE_TYPE::CONFLICT:
+		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
+			throw exception(MESSAGE_NO_OPTION.c_str());
+		} else {
+			if (isInteger(input)) {
+				inputObject->setOptionID(atoi(input.c_str()));
+			} else {
+				throw exception(MESSAGE_INVALID_OPTION.c_str());
+			}
+		}
+		break;
+
+	default:
+		if (input.size() == 0) {
+			SAFE_DELETE(inputObject);
+			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+		} else {
+			inputObject->setTitle(input);
+		}
+		break;
 	}
 }
 
@@ -886,6 +1042,16 @@ int MariaInterpreter_New::getDayOfWeek(string text) {
 	}
 
 	return -1;
+}
+
+int MariaInterpreter_New::getLastDayOfMonth(int year, int month) {
+	MariaTime* tempDate = new MariaTime(year, month+1, 0);
+
+	int day = tempDate->getDay();
+
+	SAFE_DELETE(tempDate);
+
+	return day;
 }
 
 int MariaInterpreter_New::getMonth(string text) {
