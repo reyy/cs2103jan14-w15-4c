@@ -48,6 +48,9 @@ private:
 	void parseAddDeadlineTask(string input, MariaInputObject* inputObject);
 	void parseAddTimedTask(string input, MariaInputObject* inputObject);
 	void parseEdit(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseEditTitle(string input, MariaInputObject* inputObject);
+	void parseEditStartTime(string input, MariaInputObject* inputObject);
+	void parseEditEndTime(string input, MariaInputObject* inputObject);
 	void parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 	void parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 	void parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState);

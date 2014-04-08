@@ -547,6 +547,89 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 		}
 		break;
 
+		case MariaInputObject::COMMAND_TYPE::EDIT_START_TIME: {
+			string toEditTitle = input->getTitle();
+		
+			//Jay: Pending splitting up of conflict and non conflict.
+			if (mariaStateManager->getCurrentState() == STATE_TYPE::CONFLICT) {
+				int numberToEdit = input->getOptionID();
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
+				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
+					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
+					toEditTask->getMariaTask()->setStart(input->getEditTime());
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
+					mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
+					mariaStateManager->transitState();
+				}
+			} else {
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
+
+				if (listOfTasks.size() == 1) {
+					//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
+					//still enable updating but no visual cues.
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+						listOfTasks[0]->setStart(input->getEditTime());
+						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
+						tempObj->updateUITask();
+					}
+				} else if (listOfTasks.size() == 0) {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
+				} else {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar tasks, which one should I edit?");
+
+					mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, mariaTaskManager, toEditTitle));
+					mariaStateManager->transitState();
+				}
+			}
+		}
+		break;
+		case MariaInputObject::COMMAND_TYPE::EDIT_END_TIME: {
+			string toEditTitle = input->getTitle();
+
+			//Jay: Pending removal of check if its in conflict state.
+			if (mariaStateManager->getCurrentState() == STATE_TYPE::CONFLICT) {
+				int numberToEdit = input->getOptionID();
+				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
+				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
+					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
+					toEditTask->getMariaTask()->setEnd(input->getEditTime());
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+					
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done.");
+					mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager));
+					mariaStateManager->transitState();
+				}
+			} else {
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
+
+				if (listOfTasks.size() == 1) {
+					//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
+					//still enable updating but no visual cues.
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+						listOfTasks[0]->setEnd(input->getEditTime());
+						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
+
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
+						tempObj->updateUITask();
+					}
+				} else if (listOfTasks.size() == 0) {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
+				} else {
+					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar tasks, which one should I edit?");
+
+					mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, mariaTaskManager, toEditTitle));
+					mariaStateManager->transitState();
+				}
+			}
+		}
+		break;
+
 		case MariaInputObject::COMMAND_TYPE::SHOW_DATE: {
 			// Show today, tomorrow, date
 			// Date object is obtained through input->getEndTime();

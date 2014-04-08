@@ -101,5 +101,108 @@ namespace MariaTest {
 			SAFE_DELETE(output);
 			SAFE_DELETE(program);
 		}
+
+		TEST_METHOD(I2_EditTitle) {
+			MariaInterpreter_New* program = new MariaInterpreter_New();
+
+			string input = "edit apple change title banana";
+			string expectedTitle = "apple";
+			string expectedEditField = "banana";
+
+			MariaInputObject* output;
+			try {
+				output = program->parseInput(input);
+			} catch (exception& e) {
+				Assert::IsFalse(1);
+				e=e;
+			}
+
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
+			Assert::AreEqual(expectedTitle, output->getTitle());
+			Assert::AreEqual(expectedEditField, output->getEditField());
+
+			SAFE_DELETE(output);
+			SAFE_DELETE(program);
+		}
+
+		TEST_METHOD(I2_EditStartTime) {
+			MariaInterpreter_New* program = new MariaInterpreter_New();
+
+			string input = "edit apple change start Sunday";
+			string expectedTitle = "apple";
+
+			MariaInputObject* output;
+			try {
+				output = program->parseInput(input);
+			} catch (exception& e) {
+				Assert::IsFalse(1);
+				e=e;
+			}
+
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
+
+			int expectedYear = MariaTime::getCurrentTime().getYear();
+			int expectedMonth = MariaTime::getCurrentTime().getMonth();
+			int expectedDay = MariaTime::getCurrentTime().getDay();
+			int expectedDayOfWeek = 0;
+
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int differenceInDays = expectedDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				expectedDay += (7 - abs(differenceInDays));
+			} else {
+				expectedDay += differenceInDays;
+			}
+
+			Assert::AreEqual(expectedTitle, output->getTitle());
+			Assert::AreEqual(expectedYear, output->getEditTime()->getYear());
+			Assert::AreEqual(expectedMonth, output->getEditTime()->getMonth());
+			Assert::AreEqual(expectedDay, output->getEditTime()->getDay());
+			Assert::AreEqual(expectedDayOfWeek, output->getEditTime()->getDayWeek());
+
+			SAFE_DELETE(output);
+			SAFE_DELETE(program);
+		}
+
+		TEST_METHOD(I2_EditEndTime) {
+			MariaInterpreter_New* program = new MariaInterpreter_New();
+
+			string input = "edit apple change end Sunday";
+			string expectedTitle = "apple";
+
+			MariaInputObject* output;
+			try {
+				output = program->parseInput(input);
+			} catch (exception& e) {
+				Assert::IsFalse(1);
+				e=e;
+			}
+
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
+
+			int expectedYear = MariaTime::getCurrentTime().getYear();
+			int expectedMonth = MariaTime::getCurrentTime().getMonth();
+			int expectedDay = MariaTime::getCurrentTime().getDay();
+			int expectedDayOfWeek = 0;
+
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int differenceInDays = expectedDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				expectedDay += (7 - abs(differenceInDays));
+			} else {
+				expectedDay += differenceInDays;
+			}
+
+			Assert::AreEqual(expectedTitle, output->getTitle());
+			Assert::AreEqual(expectedYear, output->getEditTime()->getYear());
+			Assert::AreEqual(expectedMonth, output->getEditTime()->getMonth());
+			Assert::AreEqual(expectedDay, output->getEditTime()->getDay());
+			Assert::AreEqual(expectedDayOfWeek, output->getEditTime()->getDayWeek());
+
+			SAFE_DELETE(output);
+			SAFE_DELETE(program);
+		}
 	};
 }
