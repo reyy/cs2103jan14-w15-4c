@@ -103,11 +103,14 @@ MariaInputObject* MariaInterpreter_New::parseInput(string input, STATE_TYPE curr
 void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
+	int dummyVar = 0;
+
 	if (hasDateTime(input)) {
 		// Check if the substring after the last by/from/to contains a valid date/time.
-		if (hasDateTime(extractFromBackOfString(input, " from ")) && hasDateTime(extractFromBackOfString(input, " to "))) {
+		if (hasDateTime(extractFromBackOfString(input, " from ", dummyVar)) && hasDateTime(extractFromBackOfString(input, " to ", dummyVar))) {
 			parseAddTimedTask(input, inputObject);
-		} else if (hasDateTime(extractFromBackOfString(input, " by "))) {
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
+		} else if (hasDateTime(extractFromBackOfString(input, " by ", dummyVar))) {
 			parseAddDeadlineTask(input, inputObject);
 			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 		} else {
@@ -123,7 +126,11 @@ void MariaInterpreter_New::parseAdd(string input, MariaInputObject* inputObject,
 
 void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* inputObject) {
 	assert(inputObject != NULL);
-	string dateTimeString = extractFromBackOfString(input, " by ");
+	int delimiterPos = 0;
+	string dateTimeString = extractFromBackOfString(input, " by ", delimiterPos);
+
+	input = input.substr(0, delimiterPos);
+	inputObject->setTitle(input);
 
 	if (dateTimeString.size() == 0) {
 		SAFE_DELETE(inputObject);
@@ -159,6 +166,45 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 			month = MariaTime::getCurrentTime().getMonth();
 			day = MariaTime::getCurrentTime().getDay() + 1;
 			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "(^(0?[1-9]|[12][0-9]|3[01])[-/](0?[1-9]|1[012])[-/](19|20)?[0-9][0-9]$)") && !hasDateString) {
+			int seperatorPos = 0;
+			char seperatorArray[2] = { '/', '-' };
+
+			for (int j = 0; j < 2; j++) {
+				seperatorPos = tokenizedDateTime[i].find(seperatorArray[j]);
+
+				if (seperatorPos != string::npos) {
+					vector<string> workingList = tokenizeString(tokenizedDateTime[i], seperatorArray[j]);
+
+					if (workingList.size() != 3) {
+						SAFE_DELETE(inputObject);
+						throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+					}
+
+					day = atoi(workingList[0].c_str());
+					month = atoi(workingList[1].c_str());
+					year = atoi(workingList[2].c_str());
+
+					if (day <= 0) {
+						day = 1;
+					} else if (day >= 32) {
+						day = 31;
+					}
+
+					if (month <= 0) {
+						month = 1;
+					} else if (month >= 13) {
+						month = 12;
+					}
+
+					if (year < 100) {
+						year += 2000;
+					}
+
+					hasDateString = true;
+					break;
+				}
+			}
 		} else if (isStringEqual(tokenizedDateTime[i], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?") && !hasDateString) {
 			year = MariaTime::getCurrentTime().getYear();
 			month = getMonth(tokenizedDateTime[i]);
@@ -180,6 +226,12 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 				} else if (day >= 32) {
 					day = 31;
 				}
+				i--;
+			} else {
+				if (month == MariaTime::getCurrentTime().getMonth()) {
+					year++;
+				}
+				day = 1;
 			}
 			hasDateString = true;
 		} else if (isStringEqual(tokenizedDateTime[i], "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day") && !hasDateString) {
@@ -205,25 +257,348 @@ void MariaInterpreter_New::parseAddDeadlineTask(string input, MariaInputObject* 
 	}
 
 	if (hasDateString && !hasTimeString) {
-		// What's a good default time??
-		hour = 9;
+		if (year == MariaTime::getCurrentTime().getYear() &&
+			month == MariaTime::getCurrentTime().getMonth() &&
+			day == MariaTime::getCurrentTime().getDay()) {
+				hour = MariaTime::getCurrentTime().getHour()+1;
+		} else {
+			hour = 9;
+		}
 		min = 0;
-
-		//TODO: Account for passing of day.
 	} else if (!hasDateString && hasTimeString) {
 		// Check if the time wanted has already passed. If so, go to next day.
 		year = MariaTime::getCurrentTime().getYear();
 		month = MariaTime::getCurrentTime().getMonth();
 		day = MariaTime::getCurrentTime().getDay();
+
+		if ((hour < MariaTime::getCurrentTime().getHour()) ||
+			(hour == MariaTime::getCurrentTime().getHour() && min <= MariaTime::getCurrentTime().getMin())){
+			day++;
+		}
 	} else if (!hasDateString && !hasTimeString) {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
 	}
-
 	inputObject->setEndTime(new MariaTime(year, month, day, hour, min));
 }
 
 void MariaInterpreter_New::parseAddTimedTask(string input, MariaInputObject* inputObject) {
+	assert(inputObject != NULL);
+
+	////////
+	// To //
+	////////
+	int delimiterPos = 0;
+	string dateTimeString = extractFromBackOfString(input, " to ", delimiterPos);
+
+	input = input.substr(0, delimiterPos);
+
+	if (dateTimeString.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	dateTimeString = trimWhiteSpace(dateTimeString);
+	vector<string> tokenizedDateTime = tokenizeString(dateTimeString);
+	removeTokens(tokenizedDateTime, 0, 1);
+
+	int year, month, day, hour, min;
+	// Flags to ensure that only the very last of each is captured.
+	// Extra dates are ignored.
+	bool hasDateString = false;
+	bool hasTimeString = false;
+
+	for (int i = tokenizedDateTime.size() - 1; i >= 0; i--) {
+		if (hasTime(tokenizedDateTime[i]) && !hasTimeString) {
+			try {
+				parseTime(tokenizedDateTime[i], hour, min);
+			} catch (exception& e) {
+				SAFE_DELETE(inputObject);
+				throw;
+			}
+			hasTimeString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "tomorrow") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay() + 1;
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "(^(0?[1-9]|[12][0-9]|3[01])[-/](0?[1-9]|1[012])[-/](19|20)?[0-9][0-9]$)") && !hasDateString) {
+			int seperatorPos = 0;
+			char seperatorArray[2] = { '/', '-' };
+
+			for (int j = 0; j < 2; j++) {
+				seperatorPos = tokenizedDateTime[i].find(seperatorArray[j]);
+
+				if (seperatorPos != string::npos) {
+					vector<string> workingList = tokenizeString(tokenizedDateTime[i], seperatorArray[j]);
+
+					if (workingList.size() != 3) {
+						SAFE_DELETE(inputObject);
+						throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+					}
+
+					day = atoi(workingList[0].c_str());
+					month = atoi(workingList[1].c_str());
+					year = atoi(workingList[2].c_str());
+
+					if (day <= 0) {
+						day = 1;
+					} else if (day >= 32) {
+						day = 31;
+					}
+
+					if (month <= 0) {
+						month = 1;
+					} else if (month >= 13) {
+						month = 12;
+					}
+
+					if (year < 100) {
+						year += 2000;
+					}
+
+					hasDateString = true;
+					break;
+				}
+			}
+		} else if (isStringEqual(tokenizedDateTime[i], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = getMonth(tokenizedDateTime[i]);
+
+			// Check to see if the month is past today's date.
+			// If it is, advance by one year.
+			if (month > MariaTime::getCurrentTime().getMonth()) {
+				year++;
+			}
+
+			// Check the previous token if it is a valid day.
+			// If it isn't, just set it to 1st of whatever month this is.
+			if (i >= 1 && isInteger(tokenizedDateTime[i-1])) {
+				day = atoi(tokenizedDateTime[i-1].c_str());
+
+				// Don't know if this check is necessary. Cause of maketime.
+				if (day <= 0) {
+					day = 1;
+				} else if (day >= 32) {
+					day = 31;
+				}
+				i--;
+			} else {
+				if (month == MariaTime::getCurrentTime().getMonth()) {
+					year++;
+				}
+				day = 1;
+			}
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+
+			// do that minus magic thingy
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int inputDayOfWeek = getDayOfWeek(tokenizedDateTime[i]);
+			int differenceInDays = inputDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				day += (7 - abs(differenceInDays));
+			} else {
+				day += differenceInDays;
+			}
+
+			// Also check if the preceding token is "next".
+			// If it is, add a week to this day.
+			hasDateString = true;
+		}
+	}
+
+	if (hasDateString && !hasTimeString) {
+		if (year == MariaTime::getCurrentTime().getYear() &&
+			month == MariaTime::getCurrentTime().getMonth() &&
+			day == MariaTime::getCurrentTime().getDay()) {
+				hour = MariaTime::getCurrentTime().getHour()+1;
+		} else {
+			hour = 9;
+		}
+		min = 0;
+	} else if (!hasDateString && hasTimeString) {
+		// Check if the time wanted has already passed. If so, go to next day.
+		year = MariaTime::getCurrentTime().getYear();
+		month = MariaTime::getCurrentTime().getMonth();
+		day = MariaTime::getCurrentTime().getDay();
+
+		if ((hour < MariaTime::getCurrentTime().getHour()) ||
+			(hour == MariaTime::getCurrentTime().getHour() && min <= MariaTime::getCurrentTime().getMin())){
+			day++;
+		}
+	} else if (!hasDateString && !hasTimeString) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+	inputObject->setEndTime(new MariaTime(year, month, day, hour, min));
+
+	//////////
+	// From //
+	//////////
+	delimiterPos = 0;
+	dateTimeString = extractFromBackOfString(input, " from ", delimiterPos);
+
+	input = input.substr(0, delimiterPos);
+
+	inputObject->setTitle(input);
+
+	if (dateTimeString.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	dateTimeString = trimWhiteSpace(dateTimeString);
+	tokenizedDateTime = tokenizeString(dateTimeString);
+	removeTokens(tokenizedDateTime, 0, 1);
+
+	// Flags to ensure that only the very last of each is captured.
+	// Extra dates are ignored.
+	hasDateString = false;
+	hasTimeString = false;
+
+	for (int i = tokenizedDateTime.size() - 1; i >= 0; i--) {
+		if (hasTime(tokenizedDateTime[i]) && !hasTimeString) {
+			try {
+				parseTime(tokenizedDateTime[i], hour, min);
+			} catch (exception& e) {
+				SAFE_DELETE(inputObject);
+				throw;
+			}
+			hasTimeString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "tomorrow") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay() + 1;
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "(^(0?[1-9]|[12][0-9]|3[01])[-/](0?[1-9]|1[012])[-/](19|20)?[0-9][0-9]$)") && !hasDateString) {
+			int seperatorPos = 0;
+			char seperatorArray[2] = { '/', '-' };
+
+			for (int j = 0; j < 2; j++) {
+				seperatorPos = tokenizedDateTime[i].find(seperatorArray[j]);
+
+				if (seperatorPos != string::npos) {
+					vector<string> workingList = tokenizeString(tokenizedDateTime[i], seperatorArray[j]);
+
+					if (workingList.size() != 3) {
+						SAFE_DELETE(inputObject);
+						throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+					}
+
+					day = atoi(workingList[0].c_str());
+					month = atoi(workingList[1].c_str());
+					year = atoi(workingList[2].c_str());
+
+					if (day <= 0) {
+						day = 1;
+					} else if (day >= 32) {
+						day = 31;
+					}
+
+					if (month <= 0) {
+						month = 1;
+					} else if (month >= 13) {
+						month = 12;
+					}
+
+					if (year < 100) {
+						year += 2000;
+					}
+
+					hasDateString = true;
+					break;
+				}
+			}
+		} else if (isStringEqual(tokenizedDateTime[i], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = getMonth(tokenizedDateTime[i]);
+
+			// Check to see if the month is past today's date.
+			// If it is, advance by one year.
+			if (month > MariaTime::getCurrentTime().getMonth()) {
+				year++;
+			}
+
+			// Check the previous token if it is a valid day.
+			// If it isn't, just set it to 1st of whatever month this is.
+			if (i >= 1 && isInteger(tokenizedDateTime[i-1])) {
+				day = atoi(tokenizedDateTime[i-1].c_str());
+
+				// Don't know if this check is necessary. Cause of maketime.
+				if (day <= 0) {
+					day = 1;
+				} else if (day >= 32) {
+					day = 31;
+				}
+				i--;
+			} else {
+				if (month == MariaTime::getCurrentTime().getMonth()) {
+					year++;
+				}
+				day = 1;
+			}
+			hasDateString = true;
+		} else if (isStringEqual(tokenizedDateTime[i], "mon(day)?|tues?(day)?|wed(nesday)?|thur?s?(day)?|fri(day)?|sat(urday)?|(sun)?day") && !hasDateString) {
+			year = MariaTime::getCurrentTime().getYear();
+			month = MariaTime::getCurrentTime().getMonth();
+			day = MariaTime::getCurrentTime().getDay();
+
+			// do that minus magic thingy
+			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
+			int inputDayOfWeek = getDayOfWeek(tokenizedDateTime[i]);
+			int differenceInDays = inputDayOfWeek - currentDayOfWeek;
+
+			if (differenceInDays < 0) {
+				day += (7 - abs(differenceInDays));
+			} else {
+				day += differenceInDays;
+			}
+
+			// Also check if the preceding token is "next".
+			// If it is, add a week to this day.
+			hasDateString = true;
+		}
+	}
+
+	if (hasDateString && !hasTimeString) {
+		if (year == MariaTime::getCurrentTime().getYear() &&
+			month == MariaTime::getCurrentTime().getMonth() &&
+			day == MariaTime::getCurrentTime().getDay()) {
+				hour = MariaTime::getCurrentTime().getHour()+1;
+		} else {
+			hour = 9;
+		}
+		min = 0;
+	} else if (!hasDateString && hasTimeString) {
+		// Check if the time wanted has already passed. If so, go to next day.
+		year = MariaTime::getCurrentTime().getYear();
+		month = MariaTime::getCurrentTime().getMonth();
+		day = MariaTime::getCurrentTime().getDay();
+
+		if ((hour < MariaTime::getCurrentTime().getHour()) ||
+			(hour == MariaTime::getCurrentTime().getHour() && min <= MariaTime::getCurrentTime().getMin())){
+			day++;
+		}
+	} else if (!hasDateString && !hasTimeString) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+	inputObject->setStartTime(new MariaTime(year, month, day, hour, min));
 }
 
 void MariaInterpreter_New::parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
@@ -436,6 +811,7 @@ bool MariaInterpreter_New::hasDate(string text) {
 }
 
 bool MariaInterpreter_New::hasTime(string text) {
+	//TODO: Needs further revision.
 	regex timeExpression("([01]?[0-9]|2[0-3])([.:][0-5][0-9])?(\\s*[AaPp][Mm])?", regex_constants::icase);
 
 	return regex_search(text, timeExpression);
@@ -447,7 +823,7 @@ bool MariaInterpreter_New::hasDateTime(string text) {
 
 bool MariaInterpreter_New::hasDateFormat(string text) {
 	//TODO: May need further revision.
-	regex dateExpression("(by|from|to)[ ](^(0?[1-9]|[12][0-9]|3[01])[-/.](0?[1-9]|1[012])[-/.](19|20)?[0-9][0-9]$)", regex_constants::icase);
+	regex dateExpression("(by|from|to)[ ](^(0?[1-9]|[12][0-9]|3[01])[-/](0?[1-9]|1[012])[-/](19|20)?[0-9][0-9]$)", regex_constants::icase);
 
 	return regex_search(text, dateExpression);
 }
@@ -476,7 +852,7 @@ bool MariaInterpreter_New::hasTomorrow(string text) {
 	return regex_search(text, tomorrowExpression);
 }
 
-string MariaInterpreter_New::extractFromBackOfString(string text, string delimiter) {
+string MariaInterpreter_New::extractFromBackOfString(string text, string delimiter, int& delimiterPos) {
 	size_t occ1 = text.find(delimiter);
 	size_t occ2;
 
@@ -487,10 +863,12 @@ string MariaInterpreter_New::extractFromBackOfString(string text, string delimit
 			if (occ2 != string::npos) {
 				occ1 = occ2;
 			} else {
+				delimiterPos = occ1;
 				return text.substr(occ1);
 			}
 		} while (occ2 != string::npos);
 	}
+	delimiterPos = text.size();
 	return "";
 }
 

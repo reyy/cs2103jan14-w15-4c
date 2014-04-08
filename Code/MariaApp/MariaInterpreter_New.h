@@ -51,6 +51,7 @@ private:
 	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
 
 	void parseTime(string input, int& hour, int& min);
+	MariaTime* parseDateTimeString(string input);
 
 	bool hasDate(string text);
 	bool hasTime(string text);
@@ -61,7 +62,7 @@ private:
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
-	string extractFromBackOfString(string text, string delimiter);
+	string extractFromBackOfString(string text, string delimiter, int& delimiterPos);
 	int getDayOfWeek(string text);
 	int getMonth(string text);
 	bool isInteger(string text);

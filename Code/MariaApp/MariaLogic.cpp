@@ -447,7 +447,21 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 		break;
 
 		case MariaInputObject::COMMAND_TYPE::ADD_DEADLINE: {
-			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, new MariaTime(*input->getEndTime()));
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, input->getEndTime());
+			if (toAdd != NULL) {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
+				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				}
+			} else {
+				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
+			}
+		}
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::ADD_TIMED: {
+			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), input->getStartTime(), input->getEndTime());
 			if (toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
 				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
