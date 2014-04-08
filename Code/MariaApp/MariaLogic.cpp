@@ -71,9 +71,7 @@ bool MariaLogic::processUndo() {
 }
 
 bool MariaLogic::checkValidCommand(std::string inputText) {
-	//TODO: Miki, check if command valid and return true.
-
-	return true;
+	return mariaInterpreter->checkValidCommand(inputText);
 }
 
 bool MariaLogic::processCommand(std::string inputText) {
@@ -83,7 +81,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
-	mariaUI->getCommandBar()->getStatus()->setStatus(MariaUIStatus::OK);
 
 	try {
 		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());

@@ -151,11 +151,6 @@ bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
 				}
 			} else {
 				_commandBar->getTextbox()->setSuggestText("");
-				if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
-					_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
-				} else {
-					_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
-				}
 			}
 		}
 	}
@@ -178,6 +173,16 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	} else if(keyPressed == Qt::Key_Down) {
 		_mariaLogic->processCommand_New("down");
 	} else {
+		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
+			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
+		} else {
+			if(_commandBar->getTextbox()->getUserInput().length() > 0) {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
+			} else {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+			}
+
+		}
 		event->ignore();
 	}
 }
