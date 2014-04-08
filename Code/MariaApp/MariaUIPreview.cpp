@@ -1,26 +1,27 @@
 #include "MariaUIPreview.h"
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_NONE = "You have no events scheduled for tomorrow.";
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW = "There is one event scheduled for %s tomorrow.";
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_MULTIPLE = "There are %i events scheduled and the first one starts at %s tomorrow.";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_NONE = "You have no events scheduled for tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW = "There is one event scheduled for %s tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_MULTIPLE = "There are %i events scheduled and the first one starts at %s tomorrow.\n";
 
-const string MariaUIPreview::PREVIEW_EVENT_TODAY_NONE = "There are no scheduled events today.";
-const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_AT = "The first thing on your calendar today is '%s', at %s.";
-const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME = "The first thing on your calendar today is '%s', in %s minutes.";
-const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_AT = "'%s' is next up on your calendar, at %s.";
-const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME = "'%s' is next up on your calendar, in %s minutes.";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NONE = "There are no scheduled events today.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_AT = "The first thing on your calendar today is '%s', at %s.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME = "The first thing on your calendar today is '%s', in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_AT = "'%s' is next up on your calendar, at %s.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME = "'%s' is next up on your calendar, in %s minutes.\n";
 
-const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW = "One task is due by %s tomorrow.";
+const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW = "One task is due by %s tomorrow.\n";
 const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW_MUTIPLE = "%i tasks are due tomorrow.\n";
 
-const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_AT = "One task is due today.\nIt is '%s' and is due by %s.";
-const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_REMAINING_TIME = "One task is due today It is '%s' and is due in %s minutes.";
+const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_AT = "One task is due today.\nIt is '%s' and is due by %s.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_REMAINING_TIME = "One task is due today It is '%s' and is due in %s minutes.\n";
 const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_MUTIPLE = "%i tasks are due today.\n";
-const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_AT = "%s is due by %s.\n";
-const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_REMAINING_TIME = "%s is due in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_AT = "'%s' is due by %s.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_REMAINING_TIME = "'%s' is due in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_TRIM = "Here are some of the tasks.\n";
 
-const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was created since %s, was it done yet?";
+const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was created since %s, was it done yet?\n";
 
-const float MariaUIPreview::START_HEIGHT_SCALE = 0.3;
+const float MariaUIPreview::START_HEIGHT_SCALE = 0.28;
 const float MariaUIPreview::MESSAGE_HEIGHT = 220;
 
 MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow,MariaTaskManager *taskManager) {
@@ -29,7 +30,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow,MariaTaskManager *taskMa
 
 	_mainText = new QLabel(_qmainWindow);
 	_mainText->setAlignment(Qt::AlignJustify);
-	_mainText->setStyleSheet("color:#ffffff; font-size:"+QString::number(FONT_SIZE)+"px;");
+	_mainText->setStyleSheet("padding-left:" + QString::number(TEXTBOX_X_OFFSET) + "px;padding-right:" + QString::number(TEXTBOX_X_OFFSET) + "px; color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
 	_mainText->setWordWrap(true);
 	_mainText->hide();
 
@@ -54,8 +55,8 @@ string MariaUIPreview::generateTodayText() {
 	char buffer[STRING_BUFFER_SIZE];
 
 	//Today's Task.
-	vector<MariaTask*> taskListNow = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED);
-	vector<MariaTask*> taskListAll = _taskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED);
+	vector<MariaTask*> taskListNow = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED, false);
+	vector<MariaTask*> taskListAll = _taskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED, false);
 	
 	if(taskListNow.size() > 0) {
 		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &now);
@@ -87,7 +88,7 @@ string MariaUIPreview::generateTodayText() {
 	}
 
 	//Today's Deadline.
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE);
+	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE, false);
 
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
@@ -109,7 +110,12 @@ string MariaUIPreview::generateTodayText() {
 			sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_MUTIPLE.c_str(), taskListDeadLine.size());
 			toReturn+=buffer;
 
-			for(int i = 0; i < taskListDeadLine.size(); i++){
+			int maxTask = taskListDeadLine.size();
+			if(maxTask > MAX_TASK_SHOWN) {
+				maxTask = MAX_TASK_SHOWN;
+				toReturn += PREVIEW_DEADLINE_ITEM_TRIM;
+			}
+			for(int i = 0; i < maxTask; i++){
 				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &now);
 				
 				if(withinTheHour >= 0 ) {//Check if event has passed.
@@ -137,7 +143,7 @@ string MariaUIPreview::generateTomorrowText() {
 	char buffer[STRING_BUFFER_SIZE];
 	
 	//Tomorrow's Task
-	vector<MariaTask*> taskList = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED);
+	vector<MariaTask*> taskList = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED, false);
 
 	if(taskList.size()>0) {
 		if(taskList.size()==1) {
@@ -155,7 +161,7 @@ string MariaUIPreview::generateTomorrowText() {
 	}
 
 	//Tomorrow's Deadline
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE);
+	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
 
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
@@ -177,7 +183,7 @@ string MariaUIPreview::generateTomorrowText() {
 string MariaUIPreview::generateSuggestionText(bool force) {
 	string toReturn;
 
-	vector<MariaTask*> taskList = _taskManager->findTask(MariaTask::TaskType::FLOATING);
+	vector<MariaTask*> taskList = _taskManager->findTask(MariaTask::TaskType::FLOATING, false);
 
 	char buffer[STRING_BUFFER_SIZE];
 
@@ -203,14 +209,14 @@ void MariaUIPreview::updateText() {
 	temp += generateTodayText();
 
 	if(temp.length()>0) {
-		temp+="\n\n";
+		temp+="\n";
 	}
 
 	toPrint+=temp;
 	temp = generateTomorrowText();
 
 	if(temp.length()>0) {
-		temp+="\n\n";
+		temp+="\n";
 	}
 
 	toPrint+=temp;
@@ -228,6 +234,6 @@ void MariaUIPreview::startUpdating() {
 }
 
 void MariaUIPreview::updateGUI(QPointF statePosition) {
-	_mainText->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, 
-		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width()-2*TEXTBOX_X_OFFSET, MESSAGE_HEIGHT));
+	_mainText->setGeometry(QRect(statePosition.x(), 
+		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width(), MESSAGE_HEIGHT));
 }

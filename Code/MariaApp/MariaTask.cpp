@@ -65,13 +65,14 @@ MariaTask* MariaTask::getClone() {
 	MariaTime *clonedEnd = NULL;
 
 	if(start != NULL) {
-		new MariaTime(start->get());
+		clonedStart = new MariaTime(start->get());
 	}
 	if(end != NULL) {
-		new MariaTime(end->get());
+		clonedEnd = new MariaTime(end->get());
 	}
 
 	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd);
+	clonedTask->setCreated(new MariaTime(created->get()));
 	return clonedTask;
 }
 
@@ -122,7 +123,31 @@ void MariaTask::setCreated(MariaTime* created) {
 }
 
 void MariaTask::setIsDone(bool isDone) {
+	if(MariaTask::observer != NULL){
+		MariaTask::observer->notifyAction(this);
+	}
 	this->isDone = isDone;
+}
+
+void MariaTask::setAll(MariaTask* other) {
+	title = other->getTitle();
+	description = other->getDescription();
+	isDone = (other->getIsDone());
+
+	delete start;
+	if(other->getStart() != NULL) {
+		start = new MariaTime(other->getStart()->get());
+	} else {
+		start = NULL;
+	}
+	
+	delete end;
+	if(other->getEnd() != NULL) {
+		end = new MariaTime(other->getEnd()->get());
+	} else {
+		end = NULL;
+	}
+	refreshTaskType();
 }
 
 void MariaTask::refreshTaskType() {

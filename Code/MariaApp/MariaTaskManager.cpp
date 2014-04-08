@@ -8,8 +8,12 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 	}
 	sortTasks();
 
-	undoList = new vector<pair<MariaTask**,MariaTask*>*>();
+	undoList = new vector<pair<MariaTask*,MariaTask*>*>();
 	MariaTask::initObserver(this);
+
+	previousStart = NULL;
+	previousEnd = NULL;
+	queryResult = NULL;
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
@@ -18,7 +22,7 @@ MariaTaskManager::~MariaTaskManager(void) {
 	}
 	delete taskList;
 
-	for(pair<MariaTask**,MariaTask*>* t: (*this->undoList)) {
+	for(pair<MariaTask*,MariaTask*>* t: (*this->undoList)) {
 		delete t;
 	}
 	delete undoList;
@@ -36,7 +40,7 @@ MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* e
 	return tempTask;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(std::string searchString) {
+vector<MariaTask*> MariaTaskManager::findTask(std::string searchString, bool addToHistory) {
 	vector<MariaTask*> returnList;
 	searchString = lowercaseString(searchString);
 
@@ -46,10 +50,18 @@ vector<MariaTask*> MariaTaskManager::findTask(std::string searchString) {
 		}
 	}
 
+	if(addToHistory) {
+		storePreviousQuery(searchString);
+		if(queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (returnList);
+	}
+
 	return returnList;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end) {
+vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, bool addToHistory) {
 	vector<MariaTask*> returnList;
 
 	for(MariaTask* temp : *taskList) {
@@ -62,10 +74,18 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end) 
 		}
 	}
 
+	if(addToHistory) {
+		storePreviousQuery(start, end);
+		if(queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (returnList);
+	}
+
 	return returnList;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type) {
+vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type, bool addToHistory) {
 	vector<MariaTask*> returnList;
 
 	for(MariaTask* temp : *taskList) {
@@ -85,10 +105,18 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 		}
 	}
 
+	if(addToHistory) {
+		storePreviousQuery(start, end, type);
+		if(queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (returnList);
+	}
+
 	return returnList;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type) {
+vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type, bool addToHistory) {
 	assert(taskList!=NULL);
 	vector<MariaTask*> returnList;
 
@@ -97,6 +125,15 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type) {
 			returnList.push_back(temp);
 		}
 	}
+
+	if(addToHistory) {
+		storePreviousQuery(type);
+		if(queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (returnList);
+	}
+
 	return returnList;
 }
 
@@ -106,7 +143,7 @@ vector<MariaTask*> MariaTaskManager::getAllTasks() {
 	return *taskList;
 }
 
-bool MariaTaskManager::archiveTask(MariaTask* task){
+bool MariaTaskManager::archiveTask(MariaTask* task) {
 	assert(task!=NULL);
 
 	this->notifyAction(task);
@@ -123,6 +160,66 @@ bool MariaTaskManager::archiveTask(MariaTask* task){
 	
 }
 
+int MariaTaskManager::compareToPreviousQuery() {
+	if(queryResult == NULL) {
+		return false;
+	}
+	vector<MariaTask*> previousQueryResult = vector<MariaTask*>(*queryResult);
+
+	if(previousSearchString != "") {
+		findTask(previousSearchString);
+	} else if(previousStart == NULL && previousEnd == NULL) {
+		findTask(previousType);
+	} else if(previousType != MariaTask::TaskType::INVALID) {
+		findTask(previousStart, previousEnd, previousType);
+	} else {
+		findTask(previousStart, previousEnd);
+	}
+
+	return queryResult->size() - previousQueryResult.size();
+}
+
+void MariaTaskManager::deletePreviousQuery() {
+	previousSearchString = "";
+	if(previousStart != NULL) {
+		delete previousStart;
+	}
+	previousStart = NULL;
+	if(previousEnd != NULL) {
+		delete previousEnd;
+	}
+	previousEnd = NULL;
+	previousType = MariaTask::TaskType::INVALID;
+}
+
+void MariaTaskManager::storePreviousQuery(string previousSearchString) {
+	deletePreviousQuery();
+	this->previousSearchString = previousSearchString;
+}
+
+void MariaTaskManager::storePreviousQuery(MariaTask::TaskType previousType) {
+	deletePreviousQuery();
+	this->previousType = previousType;
+}
+
+void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd){
+	MariaTime * tempStart = new MariaTime(previousStart->get());
+	MariaTime * tempEnd = new MariaTime(previousEnd->get());
+	deletePreviousQuery();
+	this->previousStart = tempStart;
+	this->previousEnd = tempEnd;
+}
+
+void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd, MariaTask::TaskType previousType) {
+	MariaTime * tempStart = new MariaTime(previousStart->get());
+	MariaTime * tempEnd = new MariaTime(previousEnd->get());
+	deletePreviousQuery();
+	this->previousStart = tempStart;
+	this->previousEnd = tempEnd;
+	this->previousType = previousType;
+}
+
+
 string MariaTaskManager::lowercaseString(string text) {
 	string toReturn = "";
 
@@ -134,9 +231,9 @@ string MariaTaskManager::lowercaseString(string text) {
 }
 
 void MariaTaskManager::sortTasks() {
-	vector<MariaTask*> floatingTasks = findTask(MariaTask::FLOATING);
-	vector<MariaTask*> deadlineTasks = findTask(MariaTask::DEADLINE);
-	vector<MariaTask*> timedTasks = findTask(MariaTask::TIMED);
+	vector<MariaTask*> floatingTasks = findTask(MariaTask::FLOATING, false);
+	vector<MariaTask*> deadlineTasks = findTask(MariaTask::DEADLINE, false);
+	vector<MariaTask*> timedTasks = findTask(MariaTask::TIMED, false);
 	std::sort(floatingTasks.begin(), floatingTasks.end(), &compareTasks);
 	std::sort(deadlineTasks.begin(), deadlineTasks.end(), &compareTasks);
 	std::sort(timedTasks.begin(), timedTasks.end(), &compareTasks);
@@ -151,44 +248,64 @@ bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2) {
 	return ((*t1) < (*t2));
 }
 
-bool MariaTaskManager::undoLast() {
+MariaTask* MariaTaskManager::undoLast() {
 	if(undoList->empty()) {
-		return false;
+		return NULL;
 	}
-	MariaTask* taskPointer = *(undoList->back())->first;
+	MariaTask* toReturn = NULL;
+	MariaTask* taskPointer = (undoList->back())->first;
 	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
 	
 	if(it != taskList->end()) {
+		toReturn = (undoList->back())->first;
 		if(oldTask == NULL) { 
 			//last action = addTask
 			delete taskPointer;
 			taskList->erase(it);
 		} else { 
 			//last action = editTask
-			delete taskPointer; //delete current task
-			*(undoList->back())->first = oldTask; //set pointer in taskList to old task
+			/*delete taskPointer; //delete current task
+			taskList->erase(it);
+			for(pair<MariaTask*,MariaTask*> *p : *undoList) {
+				if(p->first == taskPointer) {
+					p->first = oldTask;
+				}
+			}
+			taskList->push_back(oldTask);
+			sortTasks();*/
+			taskPointer->setAll(oldTask);
+			delete oldTask;
+			//(undoList->back())->first = oldTask; //set pointer in taskList to old task
 		}
 	} else {
 		//last action = deleteTask
+		for(pair<MariaTask*,MariaTask*> *p : *undoList) {
+			if(p->first == taskPointer) {
+				p->first = oldTask;
+			}
+		}
 		taskList->push_back(oldTask);
 		sortTasks();
+
+		toReturn = oldTask;
 	}
 	undoList->pop_back();
-	return true;
+	return toReturn;
 }
 
 void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 	
 	MariaTask *oldTask = NULL;
-	MariaTask **taskPointer = NULL;
+	MariaTask *taskPointer = NULL;
 	
 	for(int i = 0; i<taskList->size(); i++) {
 		if(((MariaTask*)task) == (*taskList)[i]){
-			taskPointer = &(*taskList)[i];
+			taskPointer = (*taskList)[i];
 			break;
 		}
 	}
+	//taskPointer = (MariaTask*)task;
 
 	assert(taskPointer != NULL);
 
@@ -200,5 +317,5 @@ void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 		undoList->erase(undoList->begin());
 	}
 
-	undoList->push_back(new pair<MariaTask**, MariaTask*>(taskPointer, oldTask));
+	undoList->push_back(new pair<MariaTask*, MariaTask*>(taskPointer, oldTask));
 }

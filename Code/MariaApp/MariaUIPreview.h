@@ -29,6 +29,7 @@ public:
 	static const string PREVIEW_DEADLINE_TODAY_MUTIPLE;
 	static const string PREVIEW_DEADLINE_ITEM_AT;
 	static const string PREVIEW_DEADLINE_ITEM_REMAINING_TIME;
+	static const string PREVIEW_DEADLINE_ITEM_TRIM;
 
 	static const string PREVIEW_FLOATING_SUGGESTION_DEFAULT;
 
@@ -38,6 +39,7 @@ public:
 	static const int UPDATE_FREQUENCY = 30000;
 	static const int FONT_SIZE = 16;
 	static const int STRING_BUFFER_SIZE = 255;
+	static const int MAX_TASK_SHOWN = 3;
 
 private:
 	QMainWindow *_qmainWindow;

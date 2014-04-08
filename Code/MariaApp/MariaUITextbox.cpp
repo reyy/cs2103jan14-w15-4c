@@ -51,15 +51,18 @@ void MariaUITextbox::updateSuggestText() {
 }
 
 void MariaUITextbox::setQuestionText(const std::string text) {
-	_questionText->setText(QString::fromStdString(text));
+	QFontMetrics fm = QFontMetrics(_questionText->font());
+	_questionText->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _questionText->width()));
 }
 
 void MariaUITextbox::setSuggestText(const std::string text) {
-	_suggestText->setText(QString::fromStdString(text));
+	QFontMetrics fm = QFontMetrics(_suggestText->font());
+	_suggestText->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _suggestText->width()));
 }
 
 void MariaUITextbox::setUserInput(const std::string text) {
-	_inputBox->setText(QString::fromStdString(text));
+	QFontMetrics fm = QFontMetrics(_inputBox->font());
+	_inputBox->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _inputBox->width()));
 }
 	
 std::string MariaUITextbox::getUserInput() {

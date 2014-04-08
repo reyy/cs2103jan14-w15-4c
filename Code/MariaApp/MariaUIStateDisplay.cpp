@@ -27,7 +27,13 @@ MariaUIStateDisplay::~MariaUIStateDisplay() {
 }
 
 void MariaUIStateDisplay::updateUITaskNumber() {
-	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
+
+	int maxShown = _taskStack.size() - _page*_maxTaskDisplay;
+	if(maxShown > _maxTaskDisplay) {
+		maxShown = _maxTaskDisplay;
+	}
+
+	for( int i = _page*_maxTaskDisplay ; i < _page*_maxTaskDisplay + maxShown ; i++ ) {
 		_taskStack.at(i)->setTitlePretext(std::to_string(i + 1) + ". ");
 	}
 }

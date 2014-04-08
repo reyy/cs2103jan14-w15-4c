@@ -11,7 +11,7 @@ const float MariaUI::WINDOW_DEFAULT_COLOR_R = 186;
 const float MariaUI::WINDOW_DEFAULT_COLOR_G = 199;
 const float MariaUI::WINDOW_DEFAULT_COLOR_B = 22;
 
-QPixmap *MariaUI::_taskTypeIconHandler[AMOUNT_OF_TASK_TYPE]={};
+QPixmap *MariaUI::_taskTypeIconHandler[AMOUNT_OF_IMAGES]={};
 
 MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
 	_mariaLogic = mariaLogic;
@@ -86,12 +86,21 @@ void MariaUI::loadImages() {
 	_taskTypeIconHandler[0] = new QPixmap("./Resources/ui_task_type_floating.png");
 	_taskTypeIconHandler[1] = new QPixmap("./Resources/ui_task_type_deadline.png");
 	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
+	_taskTypeIconHandler[3] = new QPixmap("./Resources/ui_completed.png");
+	_taskTypeIconHandler[4] = new QPixmap("./Resources/ui_not_completed.png");
+	_taskTypeIconHandler[5] = new QPixmap("./Resources/ui_maria_logo_1.png");
+	_taskTypeIconHandler[6] = new QPixmap("./Resources/ui_maria_logo_2.png");
+	_taskTypeIconHandler[7] = new QPixmap("./Resources/ui_maria_logo_3.png");
+	_taskTypeIconHandler[8] = new QPixmap("./Resources/ui_maria_logo_4.png");
+	_taskTypeIconHandler[9] = new QPixmap("./Resources/ui_maria_logo_5.png");
+	_taskTypeIconHandler[10] = new QPixmap("./Resources/ui_maria_logo_6.png");
+	_taskTypeIconHandler[11] = new QPixmap("./Resources/ui_loadingdots.png");
 }
 
-void MariaUI::unloadImages() {	
-	delete _taskTypeIconHandler[2];
-	delete _taskTypeIconHandler[1];
-	delete _taskTypeIconHandler[0];
+void MariaUI::unloadImages() {
+	for(int i = 0 ; i < AMOUNT_OF_IMAGES ; i++ ) {
+		delete _taskTypeIconHandler[i];
+	}
 }
 
 void MariaUI::quitAction() {

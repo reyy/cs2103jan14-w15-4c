@@ -12,7 +12,8 @@ public:
 	typedef enum {
 		FLOATING, 
 		DEADLINE, 
-		TIMED
+		TIMED,
+		INVALID
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
@@ -37,6 +38,7 @@ public:
 	void setEnd(MariaTime*);
 	void setCreated(MariaTime*);
 	void setIsDone(bool);
+	void setAll(MariaTask*);
 
 	void refreshTaskType();
 
