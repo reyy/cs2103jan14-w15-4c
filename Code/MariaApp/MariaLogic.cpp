@@ -106,10 +106,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
 			if (toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-				if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+				if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
+				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -120,10 +120,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, input->getEndTime());
 			if (toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
+				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -134,10 +134,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 			MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), input->getStartTime(), input->getEndTime());
 			if (toAdd != NULL) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
-				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 				}
+				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -325,14 +325,16 @@ bool MariaLogic::processCommand(std::string inputText) {
 					mariaStateManager->transitState();
 				}
 			} else {
-				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle);
+				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toDeleteTitle,false);
 
 				if (listOfTasks.size() == 1) {
 					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
 						mariaTaskManager->archiveTask(listOfTasks[0]);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' has been deleted!");
-						((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+						if(mariaTaskManager->compareToPreviousQuery()) {
+							((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
+						}
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
