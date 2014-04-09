@@ -7,7 +7,6 @@
 #include "MariaUITask.h"
 #include "MariaTask.h"
 
-class MariaTaskManager;
 class MariaUIStateDisplay : public MariaStateObject {
 public:
 	static const int TEXTBOX_X_OFFSET = 30;
@@ -18,7 +17,6 @@ public:
 
 protected:
 	QMainWindow *_qmainWindow;
-	MariaTaskManager *_taskManager;
 	int _maxTaskDisplay;
 
 private:
@@ -30,7 +28,7 @@ private:
 	QLabel *_pageText;
 
 public:
-	MariaUIStateDisplay(QMainWindow* qmainWindow, MariaTaskManager *taskManager, float taskStartHeight, int maxTaskDisplay);
+	MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay);
 	~MariaUIStateDisplay();
 
 	MariaUITask* addUITask(MariaTask *task, MariaUITask::DISPLAY_TYPE type);

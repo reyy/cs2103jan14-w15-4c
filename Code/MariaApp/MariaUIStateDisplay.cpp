@@ -1,16 +1,14 @@
 #include <assert.h> 
 #include "MariaUIStateDisplay.h"
 #include "MariaUI.h"
-#include "MariaTaskManager.h"
 
 const float MariaUIStateDisplay::TITLE_Y_OFFSET = 4.0;
 const float MariaUIStateDisplay::TITLE_WIDTH = 200.0;
 const float MariaUIStateDisplay::TITLE_HEIGHT = 40.0;
 const float MariaUIStateDisplay::FONT_SIZE = 12.0;
 
-MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, MariaTaskManager *taskManager, float taskStartHeight, int maxTaskDisplay) : MariaStateObject(qmainWindow) {
+MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay) : MariaStateObject(qmainWindow) {
 	_qmainWindow = qmainWindow;
-	_taskManager = taskManager;
 	_taskStartHeight = _qmainWindow->height()*taskStartHeight;
 	_page = 0;
 	_maxTaskDisplay = maxTaskDisplay;

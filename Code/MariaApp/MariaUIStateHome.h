@@ -19,6 +19,7 @@ public:
 private:
 	MariaUIClock *_clock;
 	MariaUIPreview *_preview;
+	vector<MariaTask*> _weekTask;
 
 	void initBeginState();
 	void initActiveState();
@@ -28,9 +29,10 @@ private:
 	bool timerEndState();
 
 public:
-	MariaUIStateHome(QMainWindow* qmainWindow, MariaTaskManager *taskManager);
+	MariaUIStateHome(QMainWindow* qmainWindow, vector<MariaTask*> weekTask);
 	~MariaUIStateHome();
 
 	void updateGUI();
+	MariaUIPreview* getUIPreview();
 };
 

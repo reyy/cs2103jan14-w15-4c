@@ -1,7 +1,6 @@
 #include <QKeyEvent>
 #include "MariaUI.h"
 #include "MariaLogic.h"
-#include "MariaInterpreter.h"
 
 const float MariaUI::FLOW_FACTOR = 0.1;
 const float MariaUI::VALUE_THRESHOLD = 1.0;
@@ -124,6 +123,19 @@ void MariaUI::updateBackgroundColor() {
 	this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
 }
 
+void MariaUI::showHideEvent() {
+	if(isVisible()) {
+		setWindowState(Qt::WindowState::WindowMinimized);
+		trayIcon->show();
+		trayIcon->showMessage("M.A.R.I.A. is still running!", "Press Ctrl + Space to show M.A.R.I.A.\nType \'exit\' to quit the program.");
+		hide();
+	} else {
+		setWindowState(Qt::WindowState::WindowActive);
+		trayIcon->hide();
+		show();
+	}
+}
+
 void MariaUI::resizeEvent(QResizeEvent* event) {
 	QWidget::resizeEvent(event);
 }
@@ -139,11 +151,6 @@ bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
 				}
 			} else {
 				_commandBar->getTextbox()->setSuggestText("");
-				if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
-					_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
-				} else {
-					_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
-				}
 			}
 		}
 	}
@@ -166,21 +173,23 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	} else if(keyPressed == Qt::Key_Down) {
 		_mariaLogic->processCommand_New("down");
 	} else {
+		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
+			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
+		} else {
+			if(_commandBar->getTextbox()->getUserInput().length() > 0) {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
+			} else {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+			}
+
+		}
 		event->ignore();
 	}
 }
 
-void MariaUI::showHideEvent() {
-	if(isVisible()) {
-		setWindowState(Qt::WindowState::WindowMinimized);
-		trayIcon->show();
-		trayIcon->showMessage("M.A.R.I.A. is still running!", "Press Ctrl + Space to show M.A.R.I.A.\nType \'exit\' to quit the program.");
-		hide();
-	} else {
-		setWindowState(Qt::WindowState::WindowActive);
-		trayIcon->hide();
-		show();
-	}
+void MariaUI::forceLogicCall() {
+	//Overwrite for UI classes to initiate a call to logic instead of through keyboards.
+	_mariaLogic->generateTextforUI();
 }
 
 void MariaUI::setExpand(bool value) {

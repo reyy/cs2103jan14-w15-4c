@@ -88,12 +88,6 @@
     <ClCompile Include="MariaUIPreview.cpp">
       <Filter>User Interface\Elements</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MariaUIPreview.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MariaUIPreview.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MariaUITextbox.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>

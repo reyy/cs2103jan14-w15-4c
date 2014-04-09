@@ -90,7 +90,7 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 
 	for(MariaTask* temp : *taskList) {
 		if(temp->getType() == type) {
-		switch(type) {
+			switch(type) {
 			case MariaTask::TaskType::DEADLINE:
 				if(temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
 					returnList.push_back(temp);
@@ -137,6 +137,18 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type, bool add
 	return returnList;
 }
 
+vector<MariaTask*> MariaTaskManager::getWeeklyTask() {
+	//Manually set start and end time to return the task for the next 7 days from now.
+	MariaTime* startTime = &MariaTime::getCurrentTime();
+	startTime->setHour(0);
+	startTime->setMin(0);
+	MariaTime* endTime =  &MariaTime::getCurrentTime();
+	endTime->setDay(startTime->getDay()+7);
+	endTime->setHour(23);
+	endTime->setMin(59);
+	return findTask(startTime,endTime);
+}
+
 vector<MariaTask*> MariaTaskManager::getAllTasks() {
 	assert(taskList!=NULL);
 
@@ -147,7 +159,7 @@ bool MariaTaskManager::archiveTask(MariaTask* task) {
 	assert(task!=NULL);
 
 	this->notifyAction(task);
-	
+
 	auto it = std::find(taskList->begin(), taskList->end(), task);
 
 	if(it != taskList->end()) {
@@ -157,7 +169,7 @@ bool MariaTaskManager::archiveTask(MariaTask* task) {
 	} else {
 		return false;
 	}
-	
+
 }
 
 int MariaTaskManager::compareToPreviousQuery() {
@@ -256,7 +268,7 @@ MariaTask* MariaTaskManager::undoLast() {
 	MariaTask* taskPointer = (undoList->back())->first;
 	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
-	
+
 	if(it != taskList->end()) {
 		toReturn = (undoList->back())->first;
 		if(oldTask == NULL) { 
@@ -268,9 +280,9 @@ MariaTask* MariaTaskManager::undoLast() {
 			/*delete taskPointer; //delete current task
 			taskList->erase(it);
 			for(pair<MariaTask*,MariaTask*> *p : *undoList) {
-				if(p->first == taskPointer) {
-					p->first = oldTask;
-				}
+			if(p->first == taskPointer) {
+			p->first = oldTask;
+			}
 			}
 			taskList->push_back(oldTask);
 			sortTasks();*/
@@ -295,10 +307,10 @@ MariaTask* MariaTaskManager::undoLast() {
 }
 
 void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
-	
+
 	MariaTask *oldTask = NULL;
 	MariaTask *taskPointer = NULL;
-	
+
 	for(int i = 0; i<taskList->size(); i++) {
 		if(((MariaTask*)task) == (*taskList)[i]){
 			taskPointer = (*taskList)[i];

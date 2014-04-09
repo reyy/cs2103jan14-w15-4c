@@ -29,7 +29,7 @@ private:
 	bool timerEndState();
 
 public:
-	MariaUIStateShow(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string title, vector<MariaTask*> listOfTasks);
+	MariaUIStateShow(QMainWindow* qmainWindow, string title, vector<MariaTask*> listOfTasks);
 	~MariaUIStateShow();
 	
 	void updateGUI();

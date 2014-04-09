@@ -16,8 +16,7 @@ public:
 	static const int MAX_ITEM_IN_PAGE = 3;
 
 private:
-
-	string _conflictTaskTitle;
+	vector<MariaTask*> _conflictedTask;
 
 	void initBeginState();
 	void initActiveState();
@@ -27,7 +26,7 @@ private:
 	bool timerEndState();
 
 public:
-	MariaUIStateConflict(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string conflictTaskTitle);
+	MariaUIStateConflict(QMainWindow* qmainWindow, vector<MariaTask*> conflictedTask);
 	~MariaUIStateConflict();
 
 	void updateGUI();

@@ -73,7 +73,8 @@ protected:
 public:
 	MariaUI(MariaLogic *mariaLogic, QWidget *parent = 0);
 	~MariaUI(void);
-
+	
+	void forceLogicCall();
 	void setExpand(bool value);
 	bool getExpand();
 	void setBackgroundColor(int r, int g, int b);

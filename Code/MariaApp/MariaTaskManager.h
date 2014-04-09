@@ -19,6 +19,7 @@ public:
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, bool addToHistory = true);
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type, bool addToHistory = true);
 	vector<MariaTask*> findTask(MariaTask::TaskType type, bool addToHistory = true);
+	vector<MariaTask*> getWeeklyTask();
 	vector<MariaTask*> getAllTasks();
 
 	int compareToPreviousQuery();

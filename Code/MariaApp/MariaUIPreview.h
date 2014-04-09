@@ -2,14 +2,11 @@
 #include <string>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
-#include <QtCore/QTimer>
 #include "MariaTaskManager.h"
 
 using namespace std;
 
 class MariaUIPreview : QWidget {
-	Q_OBJECT
-
 public:
 	static const string PREVIEW_EVENT_TOMORROW_NONE;
 	static const string PREVIEW_EVENT_TOMORROW;
@@ -43,27 +40,24 @@ public:
 
 private:
 	QMainWindow *_qmainWindow;
-	MariaTaskManager *_taskManager;
-	
-	QTimer *_updateTextTimer;
+
 	QLabel *_mainText;
 
-	MariaTask *_generatedSuggestionTask;
-	
-	string generateTodayText();
-	string generateTomorrowText();
-
-	//Force denotes whether to generate a new task instead of using the existing store task.
-	string generateSuggestionText(bool force);
-
-public slots:
-	void updateText();
+	string _generatedTodayText;
+	string _generatedTomorrowText;
+	string _generatedSuggestionText;
 
 public:
-	MariaUIPreview(QMainWindow *qmainWindow,MariaTaskManager *taskManager);
+	MariaUIPreview(QMainWindow *qmainWindow);
 	~MariaUIPreview();
 
-	void startUpdating();
 	void updateGUI(QPointF statePosition);
+	void updateText();
+
+	string generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine);
+	string generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine);
+
+	//Force denotes whether to generate a new task instead of using the existing store task.
+	string generateSuggestionText(vector<MariaTask*> taskListSuggest);
 };
 

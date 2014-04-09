@@ -24,42 +24,59 @@ const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was cre
 const float MariaUIPreview::START_HEIGHT_SCALE = 0.28;
 const float MariaUIPreview::MESSAGE_HEIGHT = 220;
 
-MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow,MariaTaskManager *taskManager) {
+MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	_qmainWindow=qmainWindow;
-	_taskManager=taskManager;
 
 	_mainText = new QLabel(_qmainWindow);
 	_mainText->setAlignment(Qt::AlignJustify);
 	_mainText->setStyleSheet("padding-left:" + QString::number(TEXTBOX_X_OFFSET) + "px;padding-right:" + QString::number(TEXTBOX_X_OFFSET) + "px; color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
 	_mainText->setWordWrap(true);
-	_mainText->hide();
+	_mainText->show();
 
-	_generatedSuggestionTask = NULL;
-
-	_updateTextTimer = new QTimer(this);
-	connect(_updateTextTimer, SIGNAL(timeout()), this, SLOT(updateText()));
+	_generatedTodayText = "";
+	_generatedTomorrowText = "";
+	_generatedSuggestionText = "";
 }
 
 MariaUIPreview::~MariaUIPreview() {
-	delete _updateTextTimer;
 	delete _mainText;
 }
 
-string MariaUIPreview::generateTodayText() {
+void MariaUIPreview::updateText() {
+	string toPrint;
+	string temp;
+
+	temp += _generatedTodayText;
+
+	if(temp.length()>0) {
+		temp += "\n";
+	}
+
+	toPrint += temp;
+	temp = _generatedTomorrowText;
+
+	if(temp.length()>0) {
+		temp += "\n";
+	}
+
+	toPrint += temp;
+	toPrint += _generatedSuggestionText;
+
+	_mainText->setText(QString::fromStdString(toPrint));
+}
+
+void MariaUIPreview::updateGUI(QPointF statePosition) {
+	_mainText->setGeometry(QRect(statePosition.x(), 
+		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width(), MESSAGE_HEIGHT));
+}
+
+string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine) {
 	string toReturn;
-
-	MariaTime now=MariaTime::getCurrentTime();
-	MariaTime startOfDay(now.getYear(),now.getMonth(), now.getDay(), 0, 0);
-	MariaTime endOfDay(now.getYear(),now.getMonth(), now.getDay(), 23, 59);
-
 	char buffer[STRING_BUFFER_SIZE];
 
 	//Today's Task.
-	vector<MariaTask*> taskListNow = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED, false);
-	vector<MariaTask*> taskListAll = _taskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED, false);
-	
 	if(taskListNow.size() > 0) {
-		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &now);
+		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &MariaTime::getCurrentTime());
 
 		if(taskListAll.size() - taskListNow.size() == 0) {
 			if(withinTheHour >= 0 ) {//Check if event has passed.
@@ -81,22 +98,18 @@ string MariaUIPreview::generateTodayText() {
 			}
 		}
 	} else {
-		/* MAY BE REMOVED.
 		sprintf_s(buffer, PREVIEW_EVENT_TODAY_NONE.c_str());
 		toReturn+=buffer;
-		*/
 	}
 
 	//Today's Deadline.
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE, false);
-
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
 			toReturn+="\n\n";
 		}
 
 		if(taskListDeadLine.size() == 1) {
-			int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &now);
+			int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &MariaTime::getCurrentTime());
 
 			if(withinTheHour >= 0 ) {//Check if event has passed.
 				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
@@ -116,8 +129,8 @@ string MariaUIPreview::generateTodayText() {
 				toReturn += PREVIEW_DEADLINE_ITEM_TRIM;
 			}
 			for(int i = 0; i < maxTask; i++){
-				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &now);
-				
+				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(i)->getEnd(), &MariaTime::getCurrentTime());
+
 				if(withinTheHour >= 0 ) {//Check if event has passed.
 					if(withinTheHour < 60 * 60 && withinTheHour > 1) {
 						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), taskListDeadLine.at(i)->getTitle().c_str(), std::to_string(withinTheHour/60).c_str());
@@ -130,110 +143,59 @@ string MariaUIPreview::generateTodayText() {
 		}
 	}
 
+	_generatedTodayText = toReturn;
 	return toReturn;
 }
 
-string MariaUIPreview::generateTomorrowText() {
+string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine) {
 	string toReturn;
-
-	MariaTime now=MariaTime::getCurrentTime();
-	MariaTime startOfTomorrow(now.getYear(),now.getMonth(), now.getDay()+1, 0, 0);
-	MariaTime endOfTomorrow(now.getYear(),now.getMonth(), now.getDay()+1, 23, 59);
-
 	char buffer[STRING_BUFFER_SIZE];
-	
-	//Tomorrow's Task
-	vector<MariaTask*> taskList = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED, false);
 
-	if(taskList.size()>0) {
-		if(taskList.size()==1) {
-			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertToTimeString(taskList.at(0)->getStart()).c_str());
+	//Tomorrow's Task
+	if(taskListTomorrow.size()>0) {
+		if(taskListTomorrow.size()==1) {
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
 			toReturn+=buffer;
 		} else {
-			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskList.size(), MariaTime::convertToTimeString(taskList.at(0)->getStart()).c_str());
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskListTomorrow.size(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
 			toReturn+=buffer;
 		}
 	} else {
-		/* MAY BE REMOVED
 		sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_NONE.c_str());
 		toReturn+=buffer;
-		*/
 	}
 
 	//Tomorrow's Deadline
-	vector<MariaTask*> taskListDeadLine = _taskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
-
-	if(taskListDeadLine.size() > 0) {
+	if(taskListTomorrowDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
 			toReturn+="\n\n";
 		}
 
-		if(taskListDeadLine.size() == 1) {
-			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
+		if(taskListTomorrowDeadLine.size() == 1) {
+			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrowDeadLine.at(0)->getEnd()).c_str());
 			toReturn+=buffer;
 		} else {
-			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW_MUTIPLE.c_str(), taskListDeadLine.size());
+			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW_MUTIPLE.c_str(), taskListTomorrowDeadLine.size());
 			toReturn+=buffer;
 		}
 	}
 
+	_generatedTomorrowText = toReturn;
 	return toReturn;
 }
 
-string MariaUIPreview::generateSuggestionText(bool force) {
+string MariaUIPreview::generateSuggestionText(vector<MariaTask*> taskListSuggest) {
 	string toReturn;
-
-	vector<MariaTask*> taskList = _taskManager->findTask(MariaTask::TaskType::FLOATING, false);
-
 	char buffer[STRING_BUFFER_SIZE];
 
-	if(taskList.size() > 0) {
-		if(_generatedSuggestionTask == NULL||force) {
-			_generatedSuggestionTask = taskList.at(rand() % taskList.size());
-		} else {
-			string dateCreated = MariaTime::convertToDateString(_generatedSuggestionTask->getCreated());
-			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), _generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
-			toReturn+=buffer;
-		}
-	} else {
-		_generatedSuggestionTask = NULL;
-	}
+	if(taskListSuggest.size() > 0) {
+		MariaTask* generatedSuggestionTask = taskListSuggest.at(rand() % taskListSuggest.size());
 
+		string dateCreated = MariaTime::convertToDateString(generatedSuggestionTask->getCreated());
+		sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
+		toReturn+=buffer;
+	}
+	
+	_generatedSuggestionText = toReturn;
 	return toReturn;
-}
-
-void MariaUIPreview::updateText() {
-	string toPrint;
-	string temp;
-
-	temp += generateTodayText();
-
-	if(temp.length()>0) {
-		temp+="\n";
-	}
-
-	toPrint+=temp;
-	temp = generateTomorrowText();
-
-	if(temp.length()>0) {
-		temp+="\n";
-	}
-
-	toPrint+=temp;
-	toPrint+=generateSuggestionText(false);
-
-	_mainText->setText(QString::fromStdString(toPrint));
-}
-
-void MariaUIPreview::startUpdating() {
-	if(!_updateTextTimer->isActive()) {
-		_updateTextTimer->start(UPDATE_FREQUENCY);
-		_mainText->show();
-		updateText();
-	}
-}
-
-void MariaUIPreview::updateGUI(QPointF statePosition) {
-	_mainText->setGeometry(QRect(statePosition.x(), 
-		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width(), MESSAGE_HEIGHT));
 }

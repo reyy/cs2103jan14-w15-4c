@@ -1,13 +1,11 @@
 #include <assert.h> 
 #include "MariaUIStateConflict.h"
 #include "MariaUI.h"
-#include "MariaTaskManager.h"
-
 const float MariaUIStateConflict::TASKBAR_STARTHEIGHT_SCALE = 0.1;
 const float MariaUIStateConflict::TASK_STARTHEIGHT_SCALE = 0.2;
 
-MariaUIStateConflict::MariaUIStateConflict(QMainWindow* qmainWindow, MariaTaskManager *taskManager, string conflictTaskTitle) : MariaUIStateDisplay(qmainWindow, taskManager, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
-	_conflictTaskTitle = conflictTaskTitle;
+MariaUIStateConflict::MariaUIStateConflict(QMainWindow* qmainWindow, vector<MariaTask*> conflictedTask) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
+	_conflictedTask = conflictedTask;
 }
 
 MariaUIStateConflict::~MariaUIStateConflict() {
@@ -22,8 +20,7 @@ void MariaUIStateConflict::initBeginState() {
 }
 
 void MariaUIStateConflict::initActiveState() {
-	vector<MariaTask*> tempList = _taskManager->findTask(_conflictTaskTitle);
-	for(MariaTask* temp : tempList) {
+	for(MariaTask* temp : _conflictedTask) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::EXPANDED);
 	}
 	updateUITaskNumber();

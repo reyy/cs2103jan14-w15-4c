@@ -22,10 +22,10 @@ public:
 	bool processCommand_New(std::string inputText);
 	bool processUndo();
 	void terminateProgram();
+	void generateTextforUI();
 
 public slots:
 	void doShowHide();
-	
 
 private:
 	MariaUI				*mariaUI;
@@ -35,6 +35,5 @@ private:
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 
-	
 	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };
