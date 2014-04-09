@@ -95,7 +95,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 		case MariaInputObject::COMMAND_TYPE::EXIT: {
 			MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
 			mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
-			temp->setDisplayText("Saving");
+			temp->setDisplayText("Good Bye!");
 			temp->setLoadingDone();
 			temp->setQuitAfterLoadingTrue();
 			mariaStateManager->transitState();
