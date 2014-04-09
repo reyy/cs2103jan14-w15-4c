@@ -146,7 +146,7 @@ vector<MariaTask*> MariaTaskManager::getWeeklyTask() {
 	endTime->setDay(startTime->getDay()+7);
 	endTime->setHour(23);
 	endTime->setMin(59);
-	return findTask(startTime,endTime);
+	return findTask(startTime,endTime,true);
 }
 
 vector<MariaTask*> MariaTaskManager::getAllTasks() {
