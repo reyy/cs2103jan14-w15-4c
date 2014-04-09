@@ -105,7 +105,7 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 	//Today's Deadline.
 	if(taskListDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
-			toReturn+="\n\n";
+			toReturn+="\n";
 		}
 
 		if(taskListDeadLine.size() == 1) {
@@ -168,7 +168,7 @@ string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow,
 	//Tomorrow's Deadline
 	if(taskListTomorrowDeadLine.size() > 0) {
 		if(toReturn.length()>0) {
-			toReturn+="\n\n";
+			toReturn+="\n";
 		}
 
 		if(taskListTomorrowDeadLine.size() == 1) {
