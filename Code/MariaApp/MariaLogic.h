@@ -8,7 +8,6 @@
 #include "MariaUI.h"
 #include "MariaStateManager.h"
 #include "MariaInterpreter.h"
-#include "MariaInterpreter_New.h"
 #include "MariaTaskManager.h"
 #include "MariaFileManager.h"
 
@@ -19,7 +18,6 @@ public:
 
 	bool checkValidCommand(std::string inputText);
 	bool processCommand(std::string inputText);
-	bool processCommand_New(std::string inputText);
 	bool processUndo();
 	void terminateProgram();
 	void generateTextforUI();
@@ -30,8 +28,7 @@ public slots:
 private:
 	MariaUI				*mariaUI;
 	MariaStateManager	*mariaStateManager;
-	//MariaInterpreter	*mariaInterpreter;
-	MariaInterpreter_New *mariaInterpreter;
+	MariaInterpreter	*mariaInterpreter;
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 

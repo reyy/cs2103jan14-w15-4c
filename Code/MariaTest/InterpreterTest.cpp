@@ -7,7 +7,7 @@ namespace MariaTest {
 	TEST_CLASS(Interpreter_New) {
 	public:
 		TEST_METHOD(I2_AddFloatingTask) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "add Buy apples";
 			string expectedTitle = "Buy apples";
@@ -28,7 +28,7 @@ namespace MariaTest {
 		}
 
 		TEST_METHOD(I2_AddDeadlineTask) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "add Buy apples by Sunday";
 			string expectedTitle = "Buy apples";
@@ -68,7 +68,7 @@ namespace MariaTest {
 		}
 
 		TEST_METHOD(I2_AddTimedTask) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "add Buy apples from today to tomorrow";
 			string expectedTitle = "Buy apples";
@@ -103,7 +103,7 @@ namespace MariaTest {
 		}
 
 		TEST_METHOD(I2_EditTitle) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "edit apple change title banana";
 			string expectedTitle = "apple";
@@ -126,7 +126,7 @@ namespace MariaTest {
 		}
 
 		TEST_METHOD(I2_EditStartTime) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "edit apple change start Sunday";
 			string expectedTitle = "apple";
@@ -166,7 +166,7 @@ namespace MariaTest {
 		}
 
 		TEST_METHOD(I2_EditEndTime) {
-			MariaInterpreter_New* program = new MariaInterpreter_New();
+			MariaInterpreter* program = new MariaInterpreter();
 
 			string input = "edit apple change end Sunday";
 			string expectedTitle = "apple";

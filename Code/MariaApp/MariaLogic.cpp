@@ -8,7 +8,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
 
 	//mariaInterpreter = new MariaInterpreter();
-	mariaInterpreter = new MariaInterpreter_New();
+	mariaInterpreter = new MariaInterpreter();
 	mariaFileManager = new MariaFileManager();
 	for(int i = 0; i < 3; i++){
 		try{
@@ -74,7 +74,7 @@ bool MariaLogic::checkValidCommand(std::string inputText) {
 	return mariaInterpreter->checkValidCommand(inputText);
 }
 
-bool MariaLogic::processCommand_New(std::string inputText) {
+bool MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
@@ -219,13 +219,14 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
 				} else {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar tasks, which one should I edit?");
-					
+
 					mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 					mariaStateManager->transitState();
 				}
 			}
 		}
 		break;
+
 		case MariaInputObject::COMMAND_TYPE::EDIT_END_TIME: {
 			string toEditTitle = input->getTitle();
 
@@ -260,7 +261,7 @@ bool MariaLogic::processCommand_New(std::string inputText) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
 				} else {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are similar tasks, which one should I edit?");
-					
+
 					mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 					mariaStateManager->transitState();
 				}
