@@ -275,11 +275,13 @@ void MariaUIStateDisplay::updateTitleText() {
 		}
 	}
 
-	toShow += "\n";
+	if(toShow.length() > 0) {
+		toShow += "\n";
+	}
 
 	if(offsetAfterPage > 0) {
 		toShow += to_string(offsetAfterPage);
-		if(offsetBeforePage > 1) {
+		if(offsetAfterPage > 1) {
 			toShow +=  + " items down below";
 		} else {
 			toShow +=  + " item down below";
