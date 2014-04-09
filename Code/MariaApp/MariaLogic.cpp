@@ -108,6 +108,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
 				if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+				} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
@@ -122,6 +124,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
 				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+				} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
@@ -136,6 +140,8 @@ bool MariaLogic::processCommand(std::string inputText) {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("Task '" + input->getTitle() + "' has been added!");
 				if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+				} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 			} else {
@@ -165,7 +171,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(toEditTitle, false);
 
 				if (listOfTasks.size() == 1) {
-					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setTitle(input->getEditField());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
@@ -207,7 +213,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				if (listOfTasks.size() == 1) {
 					//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
 					//still enable updating but no visual cues.
-					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setStart(input->getEditTime());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
@@ -249,7 +255,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 				if (listOfTasks.size() == 1) {
 					//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
 					//still enable updating but no visual cues.
-					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
+					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setEnd(input->getEditTime());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
