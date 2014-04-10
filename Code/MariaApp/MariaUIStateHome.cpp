@@ -29,6 +29,9 @@ void MariaUIStateHome::initActiveState() {
 	for(MariaTask* temp : _weekTask) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
 	}
+
+	updateUITaskPosition();
+	updatePage();
 }
 
 void MariaUIStateHome::initEndState() {

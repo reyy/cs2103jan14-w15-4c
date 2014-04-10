@@ -1,33 +1,33 @@
-#include "MariaUIStateSetting.h"
+#include "MariaUIStateHelp.h"
 #include "MariaUI.h"
 
-MariaUIStateSetting::MariaUIStateSetting(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
 	_qmainWindow = qmainWindow;
 }
 
-MariaUIStateSetting::~MariaUIStateSetting() {
+MariaUIStateHelp::~MariaUIStateHelp() {
 }
 
-void MariaUIStateSetting::initBeginState() {
-	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*0.3);
-}
-
-void MariaUIStateSetting::initActiveState() {
-	
-}
-
-void MariaUIStateSetting::initEndState() {
+void MariaUIStateHelp::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
 }
 
-bool MariaUIStateSetting::timerBeginState() {
+void MariaUIStateHelp::initActiveState() {
+	
+}
+
+void MariaUIStateHelp::initEndState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+}
+
+bool MariaUIStateHelp::timerBeginState() {
 	return false;
 }
 
-bool MariaUIStateSetting::timerActiveState() {
+bool MariaUIStateHelp::timerActiveState() {
 	return false;
 }
 
-bool MariaUIStateSetting::timerEndState() {
+bool MariaUIStateHelp::timerEndState() {
 	return false;
 }

@@ -210,10 +210,9 @@
     <ClCompile Include="MariaUIPreview.cpp" />
     <ClCompile Include="MariaUIStateConflict.cpp" />
     <ClCompile Include="MariaUIStateDisplay.cpp" />
-    <ClCompile Include="MariaUIStateEdit.cpp" />
+    <ClCompile Include="MariaUIStateHelp.cpp" />
     <ClCompile Include="MariaUIStateHome.cpp" />
     <ClCompile Include="MariaUIStateLoading.cpp" />
-    <ClCompile Include="MariaUIStateSetting.cpp" />
     <ClCompile Include="MariaUIStateShow.cpp" />
     <ClCompile Include="MariaUIStatus.cpp" />
     <ClCompile Include="MariaUITask.cpp" />
@@ -244,6 +243,7 @@
     <ClInclude Include="MariaInputObject.h" />
     <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
+    <ClInclude Include="MariaUIStateHelp.h" />
     <ClInclude Include="MariaUIStateType.h" />
     <ClInclude Include="MariaUndoObserver.h" />
     <CustomBuild Include="MariaStateManager.h">
@@ -349,7 +349,6 @@
     </CustomBuild>
     <ClInclude Include="MariaUIStateConflict.h" />
     <ClInclude Include="MariaUIStateDisplay.h" />
-    <ClInclude Include="MariaUIStateEdit.h" />
     <CustomBuild Include="MariaUIStateHome.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </Message>
@@ -377,7 +376,6 @@
       </Command>
     </CustomBuild>
     <ClInclude Include="MariaUIStateLoading.h" />
-    <ClInclude Include="MariaUIStateSetting.h" />
     <ClInclude Include="MariaUIStateShow.h" />
     <CustomBuild Include="MariaUITask.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

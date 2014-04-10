@@ -2,7 +2,7 @@
 
 const float MariaUICommandBar::DEFAULT_X_POSITION = 0.0;
 const float MariaUICommandBar::DEFAULT_Y_POSITION = -200.0;
-const float MariaUICommandBar::FLOW_FACTOR = 0.01;
+const float MariaUICommandBar::FLOW_FACTOR = 0.05;
 const float MariaUICommandBar::VALUE_THRESHOLD = 5.0;
 
 MariaUICommandBar::MariaUICommandBar(QMainWindow *qmainWindow) {
