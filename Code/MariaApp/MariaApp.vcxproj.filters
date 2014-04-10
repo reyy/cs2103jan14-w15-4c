@@ -1,4 +1,4 @@
-ï»¿<?xml version="1.0" encoding="utf-8"?>
+¿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="MariaFileManager.cpp" />
@@ -51,16 +51,10 @@
     <ClCompile Include="MariaUIStateConflict.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
-    <ClCompile Include="MariaUIStateEdit.cpp">
-      <Filter>User Interface\States</Filter>
-    </ClCompile>
     <ClCompile Include="MariaUIStateHome.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
     <ClCompile Include="MariaUIStateLoading.cpp">
-      <Filter>User Interface\States</Filter>
-    </ClCompile>
-    <ClCompile Include="MariaUIStateSetting.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
     <ClCompile Include="MariaUIStateShow.cpp">
@@ -93,9 +87,10 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITextbox.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="MariaLogic.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MariaUIStateHelp.cpp">
+      <Filter>User Interface\States</Filter>
     </ClCompile>
+    <ClCompile Include="MariaLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -109,13 +104,7 @@
     <ClInclude Include="MariaUIStateConflict.h">
       <Filter>User Interface\States</Filter>
     </ClInclude>
-    <ClInclude Include="MariaUIStateEdit.h">
-      <Filter>User Interface\States</Filter>
-    </ClInclude>
     <ClInclude Include="MariaUIStateLoading.h">
-      <Filter>User Interface\States</Filter>
-    </ClInclude>
-    <ClInclude Include="MariaUIStateSetting.h">
       <Filter>User Interface\States</Filter>
     </ClInclude>
     <ClInclude Include="MariaUIStateShow.h">
@@ -129,7 +118,8 @@
       <Filter>User Interface\States</Filter>
     </ClInclude>
     <ClInclude Include="MariaMacros.h">
-      <Filter>Generated Files</Filter>
+    <ClInclude Include="MariaUIStateHelp.h">
+      <Filter>User Interface\States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

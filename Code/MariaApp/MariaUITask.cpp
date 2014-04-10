@@ -2,7 +2,7 @@
 #include "MariaUITask.h"
 #include "MariaTime.h"
 
-const float MariaUITask::START_END_TIME_WIDTH = 90.0;
+const float MariaUITask::START_END_TIME_WIDTH = 100.0;
 const float MariaUITask::FLOW_FACTOR = 0.1;
 const float MariaUITask::VALUE_THRESHOLD = 1.0;
 const float MariaUITask::FONT_SIZE_TITLE = 16.0;

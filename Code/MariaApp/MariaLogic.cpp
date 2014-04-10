@@ -1,6 +1,7 @@
 #include "MariaLogic.h"
 #include "MariaUIStateLoading.h"
 #include "MariaUIStateHome.h"
+#include "MariaUIStateHelp.h"
 #include "MariaUIStateShow.h"
 #include "MariaUIStateConflict.h"
 
@@ -27,6 +28,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	temp->setDisplayText("Loading");
 	temp->setLoadingDone();
 
+	//mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHelp((QMainWindow*)mariaUI));
 
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 	mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
@@ -60,9 +62,9 @@ bool MariaLogic::processUndo() {
 			((MariaUIStateHome*)currentObj)->eraseUITask(changed);
 		} else if (taskCountDifference > 0) {
 			((MariaUIStateHome*)currentObj)->addUITask(changed, MariaUITask::DISPLAY_TYPE::NORMAL);
+			((MariaUIStateHome*)currentObj)->setPageEnd();
 		}
 		mariaTaskManager->compareToPreviousQuery();
-		((MariaUIStateHome*)currentObj)->updateUITask();
 		return true;
 	}
 	return false;
@@ -110,6 +112,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				((MariaUIStateHome*)currentObj)->setPageEnd();
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -126,6 +129,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				((MariaUIStateHome*)currentObj)->setPageEnd();
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -142,6 +146,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					((MariaUIStateHome*)currentObj)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 				}
 				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				((MariaUIStateHome*)currentObj)->setPageEnd();
 			} else {
 				mariaUI->getCommandBar()->getTextbox()->setQuestionText("There is a problem adding '" + inputText + "'");
 			}
@@ -150,13 +155,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 
 		case MariaInputObject::COMMAND_TYPE::EDIT_TITLE: {
 			string toEditTitle = input->getTitle();
-
-			//Jay: Pending splitting up of conflict and non conflict.
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::CONFLICT) {
 				int numberToEdit = input->getOptionID();
 				MariaUIStateConflict* tempObj = (MariaUIStateConflict*)currentObj;
-				if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
-					//TO DO, transit to edit state.
+				if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 					MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 					toEditTask->getMariaTask()->setTitle(input->getEditField());
 					mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
@@ -172,10 +174,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setTitle(input->getEditField());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
-						tempObj->updateUITask();
-						tempObj->updatePage();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -214,10 +213,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setStart(input->getEditTime());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
-
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
-						tempObj->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -256,10 +252,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setEnd(input->getEditTime());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
-
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Consider it done!");
-						tempObj->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -297,10 +290,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 						listOfTasks[0]->setDescription(input->getEditField());
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-						MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)currentObj;
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the description.");
-						tempObj->updateUITask();
-						tempObj->updatePage();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -431,7 +421,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 						listOfTasks[0]->setIsDone(true);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toMarkTitle + "' has been completed!");
-						((MariaUIStateHome*)currentObj)->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -469,7 +458,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 						listOfTasks[0]->setIsDone(false);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
 						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toMarkTitle + "' has been completed!");
-						((MariaUIStateHome*)currentObj)->updateUITask();
 					}
 				} else if (listOfTasks.size() == 0) {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("I couldn't find anything related. Try again.");
@@ -504,7 +492,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 			if (tempObj->isAllTaskAtLocation()) {
 				if (tempObj->isPageValid(tempObj->getPage()-1)) {
 					tempObj->setPage(tempObj->getPage()-1);
-					tempObj->updatePage();
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going up.");
 				} else {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items up there.");
@@ -518,7 +505,6 @@ bool MariaLogic::processCommand(std::string inputText) {
 			if (tempObj->isAllTaskAtLocation()) {
 				if (tempObj->isPageValid(tempObj->getPage()+1)) {
 					tempObj->setPage(tempObj->getPage()+1);
-					tempObj->updatePage();
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("Going down.");
 				} else {
 					mariaUI->getCommandBar()->getTextbox()->setQuestionText("There are no more items down there.");
@@ -527,6 +513,9 @@ bool MariaLogic::processCommand(std::string inputText) {
 		}
 		break;
 	}
+
+	//Overall UI Refresh
+	((MariaUIStateDisplay*)currentObj)->updatePage();
 
 	// Clean up.
 	SAFE_DELETE(input);

@@ -4,7 +4,7 @@
 #include <QtWidgets/qlabel.h>
 #include "MariaStateObject.h"
 
-class MariaUIStateEdit : public MariaStateObject {
+class MariaUIStateHelp : public MariaStateObject {
 	
 	QMainWindow *_qmainWindow;
 
@@ -15,7 +15,7 @@ class MariaUIStateEdit : public MariaStateObject {
 	bool timerActiveState();
 	bool timerEndState();
 public:
-	MariaUIStateEdit(QMainWindow* qmainWindow);
-	~MariaUIStateEdit();
+	MariaUIStateHelp(QMainWindow* qmainWindow);
+	~MariaUIStateHelp();
 };
 

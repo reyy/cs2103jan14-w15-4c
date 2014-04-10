@@ -1,6 +1,6 @@
 #include "MariaStateObject.h"
 
-const float MariaStateObject::FLOW_FACTOR = 0.01;
+const float MariaStateObject::FLOW_FACTOR = 0.05;
 const float MariaStateObject::VALUE_THRESHOLD = 1.0;
 
 MariaStateObject::MariaStateObject(QMainWindow* qmainWindow) {

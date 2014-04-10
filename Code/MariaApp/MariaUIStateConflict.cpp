@@ -23,7 +23,10 @@ void MariaUIStateConflict::initActiveState() {
 	for(MariaTask* temp : _conflictedTask) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::EXPANDED);
 	}
+
 	updateUITaskNumber();
+	updateUITaskPosition();
+	updatePage();
 }
 
 void MariaUIStateConflict::initEndState() {

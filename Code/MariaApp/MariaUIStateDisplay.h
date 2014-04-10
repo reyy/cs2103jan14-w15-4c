@@ -32,9 +32,7 @@ public:
 	~MariaUIStateDisplay();
 
 	MariaUITask* addUITask(MariaTask *task, MariaUITask::DISPLAY_TYPE type);
-	void updateUITask();
-	void updateUITaskDestination(QPointF destination);
-	void updateUITaskPosition(QPointF position);
+	void updateUITaskPosition();
 	void updateUITaskNumber();
 	MariaUITask* eraseUITask(int index);
 	MariaUITask* eraseUITask(MariaTask* task);

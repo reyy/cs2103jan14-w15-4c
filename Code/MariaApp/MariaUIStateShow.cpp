@@ -34,6 +34,9 @@ void MariaUIStateShow::initActiveState() {
 	for(MariaTask* temp : _listOfTasks) {
 		addUITask(temp, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 	}
+
+	updateUITaskPosition();
+	updatePage();
 }
 
 void MariaUIStateShow::initEndState() {
