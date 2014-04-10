@@ -21,6 +21,7 @@ MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) 
 	initBackgroundColor(WINDOW_DEFAULT_COLOR_R, WINDOW_DEFAULT_COLOR_G, WINDOW_DEFAULT_COLOR_B);
 	_commandBar = new MariaUICommandBar(this);
 	_commandBar->getTextbox()->setFocus();
+	_commandBar->getTextbox()->setQuestionText("How can I help you?");
 	show();
 
 	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
@@ -167,7 +168,15 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
 		}
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
-		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+		try {
+			string result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+			if(result != "") {
+				_commandBar->getTextbox()->setQuestionText(result);
+			}
+		} catch (exception& e) {
+			_commandBar->getTextbox()->setQuestionText(e.what());
+			_commandBar->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
+		}
 	} else if(keyPressed == Qt::Key_Up) {
 		_mariaLogic->processCommand("up");
 	} else if(keyPressed == Qt::Key_Down) {

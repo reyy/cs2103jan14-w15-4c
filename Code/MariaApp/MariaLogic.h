@@ -17,7 +17,7 @@ public:
 	~MariaLogic(void);
 
 	bool checkValidCommand(std::string inputText);
-	bool processCommand(std::string inputText);
+	string processCommand(std::string inputText);
 	bool processUndo();
 	void terminateProgram();
 	void generateTextforUI();
@@ -32,26 +32,37 @@ private:
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 
+	void initWindowIcon();
+	void initComponents();
+	void initTaskManager();
+	void initLoadingScreen();
+	void initShowHideWrapper();
+
 	void runCommandExit(MariaInputObject* input, MariaStateObject* state);
-	void runCommandAddFloatingTask(MariaInputObject* input, MariaStateObject* state);
-	void runCommandAddDeadlineTask(MariaInputObject* input, MariaStateObject* state);
-	void runCommandAddTimedTask(MariaInputObject* input, MariaStateObject* state);
-	void runCommandEditTitle(MariaInputObject* input, MariaStateObject* state);
-	void runCommandEditStartTime(MariaInputObject* input, MariaStateObject* state);
-	void runCommandEditEndTime(MariaInputObject* input, MariaStateObject* state);
-	void runCommandEditDescription(MariaInputObject* input, MariaStateObject* state);
-	void runCommandShowDate(MariaInputObject* input, MariaStateObject* state);
-	void runCommandShowDateRange(MariaInputObject* input, MariaStateObject* state);
-	void runCommandShowAll(MariaInputObject* input, MariaStateObject* state);
-	void runCommandSearch(MariaInputObject* input, MariaStateObject* state);
-	void runCommandDeleteTask(MariaInputObject* input, MariaStateObject* state);
-	void runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state);
-	void runCommandMarkDone(MariaInputObject* input, MariaStateObject* state);
-	void runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state);
-	void runCommandUndo(MariaInputObject* input, MariaStateObject* state);
-	void runCommandGoHome(MariaInputObject* input, MariaStateObject* state);
-	void runCommandPageUp(MariaInputObject* input, MariaStateObject* state);
-	void runCommandPageDown(MariaInputObject* input, MariaStateObject* state);
+	string runCommandAddFloatingTask(MariaInputObject* input, MariaStateObject* state);
+	string runCommandAddDeadlineTask(MariaInputObject* input, MariaStateObject* state);
+	string runCommandAddTimedTask(MariaInputObject* input, MariaStateObject* state);
+	string runCommandEditTitle(MariaInputObject* input, MariaStateObject* state);
+	string runCommandEditStartTime(MariaInputObject* input, MariaStateObject* state);
+	string runCommandEditEndTime(MariaInputObject* input, MariaStateObject* state);
+	string runCommandEditDescription(MariaInputObject* input, MariaStateObject* state);
+	string runCommandShowDate(MariaInputObject* input, MariaStateObject* state);
+	string runCommandShowDateRange(MariaInputObject* input, MariaStateObject* state);
+	string runCommandShowAll(MariaInputObject* input, MariaStateObject* state);
+	string runCommandSearch(MariaInputObject* input, MariaStateObject* state);
+	string runCommandDeleteTask(MariaInputObject* input, MariaStateObject* state);
+	string runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state);
+	string runCommandMarkDone(MariaInputObject* input, MariaStateObject* state);
+	string runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state);
+	string runCommandUndo(MariaInputObject* input, MariaStateObject* state);
+	string runCommandGoHome(MariaInputObject* input, MariaStateObject* state);
+	string runCommandPageUp(MariaInputObject* input, MariaStateObject* state);
+	string runCommandPageDown(MariaInputObject* input, MariaStateObject* state);
+
+	void saveToFile();
+	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
+	//void addStateToQueue(STATE_TYPE type, );
+	
 
 	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };
