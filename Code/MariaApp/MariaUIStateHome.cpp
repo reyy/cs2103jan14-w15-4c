@@ -2,19 +2,19 @@
 #include "MariaUIStateHome.h"
 #include "MariaUI.h"
 
-const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.24;
 const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE = 0.65;
+const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.1;
 
 MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, vector<MariaTask*> weekTask) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
-	_clock = new MariaUIClock(_qmainWindow);
 	_preview = new MariaUIPreview(_qmainWindow);
+	_clock = new MariaUIClock(_qmainWindow);
 	_weekTask = weekTask;
 }
 
 MariaUIStateHome::~MariaUIStateHome() {
 	clearUITask();
-	delete _preview;
 	delete _clock;
+	delete _preview;
 }
 
 void MariaUIStateHome::initBeginState() {
@@ -39,9 +39,10 @@ void MariaUIStateHome::initEndState() {
 }
 
 bool MariaUIStateHome::timerBeginState() {
-	_clock->updateGUI(getPosition());
 	_preview->updateGUI(getPosition());
+	_clock->updateGUI(getPosition());
 	updatePageTitleGUI();
+
 	return false;
 }
 
@@ -50,9 +51,10 @@ bool MariaUIStateHome::timerActiveState() {
 }
 
 bool MariaUIStateHome::timerEndState() {
-	_clock->updateGUI(getPosition());
 	_preview->updateGUI(getPosition());
+	_clock->updateGUI(getPosition());
 	updatePageTitleGUI();
+
 	return false;
 }
 

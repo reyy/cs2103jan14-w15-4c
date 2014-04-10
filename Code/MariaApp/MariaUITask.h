@@ -29,7 +29,7 @@ public:
 	static const float TASK_HEIGHT_FLOATING;
 	static const float TASK_HEIGHT_EXPANDED;
 	static const float TASK_HEIGHT_CONTRACTED;
-	static const float TASK_HEIGHT_CONTRACTED_WIDTH;
+	static const float TASK_WIDTH_SHORTEN;
 	static const float DESCRIPTION_X_OFFSET;
 	static const float DESCRIPTION_Y_OFFSET;
 	static const float TIME_Y_OFFSET;

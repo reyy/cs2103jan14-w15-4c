@@ -14,7 +14,7 @@ public:
 	static const string SUGGEST_TEXT_SAMPLE[];
 	static const int SUGGEST_TEXT_AMOUNT = 8;
 
-	static const int SUGGEST_TEXT_UPDATE_TIME = 10000;
+	static const int SUGGEST_TEXT_UPDATE_TIME = 5000;
 
 	static const int RESERVED_STATUS_SPACE = 30;
 	static const int TEXTBOX_X_OFFSET = 30;

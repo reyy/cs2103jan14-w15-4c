@@ -367,7 +367,7 @@ bool MariaLogic::processCommand(std::string inputText) {
 					if(mariaStateManager->getCurrentState() == STATE_TYPE::HOME) {
 						mariaTaskManager->archiveTask(listOfTasks[0]);
 						mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
-						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + toDeleteTitle + "' has been deleted!");
+						mariaUI->getCommandBar()->getTextbox()->setQuestionText("'" + listOfTasks[0]->getTitle() + "' has been deleted!");
 						if(mariaTaskManager->compareToPreviousQuery()) {
 							((MariaUIStateHome*)currentObj)->eraseUITask(listOfTasks[0]);
 						}
@@ -536,20 +536,32 @@ void MariaLogic::generateTextforUI() {
 		MariaTime now=MariaTime::getCurrentTime();
 		MariaTime startOfDay(now.getYear(),now.getMonth(), now.getDay(), 0, 0);
 		MariaTime endOfDay(now.getYear(),now.getMonth(), now.getDay(), 23, 59);
-		MariaTime startOfTomorrow(now.getYear(),now.getMonth(), now.getDay()+1, 0, 0);
 		MariaTime endOfTomorrow(now.getYear(),now.getMonth(), now.getDay()+1, 23, 59);
+		MariaTime startOfTomorrow(now.getYear(),now.getMonth(), now.getDay()+1, 0, 0);
 
 		//Generate Task for UIPreview.
 		vector<MariaTask*> taskListNow = mariaTaskManager->findTask(&now,&endOfDay, MariaTask::TaskType::TIMED, false);
 		vector<MariaTask*> taskListAll = mariaTaskManager->findTask(&startOfDay,&endOfDay, MariaTask::TaskType::TIMED, false);
 		vector<MariaTask*> taskListDeadLine = mariaTaskManager->findTask(&now,&endOfDay, MariaTask::TaskType::DEADLINE, false);
-		vector<MariaTask*> taskListTomorrow = mariaTaskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::TIMED, false);
-		vector<MariaTask*> taskListTomorrowDeadLine = mariaTaskManager->findTask(&startOfTomorrow,&endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
+		vector<MariaTask*> taskListTomorrow = mariaTaskManager->findTask(&startOfTomorrow, &endOfTomorrow, MariaTask::TaskType::TIMED, false);
+		vector<MariaTask*> taskListTomorrowDeadLine = mariaTaskManager->findTask(&startOfTomorrow, &endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
 		vector<MariaTask*> taskListSuggest = mariaTaskManager->findTask(MariaTask::TaskType::FLOATING, false);
+
+		//Nearest free day in a week. Day starts from 0. -1 denotes no free day.
+		int freeDay = -1;
+		for(int i = 0; i < 7 ; i++) {	
+			MariaTime startOfFreeDay(now.getYear(),now.getMonth(), now.getDay()+i, 0, 0);
+			MariaTime endOfFreeDay(now.getYear(),now.getMonth(), now.getDay()+i, 23, 59);
+			vector<MariaTask*> freeDayList = mariaTaskManager->findTask(&startOfFreeDay, &endOfFreeDay, false);
+			if(freeDayList.size() == 0) {
+				freeDay = (now.getDay() + i) % 7;
+				break;
+			}
+		}
 
 		preview->generateTodayText(taskListNow, taskListAll, taskListDeadLine);
 		preview->generateTomorrowText(taskListTomorrow, taskListTomorrowDeadLine);
-		preview->generateSuggestionText(taskListSuggest);
+		preview->generateSuggestionText(freeDay, taskListSuggest);
 		preview->updateText();
 	}
 }

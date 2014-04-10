@@ -17,8 +17,8 @@ public:
 	static const int MAX_ITEM_IN_PAGE = 5;
 
 private:
-	MariaUIClock *_clock;
 	MariaUIPreview *_preview;
+	MariaUIClock *_clock;
 	vector<MariaTask*> _weekTask;
 
 	void initBeginState();

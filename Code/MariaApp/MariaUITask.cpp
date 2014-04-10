@@ -2,7 +2,7 @@
 #include "MariaUITask.h"
 #include "MariaTime.h"
 
-const float MariaUITask::START_END_TIME_WIDTH = 100.0;
+const float MariaUITask::START_END_TIME_WIDTH = 120.0;
 const float MariaUITask::FLOW_FACTOR = 0.1;
 const float MariaUITask::VALUE_THRESHOLD = 1.0;
 const float MariaUITask::FONT_SIZE_TITLE = 16.0;
@@ -13,7 +13,7 @@ const float MariaUITask::TASK_HEIGHT = 36.0;
 const float MariaUITask::TASK_HEIGHT_FLOATING = 25.0;
 const float MariaUITask::TASK_HEIGHT_EXPANDED = 150.0;
 const float MariaUITask::TASK_HEIGHT_CONTRACTED = 90.0;
-const float MariaUITask::TASK_HEIGHT_CONTRACTED_WIDTH = 250.0;
+const float MariaUITask::TASK_WIDTH_SHORTEN = 230.0;
 const float MariaUITask::DESCRIPTION_X_OFFSET = 0.0;
 const float MariaUITask::DESCRIPTION_Y_OFFSET = 20.0;
 const float MariaUITask::TIME_Y_OFFSET = 6.0;
@@ -132,11 +132,13 @@ bool MariaUITask::updatePosition() {
 					break;
 				case EXPANDED:
 					_displayTitle->setGeometry(_position.x(), _position.y(), _width, TASK_HEIGHT_EXPANDED);
-					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, _width-(TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET)*2, TASK_HEIGHT_EXPANDED-DESCRIPTION_Y_OFFSET*2);
+					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET + TASK_WIDTH_SHORTEN , TASK_HEIGHT_EXPANDED - DESCRIPTION_Y_OFFSET*2);
+					_startEndText->setGeometry(_position.x() + _width - TEXTBOX_X_OFFSET - START_END_TIME_WIDTH - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), _position.y() + DESCRIPTION_Y_OFFSET*0.5, START_END_TIME_WIDTH, TASK_HEIGHT_EXPANDED - DESCRIPTION_Y_OFFSET);
+					_completed->setGeometry(_position.x() + _width - TEXTBOX_X_OFFSET - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(),  _position.y() + DESCRIPTION_Y_OFFSET*0.5, (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->height());
 					break;
 				case CONTRACTED:
 					_displayTitle->setGeometry(_position.x(), _position.y(), _width, TASK_HEIGHT_CONTRACTED);
-					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET + TASK_HEIGHT_CONTRACTED_WIDTH , TASK_HEIGHT_CONTRACTED - DESCRIPTION_Y_OFFSET*2);
+					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET + TASK_WIDTH_SHORTEN , TASK_HEIGHT_CONTRACTED - DESCRIPTION_Y_OFFSET*2);
 					_startEndText->setGeometry(_position.x() + _width - TEXTBOX_X_OFFSET - START_END_TIME_WIDTH - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), _position.y() + DESCRIPTION_Y_OFFSET*0.5, START_END_TIME_WIDTH, TASK_HEIGHT_CONTRACTED - DESCRIPTION_Y_OFFSET);
 					_completed->setGeometry(_position.x() + _width - TEXTBOX_X_OFFSET - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(),  _position.y() + DESCRIPTION_Y_OFFSET*0.5, (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->height());
 					break;
@@ -372,6 +374,7 @@ void MariaUITask::activate() {
 		case EXPANDED:
 			this->setDisplayTitle();
 			this->setDescription();
+			this->setTimeAndIcon();
 			break;
 		case CONTRACTED:
 			this->setDisplayTitle();
@@ -391,8 +394,6 @@ void MariaUITask::activate() {
 		startUpdatingTime();	
 		updateTimeText();
 		updateDetails();
-
-
 	}
 }
 
