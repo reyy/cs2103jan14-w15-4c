@@ -32,6 +32,8 @@ public:
 		GO_CREDITS,
 		PAGE_UP,
 		PAGE_DOWN,
+		PAGE_LEFT,
+		PAGE_RIGHT,
 		EXIT,
 	} COMMAND_TYPE;
 

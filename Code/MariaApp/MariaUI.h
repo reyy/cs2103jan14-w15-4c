@@ -20,12 +20,14 @@ class MariaUI : QMainWindow {
 	 Q_OBJECT
 
 public:
-	static const int AMOUNT_OF_IMAGES = 12;
+	static const int AMOUNT_OF_IMAGES = 18;
 	static const int IMAGE_INDEX_COMPLETED = 3;
 	static const int IMAGE_INDEX_NOT_COMPLETED = 4;
 	static const int IMAGE_INDEX_ICON = 5;
 	static const int AMOUNT_OF_ICON = 6;
 	static const int IMAGE_INDEX_DOTS = 11;
+	static const int AMOUNT_OF_HELP_IMAGE = 6;
+	static const int IMAGE_INDEX_HELP = 12;
 
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;

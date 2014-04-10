@@ -21,6 +21,7 @@ MariaUIStateCredits::MariaUIStateCredits(QMainWindow* qmainWindow) : MariaStateO
 	_logo = new QLabel(_qmainWindow);
 	_logoImageIndex = 0;
 	_doneAnimating = false;
+	_transitionAuto = true;
 }
 
 MariaUIStateCredits::~MariaUIStateCredits() {
@@ -50,8 +51,6 @@ void MariaUIStateCredits::initBeginState() {
 	_logo->setAlignment(Qt::AlignCenter);
 	_logo->setGeometry(QRect(_qmainWindow->width(), _qmainWindow->height(), 0.0, 0.0));
 	_logo->show();
-
-	_transitionAuto = true;
 }
 
 void MariaUIStateCredits::initActiveState() {

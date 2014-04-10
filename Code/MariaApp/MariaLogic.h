@@ -57,8 +57,11 @@ private:
 	string runCommandUndo(MariaInputObject* input, MariaStateObject* state);
 	string runCommandGoHome(MariaInputObject* input, MariaStateObject* state);
 	string runCommandGoCredits(MariaInputObject* input, MariaStateObject* state);
+	string runCommandGoHelp(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageUp(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageDown(MariaInputObject* input, MariaStateObject* state);
+	string runCommandPageLeft(MariaInputObject* input, MariaStateObject* state);
+	string runCommandPageRight(MariaInputObject* input, MariaStateObject* state);
 
 	void saveToFile();
 	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);

@@ -45,9 +45,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MariaUITask.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="MariaUI.cpp">
-      <Filter>User Interface</Filter>
-    </ClCompile>
     <ClCompile Include="MariaUIStateConflict.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
@@ -94,6 +91,9 @@
       <Filter>User Interface\States</Filter>
     </ClCompile>
     <ClCompile Include="MariaLogic.cpp" />
+    <ClCompile Include="MariaUI.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />

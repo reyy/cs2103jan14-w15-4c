@@ -56,11 +56,21 @@ string MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
+	//Miki, need you to fix this so that interpreter knows its credits, run their respective end function instead.
+
 	//Process states where there are no commands.
 	if (mariaStateManager->getCurrentState() == STATE_TYPE::CREDITS) {
 		((MariaUIStateCredits*) currentObj)->setDoneAnimating();
 			return output;
 	}
+	
+	//Miki, need interpreter to recognise its help, any other parameters reject, just call setDoneviewing. Unless its left or right.
+	//which will call the PageLeft/PageRight
+	/*
+	if (mariaStateManager->getCurrentState() == STATE_TYPE::HELP) {
+		((MariaUIStateHelp*) currentObj)->setDoneViewing();
+			return output;
+	}*/
 
 	try {
 		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
@@ -144,12 +154,24 @@ string MariaLogic::processCommand(std::string inputText) {
 			output = runCommandGoCredits(input, currentObj);
 		break;
 
+		case MariaInputObject::COMMAND_TYPE::GO_HELP:
+			output = runCommandGoHelp(input, currentObj);
+		break;
+
 		case MariaInputObject::COMMAND_TYPE::PAGE_UP:
 			output = runCommandPageUp(input, currentObj);
 		break;
 
 		case MariaInputObject::COMMAND_TYPE::PAGE_DOWN:
 			output = runCommandPageDown(input, currentObj);
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::PAGE_LEFT:
+			output = runCommandPageLeft(input, currentObj);
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::PAGE_RIGHT:
+			output = runCommandPageRight(input, currentObj);
 		break;
 	}
 
@@ -694,17 +716,28 @@ string MariaLogic::runCommandGoCredits(MariaInputObject* input, MariaStateObject
 	return ("Sure.");
 }
 
+string MariaLogic::runCommandGoHelp(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	mariaStateManager->queueState(STATE_TYPE::HELP, new MariaUIStateHelp((QMainWindow*)mariaUI));
+	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+	mariaStateManager->transitState();
+	return ("Let me get you some help.");
+}
+
 string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* state) {
 	assert(input != NULL);
 	assert(state != NULL);
 
-	MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)state;
-	if (tempObj->isAllTaskAtLocation()) {
-		if (tempObj->isPageValid(tempObj->getPage()-1)) {
-			tempObj->setPage(tempObj->getPage()-1);
-			return ("Going up.");
-		} else {
-			return ("There are no more items up there.");
+	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( state ) ) {
+		if (tempObj->isAllTaskAtLocation()) {
+			if (tempObj->isPageValid(tempObj->getPage()-1)) {
+				tempObj->setPage(tempObj->getPage()-1);
+				return ("Going up.");
+			} else {
+				return ("There are no more items up there.");
+			}
 		}
 	}
 	return ("");
@@ -714,14 +747,35 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 	assert(input != NULL);
 	assert(state != NULL);
 
-	MariaUIStateDisplay* tempObj = (MariaUIStateDisplay*)state;
-	if (tempObj->isAllTaskAtLocation()) {
-		if (tempObj->isPageValid(tempObj->getPage()+1)) {
-			tempObj->setPage(tempObj->getPage()+1);
-			return ("Going down.");
-		} else {
-			return ("There are no more items down there.");
+	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( state ) ) {
+		if (tempObj->isAllTaskAtLocation()) {
+			if (tempObj->isPageValid(tempObj->getPage()+1)) {
+				tempObj->setPage(tempObj->getPage()+1);
+				return ("Going down.");
+			} else {
+				return ("There are no more items down there.");
+			}
 		}
+	}
+	return ("");
+}
+
+string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if( MariaUIStateHelp* tempObj = dynamic_cast< MariaUIStateHelp* >( state ) ) {
+		tempObj->setHelpIndex(tempObj->getHelpIndex() - 1);
+	}
+	return ("");
+}
+
+string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if( MariaUIStateHelp* tempObj = dynamic_cast< MariaUIStateHelp* >( state ) ) {
+		tempObj->setHelpIndex(tempObj->getHelpIndex() + 1);
 	}
 	return ("");
 }

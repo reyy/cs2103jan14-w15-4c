@@ -6,7 +6,12 @@
 
 class MariaUIStateHelp : public MariaStateObject {
 	
+	static const int HELP_IMAGE_SIZE = 500;
+
 	QMainWindow *_qmainWindow;
+	QLabel *_helpImage;
+	int _helpIndex;
+	bool _doneViewing;
 
 	void initBeginState();
 	void initActiveState();
@@ -15,7 +20,11 @@ class MariaUIStateHelp : public MariaStateObject {
 	bool timerActiveState();
 	bool timerEndState();
 public:
-	MariaUIStateHelp(QMainWindow* qmainWindow);
+	MariaUIStateHelp(QMainWindow* qmainWindow, int screen = 0);
 	~MariaUIStateHelp();
+
+	int getHelpIndex();
+	void setHelpIndex(int index);
+	void setDoneViewing();
 };
 

@@ -1,15 +1,25 @@
 #include "MariaUIStateHelp.h"
 #include "MariaUI.h"
 
-MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : MariaStateObject(qmainWindow) {
 	_qmainWindow = qmainWindow;
+
+	_helpIndex = screen;
+	_helpImage = new QLabel(_qmainWindow);
+	_helpImage->setAlignment(Qt::AlignCenter);
+	_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + screen));
+	_helpImage->show();
+	_doneViewing = false;
+	_transitionAuto = true;
 }
 
 MariaUIStateHelp::~MariaUIStateHelp() {
+	delete _helpImage;
 }
 
 void MariaUIStateHelp::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(225, 191, 0);
 }
 
 void MariaUIStateHelp::initActiveState() {
@@ -21,13 +31,34 @@ void MariaUIStateHelp::initEndState() {
 }
 
 bool MariaUIStateHelp::timerBeginState() {
+	_helpImage->setGeometry(QRect(getPosition().x(), getPosition().y(), HELP_IMAGE_SIZE, HELP_IMAGE_SIZE));
 	return false;
 }
 
 bool MariaUIStateHelp::timerActiveState() {
-	return false;
+	if(_doneViewing) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 bool MariaUIStateHelp::timerEndState() {
+	_helpImage->setGeometry(QRect(getPosition().x(), getPosition().y(), HELP_IMAGE_SIZE, HELP_IMAGE_SIZE));
 	return false;
+}
+
+int MariaUIStateHelp::getHelpIndex() {
+	return _helpIndex;
+}
+
+void MariaUIStateHelp::setHelpIndex(int index) {
+	if(index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
+		_helpIndex = index;
+		_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + index));
+	}
+}
+
+void MariaUIStateHelp::setDoneViewing() {
+	_doneViewing = true;
 }

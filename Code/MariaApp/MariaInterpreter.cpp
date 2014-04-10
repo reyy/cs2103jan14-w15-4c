@@ -43,6 +43,8 @@ MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE>* 
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("credit", MariaInputObject::COMMAND_TYPE::GO_CREDITS));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::PAGE_UP));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::PAGE_DOWN));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("left", MariaInputObject::COMMAND_TYPE::PAGE_LEFT));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("right", MariaInputObject::COMMAND_TYPE::PAGE_RIGHT));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("exit", MariaInputObject::COMMAND_TYPE::EXIT));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("quit", MariaInputObject::COMMAND_TYPE::EXIT));
 }

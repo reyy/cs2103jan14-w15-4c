@@ -96,6 +96,12 @@ void MariaUI::loadImages() {
 	_taskTypeIconHandler[9] = new QPixmap("./Resources/ui_maria_logo_5.png");
 	_taskTypeIconHandler[10] = new QPixmap("./Resources/ui_maria_logo_6.png");
 	_taskTypeIconHandler[11] = new QPixmap("./Resources/ui_loadingdots.png");
+	_taskTypeIconHandler[12] = new QPixmap("./Resources/help_0.png");
+	_taskTypeIconHandler[13] = new QPixmap("./Resources/help_1.png");
+	_taskTypeIconHandler[14] = new QPixmap("./Resources/help_2.png");
+	_taskTypeIconHandler[15] = new QPixmap("./Resources/help_3.png");
+	_taskTypeIconHandler[16] = new QPixmap("./Resources/help_4.png");
+	_taskTypeIconHandler[17] = new QPixmap("./Resources/help_5.png");
 }
 
 void MariaUI::unloadImages() {
@@ -181,6 +187,10 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		result = _mariaLogic->processCommand("up");
 	} else if(keyPressed == Qt::Key_Down) {
 		result = _mariaLogic->processCommand("down");
+	} else if(keyPressed == Qt::Key_Left) {
+		result = _mariaLogic->processCommand("left");
+	} else if(keyPressed == Qt::Key_Right) {
+		result = _mariaLogic->processCommand("right");
 	} else {
 		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
 			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
