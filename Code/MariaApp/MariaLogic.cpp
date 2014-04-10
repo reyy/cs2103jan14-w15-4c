@@ -128,6 +128,10 @@ bool MariaLogic::processCommand(std::string inputText) {
 			runCommandShowDate(input, currentObj);
 		break;
 
+		case MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE:
+			runCommandShowDateRange(input, currentObj);
+		break;
+
 		case MariaInputObject::COMMAND_TYPE::SHOW_ALL:
 			runCommandShowAll(input, currentObj);
 		break;
@@ -477,6 +481,20 @@ void MariaLogic::runCommandShowDateRange(MariaInputObject* input, MariaStateObje
 	assert(input != NULL);
 	assert(state != NULL);
 
+	MariaTime* startTime = input->getStartTime();
+	startTime->setHour(0);
+	startTime->setMin(0);
+	MariaTime* endTime = input->getEndTime();
+	endTime->setHour(23);
+	endTime->setMin(59);
+	vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime);
+
+	mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have on " + MariaTime::convertToMonthString(startTime) + ".");
+	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToMonthString(startTime), listOfTasks));
+	mariaStateManager->transitState();
+
+	SAFE_DELETE(startTime);
+	SAFE_DELETE(endTime);
 }
 
 void MariaLogic::runCommandShowAll(MariaInputObject* input, MariaStateObject* state) {

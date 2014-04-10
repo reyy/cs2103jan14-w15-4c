@@ -509,6 +509,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 				inputObject->setStartTime(new MariaTime(year, month, 1));
 				inputObject->setEndTime(new MariaTime(year, month, getLastDayOfMonth(year, month)));
 				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+				return;
 			} else if (workingList.size() == 2) {
 				// Show date
 				if (isStringEqual(workingList[1], "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
