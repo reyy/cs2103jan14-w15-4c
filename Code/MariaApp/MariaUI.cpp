@@ -170,7 +170,9 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		try {
 			string result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
-			_commandBar->getTextbox()->setQuestionText(result);
+			if(result != "") {
+				_commandBar->getTextbox()->setQuestionText(result);
+			}
 		} catch (exception& e) {
 			_commandBar->getTextbox()->setQuestionText(e.what());
 			_commandBar->getStatus()->setStatus(MariaUIStatus::UNKNOWN);

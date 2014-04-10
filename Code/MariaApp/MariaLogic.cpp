@@ -355,6 +355,7 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			mariaStateManager->transitState();
 			return "Consider it done!";
 		}
+		//rey: possible control path error here!
 	} else {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
 
@@ -366,6 +367,7 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 				saveToFile();
 				return("Consider it done!");
 			}
+			//rey: possible control path error here!
 		} else if (listOfTasks.size() == 0) {
 			return ("I couldn't find anything related. Try again.");
 		} else {
@@ -541,6 +543,8 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 			return ("There are similar tasks, which one should I remove?");
 		}
 	}
+
+	return "";
 }
 
 string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state) {
@@ -557,6 +561,8 @@ string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject
 		((MariaUIStateHome*)state)->eraseAllUITask();
 		return ("All tasks have been deleted.");
 	}
+
+	return "";
 }
 
 string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject* state) {
@@ -593,6 +599,8 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 			return ("There are similar tasks, which one should I mark?");
 		}
 	}
+
+	return "";
 }
 
 string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state) {
@@ -629,6 +637,8 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 			return ("There are similar tasks, which one should I mark?");
 		}
 	}
+
+	return "";
 }
 
 string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* state) {
@@ -664,6 +674,7 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 			return ("There are no more items up there.");
 		}
 	}
+	return "";
 }
 
 string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject* state) {
@@ -679,6 +690,7 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 			return ("There are no more items down there.");
 		}
 	}
+	return "";
 }
 
 void MariaLogic::saveToFile() {
