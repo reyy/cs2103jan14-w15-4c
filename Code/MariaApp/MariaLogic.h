@@ -32,6 +32,12 @@ private:
 	MariaTaskManager	*mariaTaskManager;
 	MariaFileManager	*mariaFileManager;
 
+	void initWindowIcon();
+	void initComponents();
+	void initTaskManager();
+	void initLoadingScreen();
+	void initShowHideWrapper();
+
 	void runCommandExit(MariaInputObject* input, MariaStateObject* state);
 	string runCommandAddFloatingTask(MariaInputObject* input, MariaStateObject* state);
 	string runCommandAddDeadlineTask(MariaInputObject* input, MariaStateObject* state);
@@ -52,6 +58,11 @@ private:
 	string runCommandGoHome(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageUp(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageDown(MariaInputObject* input, MariaStateObject* state);
+
+	void saveToFile();
+	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
+	//void addStateToQueue(STATE_TYPE type, );
+	
 
 	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };

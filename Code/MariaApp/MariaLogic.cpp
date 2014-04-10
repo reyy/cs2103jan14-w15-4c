@@ -6,35 +6,11 @@
 #include "MariaUIStateConflict.h"
 
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
-	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
+	initWindowIcon();
+	initShowHideWrapper();
 
-	mariaInterpreter = new MariaInterpreter();
-	mariaFileManager = new MariaFileManager();
-	for (int i = 0; i < 3; i++) {
-		try {
-			mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
-			break;
-		} catch(exception e) {
-			//todo: do something about failed file
-			MessageBox(NULL, L"M.A.R.I.A. is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
-			quit();
-		}
-	}
-	mariaUI = new MariaUI(this);
-	mariaStateManager = new MariaStateManager();
-
-	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
-	mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
-	temp->setDisplayText("Loading");
-	temp->setLoadingDone();
-
-	//mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHelp((QMainWindow*)mariaUI));
-
-	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
-	mariaUI->getCommandBar()->getTextbox()->setQuestionText("How can I help you?");
-	mariaUI->getCommandBar()->getTextbox()->setSuggestText("create Meeting tomorrow for discussion");
-
-	_beginthread(&MariaLogic::doShowHideWrapper, 0, this);
+	initComponents();
+	initLoadingScreen();
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -54,7 +30,7 @@ bool MariaLogic::processUndo() {
 	MariaTask* changed = mariaTaskManager->undoLast();
 
 	if (changed) {
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		saveToFile();
 
 		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
 		if (taskCountDifference < 0) {
@@ -85,7 +61,7 @@ string MariaLogic::processCommand(std::string inputText) {
 		throw exception(e.what());
 	}
 
-	// Only empty the input box on a successful command.
+	// Rey: Refactoring needed for this line.
 	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 
 	switch (input->getCommandType()) {
@@ -229,6 +205,45 @@ void MariaLogic::doShowHide() {
 	}
 }
 
+void MariaLogic::initWindowIcon() {
+	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
+}
+
+void MariaLogic::initComponents() {
+	initTaskManager();
+
+	mariaInterpreter = new MariaInterpreter();
+	mariaFileManager = new MariaFileManager();
+	
+	mariaUI = new MariaUI(this);
+	mariaStateManager = new MariaStateManager();
+}
+
+void MariaLogic::initTaskManager() {
+	for (int i = 0; i < 3; i++) {
+		try {
+			mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
+			break;
+		} catch(exception e) {
+			MessageBox(NULL, L"M.A.R.I.A. is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
+			quit();
+		}
+	}
+}
+
+void MariaLogic::initLoadingScreen() {
+	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
+	mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
+	temp->setDisplayText("Loading");
+	temp->setLoadingDone();
+	
+	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+}
+
+void MariaLogic::initShowHideWrapper() {
+	_beginthread(&MariaLogic::doShowHideWrapper, 0, this);
+}
+
 void MariaLogic::runCommandExit(MariaInputObject* input, MariaStateObject* state) {
 	assert(input != NULL);
 	assert(state != NULL);
@@ -246,13 +261,10 @@ string MariaLogic::runCommandAddFloatingTask(MariaInputObject* input, MariaState
 	assert(state != NULL);
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
+
 	if (toAdd != NULL) {
-		if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-		} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
-		}
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		addTaskToUI(toAdd, state);
+		saveToFile();
 		((MariaUIStateHome*)state)->setPageEnd();
 		return "Task '" + input->getTitle() + "' has been added!";
 	} else {
@@ -265,13 +277,10 @@ string MariaLogic::runCommandAddDeadlineTask(MariaInputObject* input, MariaState
 	assert(state != NULL);
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, input->getEndTime());
+
 	if (toAdd != NULL) {
-		if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-		} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
-		}
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		addTaskToUI(toAdd, state);
+		saveToFile();
 		((MariaUIStateHome*)state)->setPageEnd();
 		return "Task '" + input->getTitle() + "' has been added!";
 	} else {
@@ -285,12 +294,8 @@ string MariaLogic::runCommandAddTimedTask(MariaInputObject* input, MariaStateObj
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), input->getStartTime(), input->getEndTime());
 	if (toAdd != NULL) {
-		if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
-		} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
-			((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
-		}
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		addTaskToUI(toAdd, state);
+		saveToFile();
 		((MariaUIStateHome*)state)->setPageEnd();
 		return "Task '" + input->getTitle() + "' has been added!";
 	} else {
@@ -308,9 +313,8 @@ string MariaLogic::runCommandEditTitle(MariaInputObject* input, MariaStateObject
 		if(numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			toEditTask->getMariaTask()->setTitle(input->getEditField());
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 					
-			//mariaUI->getCommandBar()->getTextbox()->setQuestionText("Ok, I have updated the title.");
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
 			return "Ok, I have updated the title.";
@@ -321,7 +325,7 @@ string MariaLogic::runCommandEditTitle(MariaInputObject* input, MariaStateObject
 		if (listOfTasks.size() == 1) {
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setTitle(input->getEditField());
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return "Ok, I have updated the title.";
 			}
 		} else if (listOfTasks.size() == 0) {
@@ -345,7 +349,7 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			toEditTask->getMariaTask()->setStart(input->getEditTime());
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
@@ -359,7 +363,7 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			//still enable updating but no visual cues.
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setStart(input->getEditTime());
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return("Consider it done!");
 			}
 		} else if (listOfTasks.size() == 0) {
@@ -384,7 +388,7 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			toEditTask->getMariaTask()->setEnd(input->getEditTime());
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 					
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
@@ -398,7 +402,7 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 			//still enable updating but no visual cues.
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setEnd(input->getEditTime());
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return ("Consider it done!");
 			}
 		} else if (listOfTasks.size() == 0) {
@@ -424,7 +428,7 @@ string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaState
 			//TO DO, transit to edit state.
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			toEditTask->getMariaTask()->setDescription(input->getEditField());
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 					
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();					
@@ -436,7 +440,7 @@ string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaState
 		if (listOfTasks.size() == 1) {
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setDescription(input->getEditField());
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return ("Ok, I have updated the description.");
 			}
 		} else if (listOfTasks.size() == 0) {
@@ -510,7 +514,7 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 		if (numberToDelete > 0 && numberToDelete <= tempObj->getTotalUITask()) {
 			MariaUITask* toDeleteTask = tempObj->eraseUITask(numberToDelete-1);
 			mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
@@ -522,7 +526,7 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 		if (listOfTasks.size() == 1) {
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				mariaTaskManager->archiveTask(listOfTasks[0]);
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				if (mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)state)->eraseUITask(listOfTasks[0]);
 				}
@@ -548,7 +552,7 @@ string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject
 		for (int i = 0; i < listOfTasks.size(); i++ ) {
 			mariaTaskManager->archiveTask(listOfTasks[i]);
 		}
-		mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+		saveToFile();
 
 		((MariaUIStateHome*)state)->eraseAllUITask();
 		return ("All tasks have been deleted.");
@@ -566,7 +570,7 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 		if (numberToMark > 0 && numberToMark <= tempObj->getTotalUITask()) {
 			MariaUITask* toMarkTask = tempObj->eraseUITask(numberToMark-1);
 			toMarkTask->getMariaTask()->setIsDone(true);
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
@@ -578,7 +582,7 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 		if (listOfTasks.size() == 1) {
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setIsDone(true);
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return ("'" + input->getTitle() + "' has been completed!");
 			}
 		} else if (listOfTasks.size() == 0) {
@@ -602,7 +606,7 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 		if (numberToMark > 0 && numberToMark <= tempObj->getTotalUITask()) {
 			MariaUITask* toMarkTask = tempObj->eraseUITask(numberToMark-1);
 			toMarkTask->getMariaTask()->setIsDone(false);
-			mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+			saveToFile();
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
@@ -614,16 +618,15 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 		if (listOfTasks.size() == 1) {
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setIsDone(false);
-				mariaFileManager->writeFile(mariaTaskManager->getAllTasks());
+				saveToFile();
 				return ("'" + input->getTitle() + "' has been uncompleted!");
 			}
 		} else if (listOfTasks.size() == 0) {
 			return ("I couldn't find anything related. Try again.");
 		} else {
-			return ("There are similar tasks, which one should I mark?");
-
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
+			return ("There are similar tasks, which one should I mark?");
 		}
 	}
 }
@@ -675,6 +678,19 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 		} else {
 			return ("There are no more items down there.");
 		}
+	}
+}
+
+void MariaLogic::saveToFile() {
+	vector<MariaTask*> taskList = mariaTaskManager->getAllTasks();
+	mariaFileManager->writeFile(taskList);
+}
+
+void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
+	if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME && mariaTaskManager->compareToPreviousQuery()) {
+		((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
+	} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+		((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
 	}
 }
 
