@@ -492,10 +492,12 @@ string MariaLogic::runCommandShowDate(MariaInputObject* input, MariaStateObject*
 	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToDateString(startTime), listOfTasks));
 	mariaStateManager->transitState();
 
+	string toReturn = ("This is what you have on " + MariaTime::convertToDateString(endTime) + ".");
+
 	SAFE_DELETE(startTime);
 	SAFE_DELETE(endTime);
-	
-	return ("This is what you have on " + MariaTime::convertToDateString(endTime) + ".");
+
+	return toReturn;	
 }
 
 string MariaLogic::runCommandShowDateRange(MariaInputObject* input, MariaStateObject* state) {
