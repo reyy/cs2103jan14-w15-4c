@@ -116,7 +116,7 @@ string MariaTime::getTimeFromNow() {
 	double difference = difftime(timeStamp, currentTime);
 
 	if(difference < 0) {
-		return "";
+		return ("");
 	}else if(difference > 60*60*24*30) {
 		int value = (int)difference / ( 60*60*24*30);
 		if(value == 1) {

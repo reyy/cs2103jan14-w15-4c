@@ -35,7 +35,7 @@ private:
 	void initWindowIcon();
 	void initComponents();
 	void initTaskManager();
-	void initLoadingScreen();
+	void initStartingState();
 	void initShowHideWrapper();
 
 	void runCommandExit(MariaInputObject* input, MariaStateObject* state);
@@ -56,6 +56,7 @@ private:
 	string runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state);
 	string runCommandUndo(MariaInputObject* input, MariaStateObject* state);
 	string runCommandGoHome(MariaInputObject* input, MariaStateObject* state);
+	string runCommandGoCredits(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageUp(MariaInputObject* input, MariaStateObject* state);
 	string runCommandPageDown(MariaInputObject* input, MariaStateObject* state);
 

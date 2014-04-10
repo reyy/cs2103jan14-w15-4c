@@ -82,7 +82,7 @@ string MariaTask::getTimeFromNow() {
 	}else if(type == TIMED) {
 		return getStart()->getTimeFromNow();
 	}
-	else return "";
+	else return ("");
 }
 
 void MariaTask::setTitle(string title) {

@@ -90,10 +90,10 @@
     <ClCompile Include="MariaUIStateHelp.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
-    <ClCompile Include="MariaLogic.cpp" />
     <ClCompile Include="MariaUIStateCredits.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
+    <ClCompile Include="MariaLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -164,9 +164,6 @@
     <Filter Include="User Interface">
       <UniqueIdentifier>{c057e7f9-b5cb-4d92-b1b8-d030ec1c6981}</UniqueIdentifier>
     </Filter>
-    <Filter Include="User Interface\States">
-      <UniqueIdentifier>{b96e0cb1-f870-4a6d-b914-9b1ea04e47cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="User Interface\Elements">
       <UniqueIdentifier>{ed526828-93cf-4d1d-8218-d17585430a57}</UniqueIdentifier>
     </Filter>
@@ -179,6 +176,14 @@
       <UniqueIdentifier>{5511f2a4-54d5-4d53-b5d0-b12dbf6836e0}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="User Interface\States">
+      <UniqueIdentifier>{b96e0cb1-f870-4a6d-b914-9b1ea04e47cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

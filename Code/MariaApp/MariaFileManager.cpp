@@ -147,7 +147,7 @@ string MariaFileManager::taskToString(MariaTask *task) {
 
 string MariaFileManager::timeToString(MariaTime* inputTime) {
 	if(inputTime == NULL) {
-		return "";
+		return ("");
 	} else {
 		return inputTime->get(TIME_FORMAT);
 	}
@@ -174,7 +174,7 @@ string MariaFileManager::getFirstWord(string inputText) {
 // This method returns the input string without its first word 
 string MariaFileManager::removeFirstWord(string inputText, string firstWord) {
 	if(inputText.length() <= firstWord.length()) {
-		return "";
+		return ("");
 	}
 	return inputText.substr(firstWord.length());
 }

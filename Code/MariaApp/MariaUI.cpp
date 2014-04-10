@@ -161,6 +161,8 @@ bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
 
 void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	int keyPressed = event->key();
+	string result;
+
 	if(event->key() == Qt::Key_Z && event->modifiers().testFlag(Qt::ControlModifier)) {
 		if(_mariaLogic->processUndo()) {
 			getCommandBar()->getTextbox()->setQuestionText("Undo was successful");
@@ -169,18 +171,16 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		}
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		try {
-			string result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
-			if(result != "") {
-				_commandBar->getTextbox()->setQuestionText(result);
-			}
+			result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+			
 		} catch (exception& e) {
 			_commandBar->getTextbox()->setQuestionText(e.what());
 			_commandBar->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
 		}
 	} else if(keyPressed == Qt::Key_Up) {
-		_mariaLogic->processCommand("up");
+		result = _mariaLogic->processCommand("up");
 	} else if(keyPressed == Qt::Key_Down) {
-		_mariaLogic->processCommand("down");
+		result = _mariaLogic->processCommand("down");
 	} else {
 		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
 			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
@@ -193,6 +193,10 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 
 		}
 		event->ignore();
+	}
+
+	if(result != "") {
+		_commandBar->getTextbox()->setQuestionText(result);
 	}
 }
 

@@ -29,6 +29,7 @@ public:
 		GO_HOME,
 		GO_SETTINGS,
 		GO_HELP,
+		GO_CREDITS,
 		PAGE_UP,
 		PAGE_DOWN,
 		EXIT,

@@ -1,4 +1,5 @@
 #include "MariaLogic.h"
+#include "MariaUIStateCredits.h"
 #include "MariaUIStateLoading.h"
 #include "MariaUIStateHome.h"
 #include "MariaUIStateHelp.h"
@@ -10,7 +11,7 @@ MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	initShowHideWrapper();
 
 	initComponents();
-	initLoadingScreen();
+	initStartingState();
 }
 
 MariaLogic::~MariaLogic(void) {
@@ -54,6 +55,12 @@ string MariaLogic::processCommand(std::string inputText) {
 	string output = "";
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
+
+	//Process states where there are no commands.
+	if (mariaStateManager->getCurrentState() == STATE_TYPE::CREDITS) {
+		((MariaUIStateCredits*) currentObj)->setDoneAnimating();
+			return output;
+	}
 
 	try {
 		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
@@ -133,6 +140,10 @@ string MariaLogic::processCommand(std::string inputText) {
 			output = runCommandGoHome(input, currentObj);
 		break;
 
+		case MariaInputObject::COMMAND_TYPE::GO_CREDITS:
+			output = runCommandGoCredits(input, currentObj);
+		break;
+
 		case MariaInputObject::COMMAND_TYPE::PAGE_UP:
 			output = runCommandPageUp(input, currentObj);
 		break;
@@ -143,7 +154,9 @@ string MariaLogic::processCommand(std::string inputText) {
 	}
 
 	//Overall UI Refresh
-	((MariaUIStateDisplay*)currentObj)->updatePage();
+	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( currentObj ) ) {
+		tempObj->updatePage();
+	}
 
 	// Clean up.
 	SAFE_DELETE(input);
@@ -231,7 +244,7 @@ void MariaLogic::initTaskManager() {
 	}
 }
 
-void MariaLogic::initLoadingScreen() {
+void MariaLogic::initStartingState() {
 	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
 	mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
 	temp->setDisplayText("Loading");
@@ -336,6 +349,8 @@ string MariaLogic::runCommandEditTitle(MariaInputObject* input, MariaStateObject
 			return "There are similar tasks, which one should I edit?";
 		}
 	}
+	
+	return ("");
 }
 
 string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateObject* state) {
@@ -377,6 +392,8 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			return ("There are similar tasks, which one should I edit?");
 		}
 	}
+	
+	return ("");
 }
 
 string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObject* state) {
@@ -416,6 +433,8 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 			return ("There are similar tasks, which one should I edit?");
 		}
 	}
+	
+	return ("");
 }
 
 string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaStateObject* state) {
@@ -454,6 +473,8 @@ string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaState
 			return ("There are similar tasks, which one should I edit?");
 		}
 	}
+	
+	return ("");
 }
 
 string MariaLogic::runCommandShowDate(MariaInputObject* input, MariaStateObject* state) {
@@ -481,7 +502,7 @@ string MariaLogic::runCommandShowDateRange(MariaInputObject* input, MariaStateOb
 	assert(input != NULL);
 	assert(state != NULL);
 
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandShowAll(MariaInputObject* input, MariaStateObject* state) {
@@ -544,7 +565,7 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 		}
 	}
 
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state) {
@@ -562,7 +583,7 @@ string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject
 		return ("All tasks have been deleted.");
 	}
 
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject* state) {
@@ -600,7 +621,7 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 		}
 	}
 
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state) {
@@ -638,7 +659,7 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 		}
 	}
 
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* state) {
@@ -661,6 +682,16 @@ string MariaLogic::runCommandGoHome(MariaInputObject* input, MariaStateObject* s
 	return ("How can I help you?");
 }
 
+string MariaLogic::runCommandGoCredits(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	mariaStateManager->queueState(STATE_TYPE::CREDITS, new MariaUIStateCredits((QMainWindow*)mariaUI));
+	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+	mariaStateManager->transitState();
+	return ("Sure.");
+}
+
 string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* state) {
 	assert(input != NULL);
 	assert(state != NULL);
@@ -674,7 +705,7 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 			return ("There are no more items up there.");
 		}
 	}
-	return "";
+	return ("");
 }
 
 string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject* state) {
@@ -690,7 +721,7 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 			return ("There are no more items down there.");
 		}
 	}
-	return "";
+	return ("");
 }
 
 void MariaLogic::saveToFile() {

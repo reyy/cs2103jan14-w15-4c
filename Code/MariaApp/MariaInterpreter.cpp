@@ -39,6 +39,8 @@ MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE>* 
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("home", MariaInputObject::COMMAND_TYPE::GO_HOME));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("settings", MariaInputObject::COMMAND_TYPE::GO_SETTINGS));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("help", MariaInputObject::COMMAND_TYPE::GO_HELP));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("credits", MariaInputObject::COMMAND_TYPE::GO_CREDITS));
+	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("credit", MariaInputObject::COMMAND_TYPE::GO_CREDITS));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("up", MariaInputObject::COMMAND_TYPE::PAGE_UP));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("down", MariaInputObject::COMMAND_TYPE::PAGE_DOWN));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("exit", MariaInputObject::COMMAND_TYPE::EXIT));
@@ -998,7 +1000,7 @@ string MariaInterpreter::extractFromBackOfString(string text, string delimiter, 
 		} while (occ2 != string::npos);
 	}
 	delimiterPos = text.size();
-	return "";
+	return ("");
 }
 
 int MariaInterpreter::getDayOfWeek(string text) {
