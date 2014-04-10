@@ -23,6 +23,7 @@ public:
 	static const string MESSAGE_INVALID_DATE_TIME;
 	static const string MESSAGE_NO_ACTIVITY_TITLE;
 	static const string MESSAGE_NO_ACTIVITY_TITLE_EDIT;
+	static const string MESSAGE_NO_DESCRIPTION;
 	static const string MESSAGE_NO_INPUT;
 	static const string MESSAGE_NO_OPTION;
 

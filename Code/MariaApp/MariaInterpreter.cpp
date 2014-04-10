@@ -7,6 +7,7 @@ const string MariaInterpreter::MESSAGE_INVALID_OPTION = "Invalid option.";
 const string MariaInterpreter::MESSAGE_INVALID_DATE_TIME = "Invalid date/time detected.";
 const string MariaInterpreter::MESSAGE_NO_ACTIVITY_TITLE = "No activity title detected.";
 const string MariaInterpreter::MESSAGE_NO_ACTIVITY_TITLE_EDIT = "No new activity title detected.";
+const string MariaInterpreter::MESSAGE_NO_DESCRIPTION = "No description detected.";
 const string MariaInterpreter::MESSAGE_NO_INPUT = "No input detected.";
 const string MariaInterpreter::MESSAGE_NO_OPTION = "No option selected.";
 
@@ -429,7 +430,7 @@ void MariaInterpreter::parseEditDescription(string input, MariaInputObject* inpu
 
 	if (editFieldString.size() == 0) {
 		SAFE_DELETE(inputObject);
-		throw exception(MESSAGE_NO_ACTIVITY_TITLE_EDIT.c_str());
+		throw exception(MESSAGE_NO_DESCRIPTION.c_str());
 	}
 	inputObject->setEditField(editFieldString);
 	inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::EDIT_DESCRIPTION);
