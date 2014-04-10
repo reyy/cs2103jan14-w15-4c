@@ -14,7 +14,7 @@ MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskSta
 	_maxTaskDisplay = maxTaskDisplay;
 	
 	_pageText = new QLabel(_qmainWindow);
-	_pageText->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
+	_pageText->setStyleSheet("color:rgba(255, 255, 255, 200); font-size:" + QString::number(FONT_SIZE) + "px;");
 	_pageText->setAlignment(Qt::AlignCenter);
 	_pageText->hide();
 }

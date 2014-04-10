@@ -27,21 +27,37 @@ public:
 	static const string PREVIEW_DEADLINE_ITEM_AT;
 	static const string PREVIEW_DEADLINE_ITEM_REMAINING_TIME;
 	static const string PREVIEW_DEADLINE_ITEM_TRIM;
-
+	
 	static const string PREVIEW_FLOATING_SUGGESTION_DEFAULT;
+	static const string PREVIEW_FREE_DAY;
 
 	static const float START_HEIGHT_SCALE;
 	static const float MESSAGE_HEIGHT;
+	static const float TODAYBAR_STARTHEIGHT_SCALE;
+	static const float TOMORROWBAR_STARTHEIGHT_SCALE;
+	static const float CALENDARBAR_STARTHEIGHT_SCALE;
+	static const float TITLE_SEPARATE_HEIGHT;
+	static const float TITLE_AREA_HEIGHT;
+	static const float TITLE_XOFFSET;
+	static const float BODY_XOFFSET;
+	static const float DIVIDER_HEIGHT;
 	static const int TEXTBOX_X_OFFSET = 30;
-	static const int UPDATE_FREQUENCY = 30000;
-	static const int FONT_SIZE = 16;
+	static const int FONT_SIZE = 14;
 	static const int STRING_BUFFER_SIZE = 255;
 	static const int MAX_TASK_SHOWN = 3;
 
 private:
 	QMainWindow *_qmainWindow;
 
-	QLabel *_mainText;
+	QLabel *_textToday;
+	QLabel *_textTodayBody;
+	QLabel *_lineToday;
+	QLabel *_textTomorrow;
+	QLabel *_textTomorrowBody;
+	QLabel *_lineTomorrow;
+	QLabel *_textCalendar;
+	QLabel *_textCalendarBody;
+	QLabel *_lineCalendar;
 
 	string _generatedTodayText;
 	string _generatedTomorrowText;
@@ -58,6 +74,6 @@ public:
 	string generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine);
 
 	//Force denotes whether to generate a new task instead of using the existing store task.
-	string generateSuggestionText(vector<MariaTask*> taskListSuggest);
+	string generateSuggestionText(int day, vector<MariaTask*> taskListSuggest);
 };
 

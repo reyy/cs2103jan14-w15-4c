@@ -48,4 +48,5 @@ bool MariaUIStateConflict::timerEndState() {
 }
 
 void MariaUIStateConflict::updateGUI() {
+	updateUITaskNumber();
 }
