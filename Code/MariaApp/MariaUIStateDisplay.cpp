@@ -266,6 +266,7 @@ void MariaUIStateDisplay::updateTitleText() {
 	
 
 	string toShow="";
+	string toShow2="";
 	if(offsetBeforePage > 0) {
 		toShow += to_string(offsetBeforePage);
 		if(offsetBeforePage > 1) {
@@ -275,20 +276,20 @@ void MariaUIStateDisplay::updateTitleText() {
 		}
 	}
 
-	if(toShow.length() > 0) {
-		toShow += "\n";
-	}
-
 	if(offsetAfterPage > 0) {
-		toShow += to_string(offsetAfterPage);
+		toShow2 += to_string(offsetAfterPage);
 		if(offsetAfterPage > 1) {
-			toShow +=  + " items down below";
+			toShow2 +=  + " items down below";
 		} else {
-			toShow +=  + " item down below";
+			toShow2 +=  + " item down below";
 		}
 	}
 
-	_pageText->setText(QString::fromStdString(toShow));
+	if(toShow.length() > 0 && toShow2.length() > 0) {
+		toShow += "\n";
+	}
+
+	_pageText->setText(QString::fromStdString(toShow + toShow2));
 }
 
 void MariaUIStateDisplay::updatePageTitleGUI() {
