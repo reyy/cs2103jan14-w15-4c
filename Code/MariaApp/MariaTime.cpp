@@ -210,6 +210,13 @@ string MariaTime::convertToDateString(MariaTime *time) {
 	return toReturn;
 }
 
+string MariaTime::convertToMonthString(MariaTime *time) {
+	string toReturn;
+	toReturn += MONTHS[time->getMonth()-1] + dateSeparator;
+	toReturn += to_string(time->getYear());
+	return toReturn;
+}
+
 int MariaTime::timeDifference(MariaTime *end, MariaTime *start) {
 	return (int)difftime(end->get(), start->get());
 }
