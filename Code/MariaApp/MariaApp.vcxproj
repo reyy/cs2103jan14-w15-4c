@@ -203,6 +203,7 @@
     <ClCompile Include="MariaStateObject.cpp" />
     <ClCompile Include="MariaTask.cpp" />
     <ClCompile Include="MariaTaskManager.cpp" />
+    <ClCompile Include="MariaText.cpp" />
     <ClCompile Include="MariaTime.cpp" />
     <ClCompile Include="MariaUI.cpp" />
     <ClCompile Include="MariaUIClock.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="MariaInterpreter.h" />
     <ClInclude Include="MariaLogic.h" />
     <ClInclude Include="MariaMacros.h" />
+    <ClInclude Include="MariaText.h" />
     <ClInclude Include="MariaUIStateCredits.h" />
     <ClInclude Include="MariaUIStateHelp.h" />
     <ClInclude Include="MariaUIStateType.h" />

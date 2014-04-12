@@ -6,6 +6,7 @@
 #include <process.h>
 #include <string>
 #include "MariaUI.h"
+#include "MariaText.h"
 #include "MariaStateManager.h"
 #include "MariaInterpreter.h"
 #include "MariaTaskManager.h"
