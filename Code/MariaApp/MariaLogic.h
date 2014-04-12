@@ -64,6 +64,7 @@ private:
 
 	void saveToFile();
 	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
+	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks);
 	//void addStateToQueue(STATE_TYPE type, );
 	
 
