@@ -31,26 +31,10 @@ string MariaLogic::processCommand(std::string inputText) {
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
-	//Miki, need you to fix this so that interpreter knows its credits, run their respective end function instead.
-
-	//Process states where there are no commands.
-	if (mariaStateManager->getCurrentState() == STATE_TYPE::CREDITS) {
-		((MariaUIStateCredits*) currentObj)->setDoneAnimating();
-			return output;
-	}
-	
-	//Miki, need interpreter to recognise its help, any other parameters reject, just call setDoneviewing. Unless its left or right.
-	//which will call the PageLeft/PageRight
-	/*
-	if (mariaStateManager->getCurrentState() == STATE_TYPE::HELP) {
-		((MariaUIStateHelp*) currentObj)->setDoneViewing();
-			return output;
-	}*/
-
 	try {
 		input = mariaInterpreter->parseInput(inputText, mariaStateManager->getCurrentState());
 	} catch (exception& e) {
-		throw exception(e.what());
+		throw;
 	}
 
 	// Rey: Refactoring needed for this line.
@@ -91,6 +75,10 @@ string MariaLogic::processCommand(std::string inputText) {
 
 		case MariaInputObject::COMMAND_TYPE::SHOW_DATE:
 			output = runCommandShowDate(input, currentObj);
+		break;
+
+		case MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE:
+			runCommandShowDateRange(input, currentObj);
 		break;
 
 		case MariaInputObject::COMMAND_TYPE::SHOW_ALL:
@@ -151,7 +139,8 @@ string MariaLogic::processCommand(std::string inputText) {
 	}
 
 	//Overall UI Refresh
-	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( currentObj ) ) {
+	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(currentObj);
+	if (tempObj != NULL) {
 		tempObj->updatePage();
 	}
 
@@ -501,6 +490,20 @@ string MariaLogic::runCommandShowDateRange(MariaInputObject* input, MariaStateOb
 	assert(input != NULL);
 	assert(state != NULL);
 
+	MariaTime* startTime = input->getStartTime();
+	startTime->setHour(0);
+	startTime->setMin(0);
+	MariaTime* endTime = input->getEndTime();
+	endTime->setHour(23);
+	endTime->setMin(59);
+	vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime);
+
+	mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have on " + MariaTime::convertToMonthString(startTime) + ".");
+	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToMonthString(startTime), listOfTasks));
+	mariaStateManager->transitState();
+
+	SAFE_DELETE(startTime);
+	SAFE_DELETE(endTime);
 	return ("");
 }
 
@@ -695,8 +698,24 @@ string MariaLogic::runCommandGoHome(MariaInputObject* input, MariaStateObject* s
 	assert(input != NULL);
 	assert(state != NULL);
 
-	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
-	mariaStateManager->transitState();
+	STATE_TYPE currentState = mariaStateManager->getCurrentState();
+
+	switch (currentState) {
+	case STATE_TYPE::SHOW:
+	case STATE_TYPE::CONFLICT:
+		mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+		mariaStateManager->transitState();
+		break;
+
+	case STATE_TYPE::HELP:
+		((MariaUIStateHelp*)state)->setDoneViewing();
+		break;
+
+	case STATE_TYPE::CREDITS:
+		((MariaUIStateCredits*)state)->setDoneAnimating();
+		break;
+	}
+
 	return ("How can I help you?");
 }
 
@@ -707,6 +726,7 @@ string MariaLogic::runCommandGoCredits(MariaInputObject* input, MariaStateObject
 	mariaStateManager->queueState(STATE_TYPE::CREDITS, new MariaUIStateCredits((QMainWindow*)mariaUI));
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 	mariaStateManager->transitState();
+
 	return ("Sure.");
 }
 
@@ -717,6 +737,7 @@ string MariaLogic::runCommandGoHelp(MariaInputObject* input, MariaStateObject* s
 	mariaStateManager->queueState(STATE_TYPE::HELP, new MariaUIStateHelp((QMainWindow*)mariaUI));
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 	mariaStateManager->transitState();
+
 	return ("Let me get you some help.");
 }
 
@@ -724,7 +745,8 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 	assert(input != NULL);
 	assert(state != NULL);
 
-	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( state ) ) {
+	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(state);
+	if (tempObj != NULL) {
 		if (tempObj->isAllTaskAtLocation()) {
 			if (tempObj->isPageValid(tempObj->getPage()-1)) {
 				tempObj->setPage(tempObj->getPage()-1);
@@ -734,6 +756,7 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 			}
 		}
 	}
+
 	return ("");
 }
 
@@ -741,7 +764,8 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 	assert(input != NULL);
 	assert(state != NULL);
 
-	if( MariaUIStateDisplay* tempObj = dynamic_cast< MariaUIStateDisplay* >( state ) ) {
+	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(state);
+	if (tempObj != NULL) {
 		if (tempObj->isAllTaskAtLocation()) {
 			if (tempObj->isPageValid(tempObj->getPage()+1)) {
 				tempObj->setPage(tempObj->getPage()+1);
@@ -751,6 +775,7 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 			}
 		}
 	}
+
 	return ("");
 }
 
@@ -758,9 +783,19 @@ string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject*
 	assert(input != NULL);
 	assert(state != NULL);
 
-	if( MariaUIStateHelp* tempObj = dynamic_cast< MariaUIStateHelp* >( state ) ) {
-		tempObj->setHelpIndex(tempObj->getHelpIndex() - 1);
+	MariaUIStateHelp* tempObj = dynamic_cast<MariaUIStateHelp*>(state);
+
+	switch (mariaStateManager->getCurrentState()) {
+	case STATE_TYPE::HELP:
+		if (tempObj != NULL) {
+			tempObj->setHelpIndex(tempObj->getHelpIndex()-1);
+		}
+		break;
+
+	default:
+		break;
 	}
+
 	return ("");
 }
 
@@ -768,9 +803,19 @@ string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject
 	assert(input != NULL);
 	assert(state != NULL);
 
-	if( MariaUIStateHelp* tempObj = dynamic_cast< MariaUIStateHelp* >( state ) ) {
-		tempObj->setHelpIndex(tempObj->getHelpIndex() + 1);
+	MariaUIStateHelp* tempObj = dynamic_cast<MariaUIStateHelp*>(state);
+
+	switch (mariaStateManager->getCurrentState()) {
+	case STATE_TYPE::HELP:
+		if (tempObj != NULL) {
+			tempObj->setHelpIndex(tempObj->getHelpIndex()+1);
+		}
+		break;
+
+	default:
+		break;
 	}
+
 	return ("");
 }
 
