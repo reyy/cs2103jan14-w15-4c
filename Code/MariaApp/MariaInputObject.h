@@ -24,10 +24,9 @@ public:
 		MARK_DONE,
 		MARK_UNDONE,
 		DELETE_TASK,
-		DELETE_ALL,		//Pending removal
+		DELETE_ALL,
 		UNDO,
 		GO_HOME,
-		GO_SETTINGS,
 		GO_HELP,
 		GO_CREDITS,
 		PAGE_UP,

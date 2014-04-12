@@ -17,8 +17,10 @@ using namespace std;
 class MariaInterpreter {
 public:
 	// Warning Messages
+	static const string MESSAGE_BLANK;
 	static const string MESSAGE_INVALID_COMMAND;
 	static const string MESSAGE_INVALID_COMMAND_FORMAT;
+	static const string MESSAGE_INVALID_COMMAND_LOCATION;
 	static const string MESSAGE_INVALID_OPTION;
 	static const string MESSAGE_INVALID_DATE_TIME;
 	static const string MESSAGE_NO_ACTIVITY_TITLE;

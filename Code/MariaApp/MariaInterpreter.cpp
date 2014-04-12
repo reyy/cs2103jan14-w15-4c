@@ -1,8 +1,10 @@
 //@author A0111821X
 #include "MariaInterpreter.h"
 
+const string MariaInterpreter::MESSAGE_BLANK = "";
 const string MariaInterpreter::MESSAGE_INVALID_COMMAND = "Invalid command detected.";
 const string MariaInterpreter::MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format detected.";
+const string MariaInterpreter::MESSAGE_INVALID_COMMAND_LOCATION = "You can't enter that command here.";
 const string MariaInterpreter::MESSAGE_INVALID_OPTION = "Invalid option.";
 const string MariaInterpreter::MESSAGE_INVALID_DATE_TIME = "Invalid date/time detected.";
 const string MariaInterpreter::MESSAGE_NO_ACTIVITY_TITLE = "No activity title detected.";
@@ -37,7 +39,6 @@ MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE>* 
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("undo", MariaInputObject::COMMAND_TYPE::UNDO));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("back", MariaInputObject::COMMAND_TYPE::GO_HOME));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("home", MariaInputObject::COMMAND_TYPE::GO_HOME));
-	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("settings", MariaInputObject::COMMAND_TYPE::GO_SETTINGS));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("help", MariaInputObject::COMMAND_TYPE::GO_HELP));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("credits", MariaInputObject::COMMAND_TYPE::GO_CREDITS));
 	commandKeywordList->insert(pair<string, MariaInputObject::COMMAND_TYPE>("credit", MariaInputObject::COMMAND_TYPE::GO_CREDITS));
@@ -88,7 +89,6 @@ MariaInputObject* MariaInterpreter::parseInput(string input, STATE_TYPE currentS
 
 	if (commandKeyword == commandKeywordList->end()) {
 		SAFE_DELETE(toReturn);
-		//TODO: Add the actual keyword that went wrong.
 		throw exception(MESSAGE_INVALID_COMMAND.c_str());
 	}
 
@@ -136,6 +136,11 @@ void MariaInterpreter::parseAdd(string input, MariaInputObject* inputObject, STA
 	if (input.size() == 0) {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+	}
+
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
 	}
 
 	int dummyVar = 0;
@@ -256,6 +261,11 @@ void MariaInterpreter::parseEdit(string input, MariaInputObject* inputObject, ST
 	if (input.size() == 0) {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
+	}
+
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
 	}
 
 	vector<string> tokenizedInput = tokenizeString(input);
@@ -443,6 +453,11 @@ void MariaInterpreter::parseEditDescription(string input, MariaInputObject* inpu
 void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
+	}
+
 	if (input.size() == 0) {
 		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
@@ -588,6 +603,11 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 void MariaInterpreter::parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
+	}
+
 	if (input.size() == 0) {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
@@ -598,6 +618,11 @@ void MariaInterpreter::parseSearch(string input, MariaInputObject* inputObject, 
 
 void MariaInterpreter::parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
+
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
+	}
 
 	switch (currentState) {
 	case STATE_TYPE::CONFLICT:
@@ -629,6 +654,11 @@ void MariaInterpreter::parseDelete(string input, MariaInputObject* inputObject, 
 void MariaInterpreter::parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
 
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
+	}
+
 	switch (currentState) {
 	case STATE_TYPE::CONFLICT:
 		if (input.size() == 0) {
@@ -656,6 +686,11 @@ void MariaInterpreter::parseMarkDone(string input, MariaInputObject* inputObject
 
 void MariaInterpreter::parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
 	assert(inputObject != NULL);
+
+	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW && currentState != STATE_TYPE::CONFLICT) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_COMMAND_LOCATION.c_str());
+	}
 
 	switch (currentState) {
 	case STATE_TYPE::CONFLICT:

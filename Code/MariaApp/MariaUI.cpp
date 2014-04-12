@@ -191,6 +191,8 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		result = _mariaLogic->processCommand("left");
 	} else if(keyPressed == Qt::Key_Right) {
 		result = _mariaLogic->processCommand("right");
+	} else if (keyPressed == Qt::Key_Escape) {
+		result = _mariaLogic->processCommand("home");
 	} else {
 		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
 			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
