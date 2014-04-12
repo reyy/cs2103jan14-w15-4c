@@ -18,7 +18,6 @@ public:
 
 	bool checkValidCommand(std::string inputText);
 	string processCommand(std::string inputText);
-	bool processUndo();
 	void terminateProgram();
 	void generateTextforUI();
 

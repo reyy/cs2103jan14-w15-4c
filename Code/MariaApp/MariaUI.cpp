@@ -170,11 +170,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	string result;
 
 	if(event->key() == Qt::Key_Z && event->modifiers().testFlag(Qt::ControlModifier)) {
-		if(_mariaLogic->processUndo()) {
-			getCommandBar()->getTextbox()->setQuestionText("Undo was successful");
-		} else {
-			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
-		}
+		result = _mariaLogic->processCommand("undo");
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		try {
 			result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());

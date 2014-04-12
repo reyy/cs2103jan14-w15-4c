@@ -22,34 +22,6 @@ MariaLogic::~MariaLogic(void) {
 	SAFE_DELETE(mariaUI);
 }
 
-bool MariaLogic::processUndo() {
-	/*STATE_TYPE currentState = mariaStateManager->getCurrentState();
-	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW) {
-		return false; //temporary disable undo everywhere except home
-	}
-
-	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
-	MariaTask* changed = mariaTaskManager->undoLast();
-
-	if (changed) {
-		saveToFile();
-
-		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
-		if (taskCountDifference < 0) {
-			//refresh GUI!
-			((MariaUIStateHome*)currentObj)->eraseUITask(changed);
-		} else if (taskCountDifference > 0) {
-			//((MariaUIStateHome*)currentObj)->addUITask(changed, MariaUITask::DISPLAY_TYPE::NORMAL);
-//			addTaskToUI(changed, state);
-			((MariaUIStateHome*)currentObj)->setPageEnd();
-		} 
-		mariaTaskManager->compareToPreviousQuery();
-		return true;
-	}*/
-	return false;
-}
-
-
 bool MariaLogic::checkValidCommand(std::string inputText) {
 	return mariaInterpreter->checkValidCommand(inputText);
 }
