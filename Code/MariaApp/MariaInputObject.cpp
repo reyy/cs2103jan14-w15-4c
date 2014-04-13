@@ -46,14 +46,26 @@ void MariaInputObject::setOptionID(int newOptionID) {
 }
 
 void MariaInputObject::setStartTime(MariaTime* newStartTime) {
+	if (_startTime != NULL) {
+		delete _startTime;
+	}
+
 	_startTime = newStartTime;
 }
 
 void MariaInputObject::setEndTime(MariaTime* newEndTime) {
+	if (_endTime != NULL) {
+		delete _endTime;
+	}
+
 	_endTime = newEndTime;
 }
 
 void MariaInputObject::setEditTime(MariaTime* newEditTime) {
+	if (_editTime != NULL) {
+		delete _editTime;
+	}
+
 	_editTime = newEditTime;
 }
 

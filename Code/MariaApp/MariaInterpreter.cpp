@@ -255,8 +255,7 @@ void MariaInterpreter::parseAddTimedTask(string input, MariaInputObject* inputOb
 	inputObject->setStartTime(startTime);
 
 	while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
-		MariaTime* newEndTime = new MariaTime(endTime->getYear(), endTime->getMonth(), endTime->getDay()+7, endTime->getHour(), endTime->getMin());
-		SAFE_DELETE(endTime);
+		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
 
 		inputObject->setEndTime(newEndTime);
 	}
@@ -539,8 +538,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
 
 			while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
-				MariaTime* newEndTime = new MariaTime(endTime->getYear(), endTime->getMonth(), endTime->getDay()+7, endTime->getHour(), endTime->getMin());
-				SAFE_DELETE(endTime);
+				MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
 
 				inputObject->setEndTime(newEndTime);
 			}
