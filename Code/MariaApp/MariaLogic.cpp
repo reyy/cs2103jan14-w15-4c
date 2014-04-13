@@ -62,9 +62,6 @@ string MariaLogic::processCommand(std::string inputText) {
 		throw;
 	}
 
-	// Rey: Refactoring needed for this line.
-	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
-
 	switch (input->getCommandType()) {
 		case MariaInputObject::COMMAND_TYPE::EXIT:
 			runCommandExit(input, currentObj);
@@ -162,6 +159,9 @@ string MariaLogic::processCommand(std::string inputText) {
 			output = runCommandPageRight(input, currentObj);
 		break;
 	}
+
+	// Rey: Refactoring needed for this line.
+	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
 
 	//Overall UI Refresh
 	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(currentObj);
@@ -694,7 +694,7 @@ string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* sta
 	assert(state != NULL);
 
 	if (processUndo()) {
-		return ("Undo was sucessful");
+		return ("Undo was successful.");
 	} else {
 		return ("Nothing to Undo.");
 	}
@@ -799,6 +799,8 @@ string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject*
 		break;
 
 	default:
+		SAFE_DELETE(input);
+		throw exception("");
 		break;
 	}
 
@@ -819,6 +821,8 @@ string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject
 		break;
 
 	default:
+		SAFE_DELETE(input);
+		throw exception("");
 		break;
 	}
 

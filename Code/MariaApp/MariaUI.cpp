@@ -178,7 +178,6 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
 		try {
 			result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
-			
 		} catch (exception& e) {
 			_commandBar->getTextbox()->setQuestionText(e.what());
 			_commandBar->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
@@ -188,9 +187,17 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 	} else if(keyPressed == Qt::Key_Down) {
 		result = _mariaLogic->processCommand("down");
 	} else if(keyPressed == Qt::Key_Left) {
-		result = _mariaLogic->processCommand("left");
+		try {
+			result = _mariaLogic->processCommand("left");
+		} catch (exception& e) {
+			return;
+		}
 	} else if(keyPressed == Qt::Key_Right) {
-		result = _mariaLogic->processCommand("right");
+		try {
+			result = _mariaLogic->processCommand("right");
+		} catch (exception& e) {
+			return;
+		}
 	} else if (keyPressed == Qt::Key_Escape) {
 		result = _mariaLogic->processCommand("home");
 	} else {

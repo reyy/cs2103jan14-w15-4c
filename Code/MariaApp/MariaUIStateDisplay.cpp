@@ -230,6 +230,7 @@ void MariaUIStateDisplay::updatePage() {
 		} else {
 			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
 		}
+		_taskStack.at(i)->updateDetails();
 	}
 	updateTitleText();
 	updateGUI();

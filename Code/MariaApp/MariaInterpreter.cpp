@@ -582,6 +582,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 					break;
 				}
 			}
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		} else if (isStringContain(input, "jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sept?(ember)?|oct(tober)?|nov(ember)?|dec(ember)?")) {
 			int year = MariaTime::getCurrentTime().getYear();
 			int month;
@@ -666,6 +667,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 			// Also check if the preceding token is "next".
 			// If it is, add a week to this day.
 			inputObject->setEndTime(new MariaTime(year, month, day));
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		}
 	} else {
 		SAFE_DELETE(inputObject);
