@@ -1,3 +1,5 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUICommandBar.h"
 
 const float MariaUICommandBar::DEFAULT_X_POSITION = 0.0;
@@ -6,6 +8,8 @@ const float MariaUICommandBar::FLOW_FACTOR = 0.05;
 const float MariaUICommandBar::VALUE_THRESHOLD = 5.0;
 
 MariaUICommandBar::MariaUICommandBar(QMainWindow *qmainWindow) {
+	assert(qmainWindow != NULL);
+
 	_qmainWindow = qmainWindow;
 
 	_yPosition = DEFAULT_Y_POSITION;
@@ -15,14 +19,33 @@ MariaUICommandBar::MariaUICommandBar(QMainWindow *qmainWindow) {
 	_status = new MariaUIStatus(_qmainWindow);
 
 	_updateGUITimer = new QTimer(_qmainWindow);
- connect(_updateGUITimer, SIGNAL(timeout()), this, SLOT(updateGUI()));
+	connect(_updateGUITimer, SIGNAL(timeout()), this, SLOT(updateGUI()));
 	updateGUI();
 }
 
 MariaUICommandBar::~MariaUICommandBar() {
-	delete _updateGUITimer;
-	delete _status;
-	delete _textbox;
+	SAFE_DELETE(_updateGUITimer);
+	SAFE_DELETE(_status);
+	SAFE_DELETE(_textbox);
+}
+
+float MariaUICommandBar::getPosition() {
+	return _yPosition;
+}
+
+void MariaUICommandBar::setDestination(float yPosition) {
+	_yDestination = yPosition;
+	if(!_updateGUITimer->isActive()) {
+		_updateGUITimer->start(GUI_UPDATE_FREQUENCY);
+	}
+}
+
+MariaUITextbox* MariaUICommandBar::getTextbox() {
+	return _textbox;
+}
+
+MariaUIStatus* MariaUICommandBar::getStatus() {
+	return _status;
 }
 
 void MariaUICommandBar::updateGUI() {
@@ -34,23 +57,4 @@ void MariaUICommandBar::updateGUI() {
 
 	_textbox->updateGUI(QPointF(DEFAULT_X_POSITION, _yPosition));
 	_status->updateGUI(QPointF(DEFAULT_X_POSITION, _yPosition));
-}
-
-float MariaUICommandBar::getPosition() {
-	return _yPosition;
-}
-
-void MariaUICommandBar::setDestination(float yPosition) {
-	_yDestination = yPosition;
-	if(!_updateGUITimer->isActive()) {
-		_updateGUITimer->start(1);
-	}
-}
-
-MariaUITextbox* MariaUICommandBar::getTextbox() {
-	return _textbox;
-}
-
-MariaUIStatus* MariaUICommandBar::getStatus() {
-	return _status;
 }

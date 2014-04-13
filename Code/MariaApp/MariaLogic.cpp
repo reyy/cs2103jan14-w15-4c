@@ -875,7 +875,7 @@ void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
 		((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 		((MariaUIStateHome*)state)->setPageEnd();
 	} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
-		((MariaUIStateShow*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
+		((MariaUIStateShow*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::DETAILED);
 		((MariaUIStateShow*)state)->setPageEnd();
 	}
 }

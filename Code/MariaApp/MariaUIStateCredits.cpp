@@ -1,6 +1,9 @@
-#include "MariaUIStateCredits.h"
+#include <assert.h>
 #include "MariaUI.h"
+#include "MariaUIStateCredits.h"
 
+const string MariaUIStateCredits::CREDITS_STRING = "M.A.R.I.A.\nMy Attentive, Reliable and Intelligent Assistant";
+const string MariaUIStateCredits::CREDITS_STRING_BODY = "Developed for CS2103T Software Engineering(S2 2014)\nNational University of Singapore\n\nDevelopers:\nJay Chua\nMelvyn Qwek\nRey Neo\n\nSpecial Thanks:\nDr Damith C. Rajapakse\nMrs Janet Chan\nMr Jerome Cheng";
 const float MariaUIStateCredits::FLOW_FACTOR = 0.01;
 const float MariaUIStateCredits::VALUE_THRESHOLD = 0.5;
 const float MariaUIStateCredits::DISPLAY_TEXT_WIDTH = 400;
@@ -11,11 +14,12 @@ const float MariaUIStateCredits::LOGO_START_Y = -100;
 const float MariaUIStateCredits::LOGO_STAGE_Y_SCALE = 0.15;
 const float MariaUIStateCredits::TEXT_STAGE_Y_SCALE = 0.3;
 const float MariaUIStateCredits::TEXTBODY_STAGE_Y_SCALE = 0.3;
-const string MariaUIStateCredits::CREDITS_STRING = "M.A.R.I.A.\nMy Attentive, Reliable and Intelligent Assistant";
-const string MariaUIStateCredits::CREDITS_STRING_BODY = "Developed for CS2103T Software Engineering(S2 2014)\nNational University of Singapore\n\nDevelopers:\nJay Chua\nMelvyn Qwek\nRey Neo\n\nSpecial Thanks:\nDr Damith C. Rajapakse\nMrs Janet Chan\nMr Jerome Cheng";
 
 MariaUIStateCredits::MariaUIStateCredits(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+	
 	_qmainWindow = qmainWindow;
+	
 	_displayText = new QLabel(_qmainWindow);
 	_displayTextBody = new QLabel(_qmainWindow);
 	_logo = new QLabel(_qmainWindow);
