@@ -77,7 +77,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 
 	_textCalendar = new QLabel(_qmainWindow);
 	_textCalendar->setStyleSheet("color:#ffffff; font-size:10px;");
-	_textCalendar->setText("Calendar");
+	_textCalendar->setText("Outlook for the Week");
 	_textCalendar->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
 	_textCalendar->show();
 
