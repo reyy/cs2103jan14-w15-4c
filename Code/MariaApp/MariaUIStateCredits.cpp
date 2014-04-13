@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUI.h"
 #include "MariaUIStateCredits.h"
 
@@ -29,9 +30,13 @@ MariaUIStateCredits::MariaUIStateCredits(QMainWindow* qmainWindow) : MariaStateO
 }
 
 MariaUIStateCredits::~MariaUIStateCredits() {
-	delete _logo;
-	delete _displayTextBody;
-	delete _displayText;
+	SAFE_DELETE(_logo);
+	SAFE_DELETE(_displayTextBody);
+	SAFE_DELETE(_displayText);
+}
+
+void MariaUIStateCredits::setDoneAnimating() {
+	_doneAnimating = true;
 }
 
 void MariaUIStateCredits::initBeginState() {
@@ -92,10 +97,6 @@ void MariaUIStateCredits::animateLogo() {
 		_logoImageIndex = 0;
 	}
 	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
-}
-
-void MariaUIStateCredits::setDoneAnimating() {
-	_doneAnimating = true;
 }
 
 void MariaUIStateCredits::updateGUIPosition() {

@@ -1,3 +1,5 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUIStateLoading.h"
 #include "MariaUI.h"
 
@@ -15,24 +17,41 @@ const float MariaUIStateLoading::DOTS_X_SPEED = 0.15;
 const float MariaUIStateLoading::DOTS_X_VARIABLE_SPEED = 0.75;
 
 MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+
 	_qmainWindow = qmainWindow;
 	_displayText = new QLabel(_qmainWindow);
 	_logo = new QLabel(_qmainWindow);
+
 	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
 		_loadingDots[i] = new QLabel(_qmainWindow);
 	}
+
 	_logoImageIndex = 0;
+	_quitAfterLoading = false;
 	_doneLoading = false;
 	_transitionAuto = true;
-	_quitAfterLoading = false;
 }
 
 MariaUIStateLoading::~MariaUIStateLoading() {
 	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
-		delete _loadingDots[i];
+		SAFE_DELETE(_loadingDots[i]);
 	}
-	delete _logo;
-	delete _displayText;
+	SAFE_DELETE(_logo);
+	SAFE_DELETE(_displayText);
+}
+
+void MariaUIStateLoading::setDisplayText(std::string text) {
+	QString qText = QString::fromStdString(text);
+	_displayText->setText(qText);
+}
+
+void MariaUIStateLoading::setLoadingDone() {
+	_doneLoading = true;
+}
+
+void MariaUIStateLoading::setQuitAfterLoadingTrue() {
+	_quitAfterLoading = true;
 }
 
 void MariaUIStateLoading::initBeginState() {
@@ -75,7 +94,8 @@ bool MariaUIStateLoading::timerBeginState() {
 
 	if(abs(_logoYPos-_qmainWindow->height()*LOGO_STAGE_Y_SCALE)>VALUE_THRESHOLD) {
 		_logoYPos += (_qmainWindow->height()*LOGO_STAGE_Y_SCALE-_logoYPos)*FLOW_FACTOR;
-		_logo->setGeometry(QRect(_qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, _logoYPos-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()*0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+		updateGUIPosition();
+
 		return true;
 	}
 	return false;
@@ -83,7 +103,42 @@ bool MariaUIStateLoading::timerBeginState() {
 
 bool MariaUIStateLoading::timerActiveState() {
 	animateLogo();
+	bool allDotsLeft = animateDots();
 
+	if(allDotsLeft&&_doneLoading) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool MariaUIStateLoading::timerEndState() {
+	animateLogo();
+
+	if(abs(_logoYPos-LOGO_START_Y)>VALUE_THRESHOLD) {
+		_logoYPos += (LOGO_START_Y-_logoYPos)*FLOW_FACTOR;
+		updateGUIPosition();
+		
+		return true;
+	} else {
+		if(_quitAfterLoading) {
+			((MariaUI*)_qmainWindow)->quitAction();
+		}
+
+		return false;
+	}
+}
+
+void MariaUIStateLoading::animateLogo() {
+	if(_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
+		_logoImageIndex++;
+	} else {
+		_logoImageIndex = 0;
+	}
+	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
+}
+
+bool MariaUIStateLoading::animateDots() {
 	bool allDotsLeft = true;
 	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
 		if(_dotsXPos[i]<-DOTS_X_OFFSET-AMOUNT_OF_DOTS*DOTS_SEPARATION_WIDTH) {
@@ -100,45 +155,9 @@ bool MariaUIStateLoading::timerActiveState() {
 		_loadingDots[i]->setGeometry(QRect(_dotsXPos[i]-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width()*0.5, _qmainWindow->height()*DOTS_STAGE_Y_SCALE , MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->height()));
 	}
 
-	if(allDotsLeft&&_doneLoading) {
-		return false;
-	} else {
-		return true;
-	}
+	return allDotsLeft;
 }
 
-bool MariaUIStateLoading::timerEndState() {
-	animateLogo();
-
-	if(abs(_logoYPos-LOGO_START_Y)>VALUE_THRESHOLD) {
-		_logoYPos += (LOGO_START_Y-_logoYPos)*FLOW_FACTOR;
-		_logo->setGeometry(QRect(_qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, _logoYPos-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()*0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
-		if(_quitAfterLoading) {
-			((MariaUI*)_qmainWindow)->quitAction();
-		}
-		return true;
-	}
-	return false;
-}
-
-void MariaUIStateLoading::animateLogo() {
-	if(_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
-		_logoImageIndex++;
-	} else {
-		_logoImageIndex = 0;
-	}
-	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
-}
-
-void MariaUIStateLoading::setDisplayText(std::string text) {
-	QString qText = QString::fromStdString(text);
-	_displayText->setText(qText);
-}
-
-void MariaUIStateLoading::setLoadingDone() {
-	_doneLoading = true;
-}
-
-void MariaUIStateLoading::setQuitAfterLoadingTrue() {
-	_quitAfterLoading = true;
+void MariaUIStateLoading::updateGUIPosition() {
+	_logo->setGeometry(QRect(_qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, _logoYPos-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()*0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
 }
