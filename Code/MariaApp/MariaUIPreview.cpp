@@ -246,12 +246,11 @@ string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskLi
 	
 	//Find an empty day of the week.
 	if(day >= 0 && day <=6) {
-		//+ 1 to offset the starting day of the week.
-		if(MariaTime::getCurrentTime().getDayWeek() != day + 1) {
+		if(MariaTime::getCurrentTime().getDayWeek() != (day + DAY_OFFSET) % DAY_OF_WEEK) {
 			sprintf_s(buffer, PREVIEW_FREE_DAY.c_str(), MariaTime::DAYS[day]);
 			toReturn+=buffer;
 		} else {
-			sprintf_s(buffer, PREVIEW_FREE_DAY_TODAY.c_str(), MariaTime::DAYS[day]);
+			sprintf_s(buffer, PREVIEW_FREE_DAY_TODAY.c_str());
 			toReturn+=buffer;
 		}
 	}

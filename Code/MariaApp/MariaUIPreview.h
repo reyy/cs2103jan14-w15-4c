@@ -14,6 +14,8 @@ public:
 	static const int FONT_SIZE = 12;
 	static const int STRING_BUFFER_SIZE = 255;
 	static const int MAX_TASK_SHOWN = 3;
+	static const int DAY_OFFSET = 1;
+	static const int DAY_OF_WEEK = 7;
 
 	static const string PREVIEW_EVENT_TODAY_NONE;
 	static const string PREVIEW_EVENT_TODAY_FIRST_AT;
