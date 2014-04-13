@@ -9,7 +9,6 @@
 MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
 	initWindowIcon();
 	initShowHideWrapper();
-
 	initComponents();
 	initStartingState();
 }
@@ -22,11 +21,11 @@ MariaLogic::~MariaLogic(void) {
 	SAFE_DELETE(mariaUI);
 }
 
-bool MariaLogic::checkValidCommand(std::string inputText) {
+bool MariaLogic::checkValidCommand(string inputText) {
 	return mariaInterpreter->checkValidCommand(inputText);
 }
 
-string MariaLogic::processCommand(std::string inputText) {
+string MariaLogic::processCommand(string inputText) {
 	string output = MariaText::EMPTY_STRING;
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
@@ -224,7 +223,7 @@ void MariaLogic::initTaskManager() {
 			mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
 			break;
 		} catch(exception e) {
-			MessageBox(NULL, L"M.A.R.I.A. is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
+			MessageBox(NULL, L"MARIA is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
 			quit();
 		}
 	}
@@ -783,8 +782,7 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(state);
 	if (tempObj != NULL) {
 		if (tempObj->isAllTaskAtLocation()) {
-			if (tempObj->isPageValid(tempObj->getPage()-1)) {
-				tempObj->setPage(tempObj->getPage()-1);
+			if (tempObj->setPage(tempObj->getPage()-1)) {
 				return MariaText::UP;
 			} else {
 				return MariaText::UP_ERROR;
@@ -802,8 +800,7 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(state);
 	if (tempObj != NULL) {
 		if (tempObj->isAllTaskAtLocation()) {
-			if (tempObj->isPageValid(tempObj->getPage()+1)) {
-				tempObj->setPage(tempObj->getPage()+1);
+			if (tempObj->setPage(tempObj->getPage()+1)) {
 				return MariaText::DOWN;
 			} else {
 				return MariaText::DOWN_ERROR;
@@ -867,7 +864,7 @@ void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
 	if(!mariaTaskManager->compareToPreviousQuery()) {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks(true);
 		MariaUIStateShow *nextState = new MariaUIStateShow((QMainWindow*)mariaUI, "All Tasks", listOfTasks);
-		int pageNum = getPageNumOfTask(toAdd, listOfTasks);
+		int pageNum = getPageNumOfTask(toAdd, listOfTasks, nextState->getMaxTaskDisplay());
 		nextState->setPage(pageNum);
 		mariaStateManager->queueState(STATE_TYPE::SHOW, nextState);
 		mariaStateManager->transitState();
@@ -880,13 +877,13 @@ void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
 	}
 }
 
-int MariaLogic::getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks) {
+int MariaLogic::getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks, int maxTask) {
 	for(int i = 0; i<listOfTasks.size(); i++) {
 		if(listOfTasks[i] == task) {
-			return i/5;
+			return i/maxTask;
 		}
 	}
-	return listOfTasks.size()/5;
+	return listOfTasks.size()/maxTask;
 }
 
 void __cdecl MariaLogic::doShowHideWrapper(void* mariaLogic) {

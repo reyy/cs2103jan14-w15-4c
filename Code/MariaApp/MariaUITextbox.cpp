@@ -43,28 +43,29 @@ MariaUITextbox::~MariaUITextbox() {
 	if(_updateSuggestTextTimer->isActive()) {
 		_updateSuggestTextTimer->stop();
 	}
+
 	SAFE_DELETE(_updateSuggestTextTimer);
 	SAFE_DELETE(_suggestText);
 	SAFE_DELETE(_inputBox);
 	SAFE_DELETE(_questionText);
 }
 
-void MariaUITextbox::setQuestionText(const std::string text) {
+void MariaUITextbox::setQuestionText(const string text) {
 	QFontMetrics fm = QFontMetrics(_questionText->font());
 	_questionText->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _questionText->width()));
 }
 
-void MariaUITextbox::setSuggestText(const std::string text) {
+void MariaUITextbox::setSuggestText(const string text) {
 	QFontMetrics fm = QFontMetrics(_suggestText->font());
 	_suggestText->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _suggestText->width()));
 }
 
-void MariaUITextbox::setUserInput(const std::string text) {
+void MariaUITextbox::setUserInput(const string text) {
 	QFontMetrics fm = QFontMetrics(_inputBox->font());
 	_inputBox->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _inputBox->width()));
 }
 	
-std::string MariaUITextbox::getUserInput() {
+string MariaUITextbox::getUserInput() {
 	return _inputBox->text().toStdString();
 }
 

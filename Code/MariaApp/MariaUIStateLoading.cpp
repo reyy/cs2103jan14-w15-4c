@@ -41,7 +41,7 @@ MariaUIStateLoading::~MariaUIStateLoading() {
 	SAFE_DELETE(_displayText);
 }
 
-void MariaUIStateLoading::setDisplayText(std::string text) {
+void MariaUIStateLoading::setDisplayText(string text) {
 	QString qText = QString::fromStdString(text);
 	_displayText->setText(qText);
 }

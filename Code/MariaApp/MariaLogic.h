@@ -12,13 +12,15 @@
 #include "MariaTaskManager.h"
 #include "MariaFileManager.h"
 
+using namespace std;
+
 class MariaLogic : QApplication {
 public:
 	MariaLogic(int argc, char *argv[]);
 	~MariaLogic(void);
 
-	bool checkValidCommand(std::string inputText);
-	string processCommand(std::string inputText);
+	bool checkValidCommand(string inputText);
+	string processCommand(string inputText);
 	void terminateProgram();
 	void generateTextforUI();
 
@@ -65,7 +67,7 @@ private:
 
 	void saveToFile();
 	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
-	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks);
+	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks, int maxTask);
 	//void addStateToQueue(STATE_TYPE type, );
 	
 

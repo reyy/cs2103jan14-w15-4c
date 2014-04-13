@@ -41,7 +41,7 @@ MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* e
 	return tempTask;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(std::string searchString, bool addToHistory) {
+vector<MariaTask*> MariaTaskManager::findTask(string searchString, bool addToHistory) {
 	vector<MariaTask*> returnList;
 	searchString = lowercaseString(searchString);
 
