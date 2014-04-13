@@ -265,7 +265,7 @@ string MariaLogic::runCommandAddFloatingTask(MariaInputObject* input, MariaState
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
+		return MariaText::format(MariaText::TASK_ADDED_SUCCESS, taskTitle.c_str());
 	} else {
 		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}
@@ -281,7 +281,7 @@ string MariaLogic::runCommandAddDeadlineTask(MariaInputObject* input, MariaState
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
+		return MariaText::format(MariaText::TASK_ADDED_SUCCESS, taskTitle.c_str());
 	} else {
 		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}
@@ -297,7 +297,7 @@ string MariaLogic::runCommandAddTimedTask(MariaInputObject* input, MariaStateObj
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
+		return MariaText::format(MariaText::TASK_ADDED_SUCCESS, taskTitle.c_str());
 	} else {
 		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}

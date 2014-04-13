@@ -1,7 +1,7 @@
 #include "MariaText.h"
 
 const string MariaText::EMPTY_STRING = "";
-const string MariaText::TASK_ADDED_SUCESS = "Task '%s' has been added!";
+const string MariaText::TASK_ADDED_SUCCESS = "Task '%s' has been added!";
 const string MariaText::TASK_ADDED_ERROR = "There was a problem adding '%s'.";
 
 const string MariaText::TASK_UPDATED_TITLE = "Ok, I have updated the title.";
@@ -27,7 +27,7 @@ const string MariaText::SHOW_RANGE = "%s to %s.";
 const string MariaText::SEARCH_RESULT = "This is the result of the search for '%s'.";
 
 const string MariaText::UNDO_SUCCESS = "Undo was successful!";
-const string MariaText::UNDO_EMPTY = "Nothing to Undo.";
+const string MariaText::UNDO_EMPTY = "Nothing to undo.";
 const string MariaText::UNDO_ERROR = "Cannot perform Undo here.";
 
 const string MariaText::HOME = "How can I help you?";

@@ -1,15 +1,14 @@
 #pragma once
+
 #include<string>
 #include<memory>
 #include <stdarg.h>
 using namespace std;
 
-class MariaText
-{
+class MariaText {
 public:
-	
 	static const string EMPTY_STRING;
-	static const string TASK_ADDED_SUCESS;
+	static const string TASK_ADDED_SUCCESS;
 	static const string TASK_ADDED_ERROR;
 
 	static const string TASK_UPDATED_TITLE;
@@ -52,6 +51,7 @@ public:
 	static const int BUFFER_SIZE = 256;
 
 	static string format(string formatString, ... );
+
 private:
 	MariaText(void);
 };
