@@ -17,7 +17,7 @@ public:
 	} TaskType;
 	
 	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
-	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL);
+	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL, bool isDone = false);
 	~MariaTask();
 	
 	

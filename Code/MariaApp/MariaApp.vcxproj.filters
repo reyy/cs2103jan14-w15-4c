@@ -94,6 +94,9 @@
     <ClCompile Include="MariaUI.cpp">
       <Filter>User Interface</Filter>
     </ClCompile>
+    <ClCompile Include="MariaText.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MariaFileManager.h" />
@@ -126,6 +129,9 @@
     </ClInclude>
     <ClInclude Include="MariaUIStateCredits.h">
       <Filter>User Interface\States</Filter>
+    </ClInclude>
+    <ClInclude Include="MariaText.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

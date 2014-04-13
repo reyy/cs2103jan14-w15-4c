@@ -150,8 +150,16 @@ vector<MariaTask*> MariaTaskManager::getWeeklyTask() {
 	return findTask(startTime,endTime,true);
 }
 
-vector<MariaTask*> MariaTaskManager::getAllTasks() {
+vector<MariaTask*> MariaTaskManager::getAllTasks(bool addToHistory) {
 	assert(taskList!=NULL);
+
+	if(addToHistory) {
+		storePreviousQuery("");
+		if(queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (*taskList);
+	}
 
 	return *taskList;
 }
@@ -181,6 +189,8 @@ int MariaTaskManager::compareToPreviousQuery() {
 
 	if(previousSearchString != "") {
 		findTask(previousSearchString);
+	} else if(previousStart == NULL && previousEnd == NULL && previousType == MariaTask::TaskType::INVALID) {
+		getAllTasks(true);
 	} else if(previousStart == NULL && previousEnd == NULL) {
 		findTask(previousType);
 	} else if(previousType != MariaTask::TaskType::INVALID) {

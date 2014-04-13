@@ -11,12 +11,12 @@ MariaTask::MariaTask(string title, MariaTime* start, MariaTime* end) {
 	refreshTaskType();
 }
 
-MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTime* end) {
+MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTime* end, bool isDone) {
 	this->title = title;
 	this->description = description;
 	this->start = start;
 	this->end = end;
-	this->isDone = false;
+	this->isDone = isDone;
 
 	this->created = new MariaTime(MariaTime::getCurrentTime());
 	
@@ -71,7 +71,7 @@ MariaTask* MariaTask::getClone() {
 		clonedEnd = new MariaTime(end->get());
 	}
 
-	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd);
+	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd, isDone);
 	clonedTask->setCreated(new MariaTime(created->get()));
 	return clonedTask;
 }

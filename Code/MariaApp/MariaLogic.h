@@ -6,6 +6,7 @@
 #include <process.h>
 #include <string>
 #include "MariaUI.h"
+#include "MariaText.h"
 #include "MariaStateManager.h"
 #include "MariaInterpreter.h"
 #include "MariaTaskManager.h"
@@ -18,7 +19,6 @@ public:
 
 	bool checkValidCommand(std::string inputText);
 	string processCommand(std::string inputText);
-	bool processUndo();
 	void terminateProgram();
 	void generateTextforUI();
 
@@ -65,6 +65,7 @@ private:
 
 	void saveToFile();
 	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
+	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks);
 	//void addStateToQueue(STATE_TYPE type, );
 	
 
