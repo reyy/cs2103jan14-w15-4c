@@ -143,11 +143,13 @@ vector<MariaTask*> MariaTaskManager::getWeeklyTask() {
 	MariaTime* startTime = &MariaTime::getCurrentTime();
 	startTime->setHour(0);
 	startTime->setMin(0);
+
 	MariaTime* endTime =  &MariaTime::getCurrentTime();
-	endTime->setDay(startTime->getDay()+7);
+	endTime->setDay(startTime->getDay() + MariaTime::NUM_DAYS);
 	endTime->setHour(23);
 	endTime->setMin(59);
-	return findTask(startTime,endTime,true);
+
+	return findTask(startTime, endTime, true);
 }
 
 vector<MariaTask*> MariaTaskManager::getAllTasks(bool addToHistory) {
@@ -288,18 +290,8 @@ MariaTask* MariaTaskManager::undoLast() {
 			taskList->erase(it);
 		} else { 
 			//last action = editTask
-			/*delete taskPointer; //delete current task
-			taskList->erase(it);
-			for(pair<MariaTask*,MariaTask*> *p : *undoList) {
-			if(p->first == taskPointer) {
-			p->first = oldTask;
-			}
-			}
-			taskList->push_back(oldTask);
-			sortTasks();*/
 			taskPointer->setAll(oldTask);
 			delete oldTask;
-			//(undoList->back())->first = oldTask; //set pointer in taskList to old task
 		}
 	} else {
 		//last action = deleteTask
@@ -328,7 +320,6 @@ void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 			break;
 		}
 	}
-	//taskPointer = (MariaTask*)task;
 
 	assert(taskPointer != NULL);
 

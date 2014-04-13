@@ -1,3 +1,4 @@
+//@author A0111823U
 #include "MariaFileManager.h"
 
 const string MariaFileManager::INPUT_FILE = "DEFAULT.SAV";

@@ -1,3 +1,4 @@
+//@author A0111823U
 #include "MariaTask.h"
 
 MariaTask::MariaTask(string title, MariaTime* start, MariaTime* end) {
@@ -82,7 +83,7 @@ string MariaTask::getTimeFromNow() {
 	}else if(type == TIMED) {
 		return getStart()->getTimeFromNow();
 	}
-	else return ("");
+	return "";
 }
 
 void MariaTask::setTitle(string title) {

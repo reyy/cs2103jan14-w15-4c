@@ -1,3 +1,4 @@
+//@author A0111823U
 #include "MariaTime.h"
 
 const string MariaTime::TIME_SEPARATOR = ":";

@@ -26,8 +26,7 @@ public:
 	int compareToPreviousQuery();
 	MariaTask* undoLast();
 
-	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!
-	bool deleteArchive();
+	bool archiveTask(MariaTask*);
 
 	void notifyAction(MariaTaskInterface* task, bool isAddTask = false);
 
