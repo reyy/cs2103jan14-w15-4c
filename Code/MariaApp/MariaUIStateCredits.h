@@ -9,6 +9,16 @@
 using namespace std;
 
 class MariaUIStateCredits : public MariaStateObject {
+public:
+	MariaUIStateCredits(QMainWindow* qmainWindow);
+	~MariaUIStateCredits();
+
+	void setDoneAnimating();
+
+private:
+	static const int BACKGROUND_R = 37;
+	static const int BACKGROUND_G = 157;
+	static const int BACKGROUND_B = 207;
 	static const int LOGO_SPEED_RETARDER = 80;
 	static const int FONT_SIZE = 18;
 	static const int FONT_SIZE_BODY = 14;
@@ -39,13 +49,8 @@ class MariaUIStateCredits : public MariaStateObject {
 	bool timerBeginState();
 	bool timerActiveState();
 	bool timerEndState();
-
-public:
-	MariaUIStateCredits(QMainWindow* qmainWindow);
-	~MariaUIStateCredits();
-
+	
 	void animateLogo();
-	void setDoneAnimating();
 	void updateGUIPosition();
 };
 

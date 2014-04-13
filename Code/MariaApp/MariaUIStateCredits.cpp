@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUI.h"
 #include "MariaUIStateCredits.h"
 
@@ -29,15 +30,19 @@ MariaUIStateCredits::MariaUIStateCredits(QMainWindow* qmainWindow) : MariaStateO
 }
 
 MariaUIStateCredits::~MariaUIStateCredits() {
-	delete _logo;
-	delete _displayTextBody;
-	delete _displayText;
+	SAFE_DELETE(_logo);
+	SAFE_DELETE(_displayTextBody);
+	SAFE_DELETE(_displayText);
+}
+
+void MariaUIStateCredits::setDoneAnimating() {
+	_doneAnimating = true;
 }
 
 void MariaUIStateCredits::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
 
-	((MariaUI*)_qmainWindow)->setBackgroundColor(MariaUI::WINDOW_DEFAULT_COLOR_R, MariaUI::WINDOW_DEFAULT_COLOR_G, MariaUI::WINDOW_DEFAULT_COLOR_B);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 
 	_displayText->setStyleSheet("color:#ffffff;font-size:" + QString::number(FONT_SIZE) + "px;font-weight:bold;");
 	_displayText->setAlignment(Qt::AlignCenter);
@@ -92,10 +97,6 @@ void MariaUIStateCredits::animateLogo() {
 		_logoImageIndex = 0;
 	}
 	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
-}
-
-void MariaUIStateCredits::setDoneAnimating() {
-	_doneAnimating = true;
 }
 
 void MariaUIStateCredits::updateGUIPosition() {

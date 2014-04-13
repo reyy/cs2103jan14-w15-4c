@@ -6,6 +6,15 @@
 #include "MariaStateObject.h"
 
 class MariaUIStateLoading : public MariaStateObject {
+public:
+	MariaUIStateLoading(QMainWindow* qmainWindow);
+	~MariaUIStateLoading();
+
+	void setDisplayText(std::string text);
+	void setLoadingDone();
+	void setQuitAfterLoadingTrue();
+	
+private:
 	static const int AMOUNT_OF_DOTS = 5;
 	static const int LOGO_SPEED_RETARDER = 80;
 	static const float FLOW_FACTOR;
@@ -40,14 +49,9 @@ class MariaUIStateLoading : public MariaStateObject {
 	bool timerBeginState();
 	bool timerActiveState();
 	bool timerEndState();
-
+	
 	void animateLogo();
-public:
-	MariaUIStateLoading(QMainWindow* qmainWindow);
-	~MariaUIStateLoading();
-
-	void setDisplayText(std::string text);
-	void setLoadingDone();
-	void setQuitAfterLoadingTrue();
+	bool animateDots();
+	void updateGUIPosition();
 };
 

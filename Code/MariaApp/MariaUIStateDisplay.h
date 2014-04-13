@@ -9,12 +9,6 @@
 
 class MariaUIStateDisplay : public MariaStateObject {
 public:
-	static const int TEXTBOX_X_OFFSET = 30;
-	static const float TITLE_Y_OFFSET;
-	static const float TITLE_WIDTH;
-	static const float TITLE_HEIGHT;
-	static const float FONT_SIZE;
-
 	MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay);
 	~MariaUIStateDisplay();
 
@@ -44,6 +38,12 @@ protected:
 	int _maxTaskDisplay;
 
 private:
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const float TITLE_Y_OFFSET;
+	static const float TITLE_WIDTH;
+	static const float TITLE_HEIGHT;
+	static const float FONT_SIZE;
+
 	std::vector<MariaUITask*> _taskStack;
 	std::vector<MariaUITask*> _taskDisposeStack;
 

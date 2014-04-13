@@ -1,7 +1,10 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUIStateHelp.h"
 #include "MariaUI.h"
 
 MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow !=NULL);
 	_qmainWindow = qmainWindow;
 
 	_helpIndex = screen;
@@ -14,7 +17,7 @@ MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : Maria
 }
 
 MariaUIStateHelp::~MariaUIStateHelp() {
-	delete _helpImage;
+	SAFE_DELETE(_helpImage);
 }
 
 int MariaUIStateHelp::getHelpIndex() {
