@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm> 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include "MariaUIStateDisplay.h"
@@ -9,7 +8,6 @@
 #include "MariaTask.h"
 #include "MariaUIPreview.h"
 
-class MariaTaskManager;
 class MariaUIStateHome : public MariaUIStateDisplay {
 public:
 	static const int MAX_ITEM_IN_PAGE = 5;

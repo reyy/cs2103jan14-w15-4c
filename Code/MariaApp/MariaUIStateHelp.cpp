@@ -5,6 +5,7 @@
 
 MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : MariaStateObject(qmainWindow) {
 	assert(qmainWindow !=NULL);
+
 	_qmainWindow = qmainWindow;
 
 	_helpIndex = screen;

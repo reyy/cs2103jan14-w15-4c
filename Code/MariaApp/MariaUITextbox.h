@@ -27,10 +27,10 @@ public:
 	MariaUITextbox(QMainWindow * qmainWindow);
 	~MariaUITextbox();
 	
-	void setQuestionText(const std::string text);
-	void setSuggestText(const std::string text);
-	void setUserInput(const std::string text);	
-	std::string getUserInput();
+	void setQuestionText(const string text);
+	void setSuggestText(const string text);
+	void setUserInput(const string text);	
+	string getUserInput();
 	void updateGUI(QPointF statePosition);
 	void setFocus();
 	QLineEdit * getInputBoxReference();

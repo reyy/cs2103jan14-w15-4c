@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm> 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include "MariaStateObject.h"
@@ -22,12 +21,13 @@ public:
 	int getTotalUITask();
 	bool isAllTaskAtLocation();
 	
-	void setPage(int page);
+	int getMaxTaskDisplay();
+
+	bool setPage(int page);
 	void setPageEnd();
 	int getPage();
 	bool isPageValid(int page);
 	void updatePage();
-	void updateTitleText();
 	void updatePageTitleGUI();
 
 	//Inheritable function to update GUI if there is any UITask operations.
@@ -39,6 +39,10 @@ protected:
 
 private:
 	static const int TEXTBOX_X_OFFSET = 30;
+	static const string MESSAGE_ITEM_ABOVE;
+	static const string MESSAGE_ITEMS_ABOVE;
+	static const string MESSAGE_ITEM_BELOW;
+	static const string MESSAGE_ITEMS_BELOW;
 	static const float TITLE_Y_OFFSET;
 	static const float TITLE_WIDTH;
 	static const float TITLE_HEIGHT;
@@ -50,4 +54,5 @@ private:
 	float _taskStartHeight;
 	int _page;
 	QLabel *_pageText;
+	void updateTitleText();
 };

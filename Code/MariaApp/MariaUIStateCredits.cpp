@@ -3,7 +3,7 @@
 #include "MariaUI.h"
 #include "MariaUIStateCredits.h"
 
-const string MariaUIStateCredits::CREDITS_STRING = "M.A.R.I.A.\nMy Attentive, Reliable and Intelligent Assistant";
+const string MariaUIStateCredits::CREDITS_STRING = "MARIA\nMy Attentive, Reliable and Intelligent Assistant";
 const string MariaUIStateCredits::CREDITS_STRING_BODY = "Developed for CS2103T Software Engineering(S2 2014)\nNational University of Singapore\n\nDevelopers:\nJay Chua\nMelvyn Qwek\nRey Neo\n\nSpecial Thanks:\nDr Damith C. Rajapakse\nMrs Janet Chan\nMr Jerome Cheng";
 const float MariaUIStateCredits::FLOW_FACTOR = 0.01;
 const float MariaUIStateCredits::VALUE_THRESHOLD = 0.5;

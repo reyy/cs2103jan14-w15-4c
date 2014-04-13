@@ -1,16 +1,19 @@
 #pragma once
 
+#include <string>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
 #include "MariaStateObject.h"
+
+using namespace std;
 
 class MariaUIStateLoading : public MariaStateObject {
 public:
 	MariaUIStateLoading(QMainWindow* qmainWindow);
 	~MariaUIStateLoading();
 
-	void setDisplayText(std::string text);
+	void setDisplayText(string text);
 	void setLoadingDone();
 	void setQuitAfterLoadingTrue();
 	

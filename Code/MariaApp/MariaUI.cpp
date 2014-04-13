@@ -122,6 +122,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		break;
 	case Qt::Key_Escape:
 		result = _mariaLogic->processCommand("home");
+		_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
 		break;
 	default:
 		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
@@ -137,7 +138,7 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		break;
 	}
 
-	if(result != "") {
+	if(result.length() > 0) {
 		_commandBar->getTextbox()->setQuestionText(result);
 	}
 }
@@ -162,7 +163,7 @@ void MariaUI::showHideEvent() {
 	if(isVisible()) {
 		setWindowState(Qt::WindowState::WindowMinimized);
 		_trayIcon->show();
-		_trayIcon->showMessage("MARIA is still running!", "Press Ctrl + Space to show M.A.R.I.A.\nType \'exit\' to quit the program.");
+		_trayIcon->showMessage("MARIA is still running!", "Press Ctrl + Space to show MARIA\nType \'exit\' to quit the program.");
 		hide();
 	} else {
 		setWindowState(Qt::WindowState::WindowActive);
@@ -215,6 +216,7 @@ void MariaUI::initBackgroundColor(int r, int g, int b) {
 void MariaUI::initCommandBar() {
 	_commandBar = new MariaUICommandBar(this);
 	_commandBar->getTextbox()->setFocus();
+	_commandBar->getTextbox()->setQuestionText(MariaText::HOME);
 }
 
 void MariaUI::initTrayIcon() {
