@@ -910,14 +910,7 @@ MariaTime* MariaInterpreter::parseDateTimeString(vector<string> tokenizedDateTim
 	bool hasTimeString = false;
 
 	for (int i = tokenizedDateTime.size() - 1; i >= 0; i--) {
-		if (hasTime(tokenizedDateTime[i]) && !hasTimeString) {
-			try {
-				parseTime(tokenizedDateTime[i], hour, min);
-			} catch (exception& e) {
-				throw;
-			}
-			hasTimeString = true;
-		} else if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
+		if (isStringEqual(tokenizedDateTime[i], "today") && !hasDateString) {
 			year = MariaTime::getCurrentTime().getYear();
 			month = MariaTime::getCurrentTime().getMonth();
 			day = MariaTime::getCurrentTime().getDay();
@@ -1013,6 +1006,13 @@ MariaTime* MariaInterpreter::parseDateTimeString(vector<string> tokenizedDateTim
 			// Also check if the preceding token is "next".
 			// If it is, add a week to this day.
 			hasDateString = true;
+		} else if (hasTime(tokenizedDateTime[i]) && !hasTimeString) {
+			try {
+				parseTime(tokenizedDateTime[i], hour, min);
+			} catch (exception& e) {
+				throw;
+			}
+			hasTimeString = true;
 		}
 	}
 
