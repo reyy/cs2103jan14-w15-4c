@@ -35,7 +35,6 @@ MariaTime::MariaTime(string value) {
 
 }
 
-
 string MariaTime::get(string format) {
 	char buff[20];
 	strftime(buff, 20, format.c_str() , localtime(&timeStamp));

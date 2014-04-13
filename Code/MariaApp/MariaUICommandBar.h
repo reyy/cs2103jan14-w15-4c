@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>
@@ -9,10 +10,23 @@ class MariaUICommandBar : public QWidget {
 	Q_OBJECT
 
 public:
+	static const int GUI_UPDATE_FREQUENCY = 1;
 	static const float DEFAULT_X_POSITION;
 	static const float DEFAULT_Y_POSITION;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
+
+	MariaUICommandBar(QMainWindow *qmainWindow);
+	~MariaUICommandBar();
+
+	float getPosition();
+	void setDestination(float yPosition);
+
+	MariaUITextbox* getTextbox();
+	MariaUIStatus* getStatus();
+
+protected slots:
+	void updateGUI();
 
 private:
 	QMainWindow *_qmainWindow;
@@ -23,19 +37,5 @@ private:
 
 	float _yPosition;
 	float _yDestination;
-
-protected slots:
-	void updateGUI();
-
-public:
-	MariaUICommandBar(QMainWindow *qmainWindow);
-	~MariaUICommandBar();
-
-	float getPosition();
-	void setDestination(float yPosition);
-
-	MariaUITextbox* getTextbox();
-	MariaUIStatus* getStatus();
-	
 };
 

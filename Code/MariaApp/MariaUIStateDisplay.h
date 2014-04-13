@@ -15,19 +15,6 @@ public:
 	static const float TITLE_HEIGHT;
 	static const float FONT_SIZE;
 
-protected:
-	QMainWindow *_qmainWindow;
-	int _maxTaskDisplay;
-
-private:
-	std::vector<MariaUITask*> _taskStack;
-	std::vector<MariaUITask*> _taskDisposeStack;
-
-	float _taskStartHeight;
-	int _page;
-	QLabel *_pageText;
-
-public:
 	MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay);
 	~MariaUIStateDisplay();
 
@@ -51,4 +38,16 @@ public:
 
 	//Inheritable function to update GUI if there is any UITask operations.
 	virtual void updateGUI();
+
+protected:
+	QMainWindow *_qmainWindow;
+	int _maxTaskDisplay;
+
+private:
+	std::vector<MariaUITask*> _taskStack;
+	std::vector<MariaUITask*> _taskDisposeStack;
+
+	float _taskStartHeight;
+	int _page;
+	QLabel *_pageText;
 };

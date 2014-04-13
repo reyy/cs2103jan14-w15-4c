@@ -42,6 +42,7 @@ private:
 	void parseAddDeadlineTask(string input, MariaInputObject* inputObject);
 	void parseAddTimedTask(string input, MariaInputObject* inputObject);
 	void parseEdit(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseEditType(string input, MariaInputObject* inputObject, int changeTitlePos, int changeStartPos, int changeEndPos, int changeDescPos);
 	void parseEditTitle(string input, MariaInputObject* inputObject);
 	void parseEditStartTime(string input, MariaInputObject* inputObject);
 	void parseEditEndTime(string input, MariaInputObject* inputObject);
@@ -55,6 +56,27 @@ private:
 	void parseTime(string input, int& hour, int& min);
 	MariaTime* parseDateTimeString(vector<string> tokenizedInput);
 
+	static const string EXPRESSION_DATE_FORMAT;
+	static const string EXPRESSION_DAYS_OF_WEEK;
+	static const string EXPRESSION_DAYS_OF_WEEK_INDIVIDUAL[7];
+	static const string EXPRESSION_MONTHS_OF_YEAR;
+	static const string EXPRESSION_MONTHS_OF_YEAR_INDIVIDUAL[12];
+	static const string EXPRESSION_TODAY;
+	static const string EXPRESSION_TOMORROW;
+	static const string EXPRESSION_TIME_FORMAT;
+
+	static const string MODIFIER_ALL_TASKS;
+
+	static const string DELIMITER_ADD_DEADLINE_TASK;
+	static const string DELIMITER_ADD_TIMED_TASK_START;
+	static const string DELIMITER_ADD_TIMED_TASK_END;
+	static const string DELIMITER_EDIT_TITLE;
+	static const string DELIMITER_EDIT_START_TIME;
+	static const string DELIMITER_EDIT_END_TIME;
+	static const string DELIMITER_EDIT_DESCRIPTION;
+	static const string DELIMITER_SHOW_DATE_RANGE_START;
+	static const string DELIMITER_SHOW_DATE_RANGE_END;
+
 	bool hasDate(string text);
 	bool hasTime(string text);
 	bool hasDateTime(string text);
@@ -64,6 +86,7 @@ private:
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
+	bool checkValidTime(int hour, int min);
 	string extractFromBackOfString(string text, string delimiter, int& delimiterPos);
 	int getDayOfWeek(string text);
 	int getLastDayOfMonth(int year, int month);

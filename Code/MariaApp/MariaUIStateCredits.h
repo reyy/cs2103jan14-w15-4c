@@ -12,6 +12,8 @@ class MariaUIStateCredits : public MariaStateObject {
 	static const int LOGO_SPEED_RETARDER = 80;
 	static const int FONT_SIZE = 18;
 	static const int FONT_SIZE_BODY = 14;
+	static const string CREDITS_STRING;
+	static const string CREDITS_STRING_BODY;
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 	static const float DISPLAY_TEXT_WIDTH;
@@ -22,8 +24,6 @@ class MariaUIStateCredits : public MariaStateObject {
 	static const float LOGO_STAGE_Y_SCALE;
 	static const float TEXT_STAGE_Y_SCALE;
 	static const float TEXTBODY_STAGE_Y_SCALE;
-	static const string CREDITS_STRING;
-	static const string CREDITS_STRING_BODY;
 	
 	QMainWindow *_qmainWindow;
 	

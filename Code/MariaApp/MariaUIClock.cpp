@@ -1,3 +1,5 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUIClock.h"
 #include "MariaTime.h"
 
@@ -20,6 +22,8 @@ const float MariaUIClock::LINE_X_OFFSET = -5;
 const float MariaUIClock::LINE_Y_OFFSET = 5;
 
 MariaUIClock::MariaUIClock(QMainWindow *qmainWindow) {
+	assert(qmainWindow != NULL);
+	
 	_qmainWindow = qmainWindow;
 
 	_currentTime = new QLabel(_qmainWindow);
@@ -43,46 +47,20 @@ MariaUIClock::MariaUIClock(QMainWindow *qmainWindow) {
 }
 
 MariaUIClock::~MariaUIClock(void) {
-	if(_clockTimer->isActive())
+	if(_clockTimer->isActive()) {
 		_clockTimer->stop();
+	}
 	
-	delete _line;
-	delete _currentDay;
-	delete _currentDate;
-	delete _currentTime;
-	delete _clockTimer;
-}
-
-void MariaUIClock::updateClock() {
-	
-	MariaTime currentTime = MariaTime::getCurrentTime();
-	QString tempString;
-
-	//Set Time and Date
-	if(currentTime.getHour()%12 == 0) {
-		tempString = QString::number(12);
-	} else {
-		tempString = QString::number(currentTime.getHour()%12);
-	}
-	if(currentTime.getMin()<10) {
-		tempString += ":0" + QString::number(currentTime.getMin());
-	} else {
-		tempString += ":" + QString::number(currentTime.getMin());
-	}
-
-	if(currentTime.getHour()<12) {
-		tempString += "AM";
-	} else {
-		tempString += "PM";
-	}
-	_currentTime->setText(tempString);
-	_currentDate->setText(QString::number(currentTime.getDay()) + " " + QString(MariaTime::MONTHS[currentTime.getMonth()-1]) + " " + QString::number(currentTime.getYear()));
-	_currentDay->setText(QString(MariaTime::DAYS[currentTime.getDayWeek()-1]));
+	SAFE_DELETE(_clockTimer);
+	SAFE_DELETE(_line);
+	SAFE_DELETE(_currentDay);
+	SAFE_DELETE(_currentDate);
+	SAFE_DELETE(_currentTime);
 }
 
 void MariaUIClock::startUpdating() {
 	if(!_clockTimer->isActive()) {
-		_clockTimer->start(1000);
+		_clockTimer->start(CLOCK_UPDATE_FREQUENCY);
 		_currentTime->show();
 		_currentDate->show();
 		_currentDay->show();
@@ -100,4 +78,32 @@ void MariaUIClock::updateGUI(QPointF statePosition) {
 		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE + DAY_Y_OFFSET, DAY_WIDTH, DAY_HEIGHT));
 	_line->setGeometry(QRect(statePosition.x() + _qmainWindow->width()*0.5 + LINE_X_OFFSET, 
 		statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE + LINE_Y_OFFSET, LINE_WIDTH, LINE_HEIGHT));
+}
+
+void MariaUIClock::updateClock() {
+	MariaTime currentTime = MariaTime::getCurrentTime();
+	QString tempString;
+
+	//Set Time and Date
+	if(currentTime.getHour() % 12 == 0) {
+		tempString = QString::number(12);
+	} else {
+		tempString = QString::number(currentTime.getHour() % 12);
+	}
+
+	if(currentTime.getMin() < 10) {
+		tempString += ":0" + QString::number(currentTime.getMin());
+	} else {
+		tempString += ":" + QString::number(currentTime.getMin());
+	}
+
+	if(currentTime.getHour() < 12) {
+		tempString += "AM";
+	} else {
+		tempString += "PM";
+	}
+
+	_currentTime->setText(tempString);
+	_currentDate->setText(QString::number(currentTime.getDay()) + " " + QString(MariaTime::MONTHS[currentTime.getMonth()-1]) + " " + QString::number(currentTime.getYear()));
+	_currentDay->setText(QString(MariaTime::DAYS[(currentTime.getDayWeek() + DAYS_OFFSET ) % DAYS_IN_WEEK]));
 }

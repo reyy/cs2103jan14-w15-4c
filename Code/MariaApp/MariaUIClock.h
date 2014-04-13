@@ -8,7 +8,20 @@
 class MariaUIClock : QWidget {
 	Q_OBJECT
 
+public:
+	MariaUIClock(QMainWindow *qmainWindow);
+	~MariaUIClock();
+
+	void startUpdating();
+	void updateGUI(QPointF statePosition);
+
+protected slots:
+	void updateClock();
+
 private:
+	static const int CLOCK_UPDATE_FREQUENCY = 1000;
+	static const int DAYS_OFFSET = 6;
+	static const int DAYS_IN_WEEK = 7;
 	static const float START_HEIGHT_SCALE;
 	static const float TIME_WIDTH;
 	static const float TIME_HEIGHT;
@@ -34,14 +47,4 @@ private:
 	QLabel *_currentDay;
 	QTimer *_clockTimer;
 	QLabel *_line;
-
-protected slots:
-	void updateClock();
-
-public:
-	MariaUIClock(QMainWindow *qmainWindow);
-	~MariaUIClock();
-
-	void startUpdating();
-	void updateGUI(QPointF statePosition);
 };

@@ -1,7 +1,6 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUIPreview.h"
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_NONE = "You have no events scheduled for tomorrow.\n";
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW = "There is one event scheduled for %s tomorrow.\n";
-const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_MULTIPLE = "There are %i events scheduled and the first one starts at %s\ntomorrow.\n";
 
 const string MariaUIPreview::PREVIEW_EVENT_TODAY_NONE = "There are no scheduled events today.\n";
 const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_AT = "The first thing on your calendar today is '%s', at %s.\n";
@@ -9,6 +8,9 @@ const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME = "The fir
 const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_AT = "'%s' is next up on your calendar, at %s.\n";
 const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME = "'%s' is next up on your calendar, in %s minutes.\n";
 
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_NONE = "You have no events scheduled for tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW = "There is one event scheduled for %s tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_MULTIPLE = "There are %i events scheduled and the first one starts at %s\ntomorrow.\n";
 const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW = "One task is due by %s tomorrow.\n";
 const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW_MUTIPLE = "%i tasks are due tomorrow.\n";
 
@@ -33,6 +35,8 @@ const float MariaUIPreview::BODY_XOFFSET = 10.0;
 const float MariaUIPreview::DIVIDER_HEIGHT = 4.0;
 
 MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
+	assert(qmainWindow != NULL);
+
 	_qmainWindow=qmainWindow;
 
 	_textToday = new QLabel(_qmainWindow);
@@ -95,15 +99,15 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 }
 
 MariaUIPreview::~MariaUIPreview() {
-	delete _lineCalendar;
-	delete _textCalendarBody;
-	delete _textCalendar;
-	delete _lineTomorrow;
-	delete _textTomorrowBody;
-	delete _textTomorrow;
-	delete _lineToday;
-	delete _textTodayBody;
-	delete _textToday;
+	SAFE_DELETE(_lineCalendar);
+	SAFE_DELETE(_textCalendarBody);
+	SAFE_DELETE(_textCalendar);
+	SAFE_DELETE(_lineTomorrow);
+	SAFE_DELETE(_textTomorrowBody);
+	SAFE_DELETE(_textTomorrow);
+	SAFE_DELETE(_lineToday);
+	SAFE_DELETE(_textTodayBody);
+	SAFE_DELETE(_textToday);
 }
 
 int MariaUIPreview::endLineCount(string text) {
@@ -116,29 +120,6 @@ int MariaUIPreview::endLineCount(string text) {
 		start += toFind.length();
 	}
 	return occurrences;
-}
-
-void MariaUIPreview::updateText() {
-	_textTodayBody->setText(QString::fromStdString(_generatedTodayText));
-	_textTomorrowBody->setText(QString::fromStdString(_generatedTomorrowText));
-	_textCalendarBody->setText(QString::fromStdString( _generatedSuggestionText));
-}
-
-void MariaUIPreview::updateGUI(QPointF statePosition) {
-	_textToday->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
-	_textTodayBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
-	_lineToday->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
-	
-	int spaces = endLineCount(_textTodayBody->text().toStdString()) + 1;
-
-	_textTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + spaces * SPACING_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
-	_textTomorrowBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
-	_lineTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
-
-	_textCalendar->setGeometry(QRect(_textToday->geometry().x(), statePosition.y() + _qmainWindow->height()*CALENDAR_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
-	_textCalendarBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
-	_lineCalendar->setGeometry(QRect(_textToday->geometry().x(), _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
-
 }
 
 string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine) {
@@ -262,9 +243,10 @@ string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow,
 string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskListSuggest) {
 	string toReturn;
 	char buffer[STRING_BUFFER_SIZE];
-
+	
+	//Find an empty day of the week.
 	if(day >= 0 && day <=6) {
-		//+ 1 to offset the 
+		//+ 1 to offset the starting day of the week.
 		if(MariaTime::getCurrentTime().getDayWeek() != day + 1) {
 			sprintf_s(buffer, PREVIEW_FREE_DAY.c_str(), MariaTime::DAYS[day]);
 			toReturn+=buffer;
@@ -274,6 +256,7 @@ string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskLi
 		}
 	}
 
+	//Suggest a task from the list of floating.
 	if(taskListSuggest.size() > 0) {
 		MariaTask* generatedSuggestionTask = taskListSuggest.at(rand() % taskListSuggest.size());
 
@@ -284,4 +267,27 @@ string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskLi
 	
 	_generatedSuggestionText = toReturn;
 	return toReturn;
+}
+
+void MariaUIPreview::updateGUI(QPointF statePosition) {
+	_textToday->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textTodayBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineToday->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+	
+	//Calculate spaces inbetween today and tomorrow text with a minimum of 1 space.
+	int spaces = endLineCount(_textTodayBody->text().toStdString()) + 1;
+
+	_textTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + spaces * SPACING_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textTomorrowBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+
+	_textCalendar->setGeometry(QRect(_textToday->geometry().x(), statePosition.y() + _qmainWindow->height()*CALENDAR_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textCalendarBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineCalendar->setGeometry(QRect(_textToday->geometry().x(), _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+}
+
+void MariaUIPreview::updateText() {
+	_textTodayBody->setText(QString::fromStdString(_generatedTodayText));
+	_textTomorrowBody->setText(QString::fromStdString(_generatedTomorrowText));
+	_textCalendarBody->setText(QString::fromStdString( _generatedSuggestionText));
 }

@@ -17,9 +17,24 @@ MariaUIStateHelp::~MariaUIStateHelp() {
 	delete _helpImage;
 }
 
+int MariaUIStateHelp::getHelpIndex() {
+	return _helpIndex;
+}
+
+void MariaUIStateHelp::setHelpIndex(int index) {
+	if(index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
+		_helpIndex = index;
+		_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + index));
+	}
+}
+
+void MariaUIStateHelp::setDoneViewing() {
+	_doneViewing = true;
+}
+
 void MariaUIStateHelp::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
-	((MariaUI*)_qmainWindow)->setBackgroundColor(225, 191, 0);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 }
 
 void MariaUIStateHelp::initActiveState() {
@@ -46,19 +61,4 @@ bool MariaUIStateHelp::timerActiveState() {
 bool MariaUIStateHelp::timerEndState() {
 	_helpImage->setGeometry(QRect(getPosition().x(), getPosition().y(), HELP_IMAGE_WIDTH, HELP_IMAGE_HEIGHT));
 	return false;
-}
-
-int MariaUIStateHelp::getHelpIndex() {
-	return _helpIndex;
-}
-
-void MariaUIStateHelp::setHelpIndex(int index) {
-	if(index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
-		_helpIndex = index;
-		_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + index));
-	}
-}
-
-void MariaUIStateHelp::setDoneViewing() {
-	_doneViewing = true;
 }
