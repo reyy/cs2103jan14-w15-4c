@@ -22,7 +22,6 @@ private:
 	static const int CLOCK_UPDATE_FREQUENCY = 1000;
 	static const int DAYS_OFFSET = 6;
 	static const int DAYS_IN_WEEK = 7;
-	static const int CLOCK_UPDATE_FREQUENCY = 1000;
 	static const float START_HEIGHT_SCALE;
 	static const float TIME_WIDTH;
 	static const float TIME_HEIGHT;
