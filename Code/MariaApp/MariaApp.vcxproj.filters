@@ -90,12 +90,14 @@
     <ClCompile Include="MariaUIStateCredits.cpp">
       <Filter>User Interface\States</Filter>
     </ClCompile>
-    <ClCompile Include="MariaLogic.cpp" />
     <ClCompile Include="MariaUI.cpp">
       <Filter>User Interface</Filter>
     </ClCompile>
     <ClCompile Include="MariaText.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaLogic.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
