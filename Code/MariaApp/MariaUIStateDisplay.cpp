@@ -3,11 +3,13 @@
 #include "MariaUI.h"
 
 const float MariaUIStateDisplay::TITLE_Y_OFFSET = 4.0;
-const float MariaUIStateDisplay::TITLE_WIDTH = 200.0;
+const float MariaUIStateDisplay::TITLE_WIDTH = 400.0;
 const float MariaUIStateDisplay::TITLE_HEIGHT = 40.0;
 const float MariaUIStateDisplay::FONT_SIZE = 12.0;
 
 MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+
 	_qmainWindow = qmainWindow;
 	_taskStartHeight = _qmainWindow->height()*taskStartHeight;
 	_page = 0;
@@ -25,7 +27,6 @@ MariaUIStateDisplay::~MariaUIStateDisplay() {
 }
 
 void MariaUIStateDisplay::updateUITaskNumber() {
-
 	int maxShown = _taskStack.size() - _page*_maxTaskDisplay;
 	if(maxShown > _maxTaskDisplay) {
 		maxShown = _maxTaskDisplay;
@@ -37,7 +38,6 @@ void MariaUIStateDisplay::updateUITaskNumber() {
 }
 
 MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLAY_TYPE type) {
-
 	int currentPosition = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
 
 	int range = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
@@ -54,11 +54,12 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DISPLA
 	if(currentPosition < 0) {
 		yOffset -= _qmainWindow->height();
 	}
+
 	if(currentPosition >= _maxTaskDisplay) {
 		yOffset += _qmainWindow->height();
 	}
 
-	MariaUITask *temp = new MariaUITask(_qmainWindow, task, _qmainWindow->width(), type);
+	MariaUITask *temp = new MariaUITask(_qmainWindow, task, type);
 	
 	if(currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
 		temp->setPosition(QPointF(_qmainWindow->width(), _taskStartHeight + compoundPosition + yOffset));
@@ -98,7 +99,6 @@ void MariaUIStateDisplay::updateUITaskPosition() {
 }
 
 MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
-	
 	assert(index<_taskStack.size());
 
 	MariaUITask* temp = NULL;
@@ -113,6 +113,8 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
 }
 
 MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
+	assert(task != NULL);
+
 	MariaUITask* temp = NULL;
 	for (int i = 0; i < _taskStack.size(); i++ ) {
 		if (_taskStack[i]->getMariaTask() == task) {
@@ -238,11 +240,10 @@ void MariaUIStateDisplay::updatePage() {
 
 void MariaUIStateDisplay::updateTitleText() {
 	int offsetBeforePage = _page*_maxTaskDisplay;
-	int offsetAfterPage = ((int)_taskStack.size() - (_page+1)*_maxTaskDisplay);
-	
+	int offsetAfterPage = ((int)_taskStack.size() - (_page + 1) * _maxTaskDisplay);
 
-	string toShow="";
-	string toShow2="";
+	string toShow = "";
+	string toShow2 = "";
 	if(offsetBeforePage > 0) {
 		toShow += to_string(offsetBeforePage);
 		if(offsetBeforePage > 1) {

@@ -513,7 +513,7 @@ string MariaLogic::runCommandShowDate(MariaInputObject* input, MariaStateObject*
 	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToDateString(startTime), listOfTasks));
 	mariaStateManager->transitState();
 
-	string toReturn = MariaText::format(MariaText::SHOW_DATE, MariaTime::convertToDateString(endTime));
+	string toReturn = MariaText::format(MariaText::SHOW_DATE, MariaTime::convertToDateString(endTime).c_str());
 
 	SAFE_DELETE(startTime);
 	SAFE_DELETE(endTime);
@@ -878,7 +878,7 @@ void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
 		((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::NORMAL);
 		((MariaUIStateHome*)state)->setPageEnd();
 	} else if (mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
-		((MariaUIStateShow*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::CONTRACTED);
+		((MariaUIStateShow*)state)->addUITask(toAdd, MariaUITask::DISPLAY_TYPE::DETAILED);
 		((MariaUIStateShow*)state)->setPageEnd();
 	}
 }

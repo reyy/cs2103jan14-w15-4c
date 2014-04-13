@@ -1,3 +1,5 @@
+#include <assert.h>
+#include "MariaMacros.h"
 #include "MariaUITextbox.h"
 
 const string MariaUITextbox::SUGGEST_TEXT_SAMPLE[] = {
@@ -15,6 +17,8 @@ const float MariaUITextbox::FONT_SIZE_TYPED_TEXT = 14.0;
 const float MariaUITextbox::FONT_SIZE_QUESTION_TEXT = 16.0;
 
 MariaUITextbox::MariaUITextbox(QMainWindow *qmainWindow) {
+	assert(qmainWindow != NULL);
+
 	_qmainWindow = qmainWindow;
 
 	_inputBox = new QLineEdit(_qmainWindow);
@@ -39,16 +43,10 @@ MariaUITextbox::~MariaUITextbox() {
 	if(_updateSuggestTextTimer->isActive()) {
 		_updateSuggestTextTimer->stop();
 	}
-	delete _updateSuggestTextTimer;
-	delete _suggestText;
-	delete _inputBox;
-	delete _questionText;
-}
-
-void MariaUITextbox::updateSuggestText() {
-	if(getUserInput().length()==0) {
-		setSuggestText(SUGGEST_TEXT_SAMPLE[rand()%SUGGEST_TEXT_AMOUNT]);
-	}
+	SAFE_DELETE(_updateSuggestTextTimer);
+	SAFE_DELETE(_suggestText);
+	SAFE_DELETE(_inputBox);
+	SAFE_DELETE(_questionText);
 }
 
 void MariaUITextbox::setQuestionText(const std::string text) {
@@ -71,9 +69,9 @@ std::string MariaUITextbox::getUserInput() {
 }
 
 void MariaUITextbox::updateGUI(QPointF statePosition) {
-	_inputBox->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET, statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
-	_suggestText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
-	_questionText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y() + QUESTION_TEXT_Y_OFFSET, _qmainWindow->width()-TEXTBOX_X_OFFSET*2-RESERVED_STATUS_SPACE, QUESTIONBOX_HEIGHT));
+	_inputBox->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET, statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET-TEXTBOX_X_OFFSET-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_suggestText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y(), _qmainWindow->width()-TEXTBOX_X_OFFSET-TEXTBOX_X_OFFSET-RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_questionText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y() + QUESTION_TEXT_Y_OFFSET, _qmainWindow->width()-TEXTBOX_X_OFFSET-TEXTBOX_X_OFFSET-RESERVED_STATUS_SPACE, QUESTIONBOX_HEIGHT));
 }
 
 void MariaUITextbox::setFocus() {
@@ -82,4 +80,10 @@ void MariaUITextbox::setFocus() {
 
 QLineEdit *  MariaUITextbox::getInputBoxReference() {
 	return _inputBox;
+}
+
+void MariaUITextbox::updateSuggestText() {
+	if(getUserInput().length() == 0) {
+		setSuggestText(SUGGEST_TEXT_SAMPLE[rand() % SUGGEST_TEXT_AMOUNT]);
+	}
 }

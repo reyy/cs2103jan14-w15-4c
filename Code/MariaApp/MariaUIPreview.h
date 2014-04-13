@@ -8,9 +8,12 @@ using namespace std;
 
 class MariaUIPreview : QWidget {
 public:
-	static const string PREVIEW_EVENT_TOMORROW_NONE;
-	static const string PREVIEW_EVENT_TOMORROW;
-	static const string PREVIEW_EVENT_TOMORROW_MULTIPLE;
+	
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int MAX_CHAR_LENGTH = 40;
+	static const int FONT_SIZE = 12;
+	static const int STRING_BUFFER_SIZE = 255;
+	static const int MAX_TASK_SHOWN = 3;
 
 	static const string PREVIEW_EVENT_TODAY_NONE;
 	static const string PREVIEW_EVENT_TODAY_FIRST_AT;
@@ -18,6 +21,9 @@ public:
 	static const string PREVIEW_EVENT_TODAY_NEXT_AT;
 	static const string PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME;
 
+	static const string PREVIEW_EVENT_TOMORROW_NONE;
+	static const string PREVIEW_EVENT_TOMORROW;
+	static const string PREVIEW_EVENT_TOMORROW_MULTIPLE;
 	static const string PREVIEW_DEADLINE_TOMORROW;
 	static const string PREVIEW_DEADLINE_TOMORROW_MUTIPLE;
 
@@ -40,11 +46,16 @@ public:
 	static const float TITLE_AREA_HEIGHT;
 	static const float BODY_XOFFSET;
 	static const float DIVIDER_HEIGHT;
-	static const int TEXTBOX_X_OFFSET = 30;
-	static const int MAX_CHAR_LENGTH = 40;
-	static const int FONT_SIZE = 12;
-	static const int STRING_BUFFER_SIZE = 255;
-	static const int MAX_TASK_SHOWN = 3;
+
+	MariaUIPreview(QMainWindow *qmainWindow);
+	~MariaUIPreview();
+
+	string generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine);
+	string generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine);
+	string generateSuggestionText(int day, vector<MariaTask*> taskListSuggest);
+	
+	void updateGUI(QPointF statePosition);
+	void updateText();
 
 private:
 	QMainWindow *_qmainWindow;
@@ -64,18 +75,5 @@ private:
 	string _generatedSuggestionText;
 
 	int endLineCount(string text);
-
-public:
-	MariaUIPreview(QMainWindow *qmainWindow);
-	~MariaUIPreview();
-
-	void updateGUI(QPointF statePosition);
-	void updateText();
-
-	string generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine);
-	string generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine);
-
-	//Force denotes whether to generate a new task instead of using the existing store task.
-	string generateSuggestionText(int day, vector<MariaTask*> taskListSuggest);
 };
 

@@ -6,8 +6,23 @@
 
 class MariaUIStatus : QWidget {
 	Q_OBJECT
+public:
+	enum STATUS_TYPE {
+		OK, INVALID, WAIT, UNKNOWN, NONE
+	};
 
-		static const int TEXTBOX_X_OFFSET = 30;
+	MariaUIStatus(QMainWindow *qmainWindow);
+	~MariaUIStatus();
+
+	void setStatus(STATUS_TYPE type);
+	STATUS_TYPE getStatus();
+	void updateGUI(QPointF statePosition);
+
+protected slots:
+		void updateStatusAnimation();	
+
+private:
+	static const int TEXTBOX_X_OFFSET = 30;
 	static const int AMOUNT_OF_IMAGES = 6;
 	static const int IMAGE_INDEX_OK = 0;
 	static const int IMAGE_INDEX_UNKNOWN = 1;
@@ -21,12 +36,6 @@ class MariaUIStatus : QWidget {
 	//Animation speed in milliseconds.
 	static const int ANIMATION_SPEED = 500;
 
-public:
-	enum STATUS_TYPE {
-		OK, INVALID, WAIT, UNKNOWN, NONE
-	};
-
-private:
 	QMainWindow *_qmainWindow;
 
 	STATUS_TYPE _currentStatus;
@@ -36,15 +45,4 @@ private:
 	QTimer *_statusAnimationTimer;
 
 	void loadImages();
-
-	protected slots:
-		void updateStatusAnimation();
-
-public:
-	MariaUIStatus(QMainWindow *qmainWindow);
-	~MariaUIStatus();
-
-	void setStatus(STATUS_TYPE type);
-	STATUS_TYPE getStatus();
-	void updateGUI(QPointF statePosition);
 };
