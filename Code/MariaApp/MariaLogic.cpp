@@ -27,7 +27,7 @@ bool MariaLogic::checkValidCommand(std::string inputText) {
 }
 
 string MariaLogic::processCommand(std::string inputText) {
-	string output = "";
+	string output = MariaText::EMPTY_STRING;
 	MariaInputObject* input = NULL;
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
 
@@ -75,7 +75,7 @@ string MariaLogic::processCommand(std::string inputText) {
 		break;
 
 		case MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE:
-			runCommandShowDateRange(input, currentObj);
+			output = runCommandShowDateRange(input, currentObj);
 		break;
 
 		case MariaInputObject::COMMAND_TYPE::SHOW_ALL:
@@ -136,7 +136,7 @@ string MariaLogic::processCommand(std::string inputText) {
 	}
 
 	// Rey: Refactoring needed for this line.
-	mariaUI->getCommandBar()->getTextbox()->setUserInput("");
+	mariaUI->getCommandBar()->getTextbox()->setUserInput(MariaText::EMPTY_STRING);
 
 	//Overall UI Refresh
 	MariaUIStateDisplay* tempObj = dynamic_cast<MariaUIStateDisplay*>(currentObj);
