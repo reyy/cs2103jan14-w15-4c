@@ -902,7 +902,7 @@ int main(int argc, char *argv[]) {
 	MariaLogic *mariaLogic = new MariaLogic(argc, argv);
 
 	int returnCode = QApplication::exec();
-	delete mariaLogic;
+	SAFE_DELETE(mariaLogic);
 
 	return returnCode;
 }

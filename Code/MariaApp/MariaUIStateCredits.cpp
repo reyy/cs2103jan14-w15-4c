@@ -42,7 +42,7 @@ void MariaUIStateCredits::setDoneAnimating() {
 void MariaUIStateCredits::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
 
-	((MariaUI*)_qmainWindow)->setBackgroundColor(MariaUI::WINDOW_DEFAULT_COLOR_R, MariaUI::WINDOW_DEFAULT_COLOR_G, MariaUI::WINDOW_DEFAULT_COLOR_B);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 
 	_displayText->setStyleSheet("color:#ffffff;font-size:" + QString::number(FONT_SIZE) + "px;font-weight:bold;");
 	_displayText->setAlignment(Qt::AlignCenter);

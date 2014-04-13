@@ -1,4 +1,5 @@
 #include <assert.h> 
+#include "MariaMacros.h"
 #include "MariaUIStateShow.h"
 #include "MariaUI.h"
 
@@ -9,6 +10,8 @@ const float MariaUIStateShow::TITLE_HEIGHT = 50.0;
 const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.15;
 
 MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, string title, vector<MariaTask*> listOfTasks) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
+	assert(qmainWindow != NULL);
+	
 	_listOfTasks = listOfTasks;
 
 	_titleLabel = new QLabel(_qmainWindow);
@@ -20,12 +23,15 @@ MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, string title, vecto
 
 MariaUIStateShow::~MariaUIStateShow() {
 	clearUITask();
-	delete _titleLabel;
+	SAFE_DELETE(_titleLabel);
+}
+
+void MariaUIStateShow::updateGUI() {
 }
 
 void MariaUIStateShow::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
-	((MariaUI*)_qmainWindow)->setBackgroundColor(116, 30, 168);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 
 	_titleLabel->show();
 }
@@ -57,7 +63,4 @@ bool MariaUIStateShow::timerEndState() {
 	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	updatePageTitleGUI();
 	return false;
-}
-
-void MariaUIStateShow::updateGUI() {
 }

@@ -16,6 +16,9 @@ public:
 	void setDoneAnimating();
 
 private:
+	static const int BACKGROUND_R = 37;
+	static const int BACKGROUND_G = 157;
+	static const int BACKGROUND_B = 207;
 	static const int LOGO_SPEED_RETARDER = 80;
 	static const int FONT_SIZE = 18;
 	static const int FONT_SIZE_BODY = 14;

@@ -1,3 +1,4 @@
+#include "MariaMacros.h"
 #include "MariaInputObject.h"
 
 MariaInputObject::MariaInputObject() {
@@ -10,18 +11,15 @@ MariaInputObject::MariaInputObject() {
 
 MariaInputObject::~MariaInputObject() {
 	if (_startTime != NULL) {
-		delete _startTime;
-		_startTime = NULL;
+		SAFE_DELETE(_startTime);
 	}
 
 	if (_endTime != NULL) {
-		delete _endTime;
-		_endTime = NULL;
+		SAFE_DELETE(_endTime);
 	}
 
 	if (_editTime != NULL) {
-		delete _editTime;
-		_editTime = NULL;
+		SAFE_DELETE(_editTime);
 	}
 }
 
