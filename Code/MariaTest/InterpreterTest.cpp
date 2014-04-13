@@ -20,7 +20,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -40,7 +40,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 
 			MariaTime* expectedTime = new MariaTime(MariaTime::getCurrentTime());
 
@@ -67,7 +67,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::ADD_TIMED);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_TIMED);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			MariaTime* expectedStartTime = new MariaTime(MariaTime::getCurrentTime());
@@ -102,7 +102,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 			Assert::AreEqual(expectedEditField, output->getEditField());
 
@@ -123,7 +123,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
 
 			MariaTime* expectedTime = new MariaTime(2014, 3, 21);
 
@@ -150,7 +150,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
 
 			MariaTime* expectedTime = new MariaTime(2014, 3, 21);
 
@@ -178,7 +178,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::EDIT_DESCRIPTION);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::EDIT_DESCRIPTION);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 			Assert::AreEqual(expectedEditField, output->getEditField());
 
@@ -200,7 +200,7 @@ namespace MariaTest {
 
 			MariaTime* expectedTime = new MariaTime(MariaTime::getCurrentTime());
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 			Assert::AreEqual(expectedTime->getYear(), output->getEndTime()->getYear());
 			Assert::AreEqual(expectedTime->getMonth(), output->getEndTime()->getMonth());
 			Assert::AreEqual(expectedTime->getDay(), output->getEndTime()->getDay());
@@ -224,7 +224,7 @@ namespace MariaTest {
 
 			MariaTime* expectedTime = new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1);
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 			Assert::AreEqual(expectedTime->getYear(), output->getEndTime()->getYear());
 			Assert::AreEqual(expectedTime->getMonth(), output->getEndTime()->getMonth());
 			Assert::AreEqual(expectedTime->getDay(), output->getEndTime()->getDay());
@@ -246,7 +246,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
 			MariaTime* expectedStartTime = new MariaTime(MariaTime::getCurrentTime());
 			Assert::AreEqual(expectedStartTime->getYear(), output->getStartTime()->getYear());
 			Assert::AreEqual(expectedStartTime->getMonth(), output->getStartTime()->getMonth());
@@ -279,7 +279,7 @@ namespace MariaTest {
 
 			string expectedTitle = "this is a really long long long task title";
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::SEARCH);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::SEARCH);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -300,7 +300,7 @@ namespace MariaTest {
 
 			string expectedTitle = "apple";
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::DELETE_TASK);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::DELETE_TASK);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -321,7 +321,7 @@ namespace MariaTest {
 
 			string expectedTitle = "";
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::DELETE_ALL);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::DELETE_ALL);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -342,7 +342,7 @@ namespace MariaTest {
 
 			string expectedTitle = "gym";
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::MARK_DONE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::MARK_DONE);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -363,7 +363,7 @@ namespace MariaTest {
 
 			string expectedTitle = "gym";
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::MARK_UNDONE);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::MARK_UNDONE);
 			Assert::AreEqual(expectedTitle, output->getTitle());
 
 			SAFE_DELETE(output);
@@ -382,7 +382,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			Assert::IsTrue(output->getCOMMAND_TYPE() == MariaInputObject::COMMAND_TYPE::UNDO);
+			Assert::IsTrue(output->getCommandType() == MariaInputObject::COMMAND_TYPE::UNDO);
 
 			SAFE_DELETE(output);
 			SAFE_DELETE(program);

@@ -46,7 +46,7 @@ public:
 	MariaUIStateLoading(QMainWindow* qmainWindow);
 	~MariaUIStateLoading();
 
-	void setDisplayText(const QString text);
+	void setDisplayText(std::string text);
 	void setLoadingDone();
 	void setQuitAfterLoadingTrue();
 };

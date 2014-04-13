@@ -37,7 +37,7 @@ string MariaLogic::processCommand(std::string inputText) {
 		throw;
 	}
 
-	switch (input->getCOMMAND_TYPE()) {
+	switch (input->getCommandType()) {
 		case MariaInputObject::COMMAND_TYPE::EXIT:
 			runCommandExit(input, currentObj);
 		break;
@@ -233,7 +233,7 @@ void MariaLogic::initTaskManager() {
 void MariaLogic::initStartingState() {
 	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
 	mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
-	temp->setDisplayText("Loading");
+	temp->setDisplayText(MariaText::LOADING);
 	temp->setLoadingDone();
 	
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
@@ -249,7 +249,7 @@ void MariaLogic::runCommandExit(MariaInputObject* input, MariaStateObject* state
 
 	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
 	mariaStateManager->queueState(STATE_TYPE::LOADING, temp);
-	temp->setDisplayText("Good Bye!");
+	temp->setDisplayText(MariaText::EXIT);
 	temp->setLoadingDone();
 	temp->setQuitAfterLoadingTrue();
 	mariaStateManager->transitState();
@@ -260,14 +260,14 @@ string MariaLogic::runCommandAddFloatingTask(MariaInputObject* input, MariaState
 	assert(state != NULL);
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
-	const char* taskTitle = input->getTitle().c_str();
+	string taskTitle = input->getTitle();
 
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
 	} else {
-		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}
 }
 
@@ -276,14 +276,14 @@ string MariaLogic::runCommandAddDeadlineTask(MariaInputObject* input, MariaState
 	assert(state != NULL);
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, input->getEndTime());
-	const char* taskTitle = input->getTitle().c_str();
+	string taskTitle = input->getTitle();
 
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
 	} else {
-		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}
 }
 
@@ -292,14 +292,14 @@ string MariaLogic::runCommandAddTimedTask(MariaInputObject* input, MariaStateObj
 	assert(state != NULL);
 
 	MariaTask *toAdd = mariaTaskManager->addTask(input->getTitle(), input->getStartTime(), input->getEndTime());
-	const char* taskTitle = input->getTitle().c_str();
+	string taskTitle = input->getTitle();
 
 	if (toAdd != NULL) {
 		addTaskToUI(toAdd, state);
 		saveToFile();
-		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_SUCESS, taskTitle.c_str());
 	} else {
-		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle);
+		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
 	}
 }
 
@@ -352,11 +352,11 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			// Check to see if the task even has an start time to begin with.
 			if (toEditTask->getMariaTask()->getStart() == NULL) {
-				throw exception("Sorry, but please recreate the activity to insert time.");
+				throw MariaText::TASK_UPDATE_TYPE_ERROR;
 			}
 			// Check to see if the new time is past the end time.
 			if (toEditTask->getMariaTask()->getEnd()->compareTo(*input->getEditTime()) < 0) {
-				throw exception("Sorry, but the new start time is past the end time.");
+				throw MariaText::TASK_UPDATE_START_TIME_ERROR;
 			}
 
 			toEditTask->getMariaTask()->setStart(input->getEditTime());
@@ -364,7 +364,7 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
-			return "Consider it done!";
+			return MariaText::TASK_UPDATED_TIME;
 		}
 		//rey: possible control path error here!
 	} else {
@@ -376,29 +376,29 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				// Check to see if the task even has an start time to begin with.
 				if (listOfTasks[0]->getStart() == NULL) {
-					throw exception("Sorry, but please recreate the activity to insert time.");
+					throw MariaText::TASK_UPDATE_TYPE_ERROR;
 				}
 				// Check to see if the new time is past the end time.
 				if (listOfTasks[0]->getEnd()->compareTo(*input->getEditTime()) < 0) {
-					throw exception("Sorry, but the new start time is past the end time.");
+					throw MariaText::TASK_UPDATE_START_TIME_ERROR;
 				}
 
 				listOfTasks[0]->setStart(input->getEditTime());
 				saveToFile();
-				return("Consider it done!");
+				return MariaText::TASK_UPDATED_TIME;
 			}
 			//rey: possible control path error here!
 		} else if (listOfTasks.size() == 0) {
-			return ("I couldn't find anything related. Try again.");
+			return MariaText::TASK_NOT_FOUND;
 		} else {
 
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
-			return ("There are similar tasks, which one should I edit?");
+			return MariaText::TASK_UPDATE_CONFLICT;
 		}
 	}
 	
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObject* state) {
@@ -413,18 +413,18 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
 			// Check to see if the task even has an end time to begin with.
 			if (toEditTask->getMariaTask()->getEnd() == NULL) {
-				throw exception("Sorry, but please recreate the activity to insert time.");
+				throw MariaText::TASK_UPDATE_TYPE_ERROR;
 			}
 			// Check to see if the new time is before the start time.
 			if (toEditTask->getMariaTask()->getStart() != NULL && toEditTask->getMariaTask()->getStart()->compareTo(*input->getEditTime()) > 0) {
-				throw exception("Sorry, but the new end time is before the start time.");
+				throw MariaText::TASK_UPDATE_END_TIME_ERROR;
 			}
 			toEditTask->getMariaTask()->setEnd(input->getEditTime());
 			saveToFile();
 					
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
-			return ("Consider it done.");
+			return MariaText::TASK_UPDATED_TIME;
 		}
 	} else {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
@@ -435,27 +435,27 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				// Check to see if the task even has an end time to begin with.
 				if (listOfTasks[0]->getEnd() == NULL) {
-					throw exception("Sorry, but please recreate the activity to insert time.");
+					throw MariaText::TASK_UPDATE_TYPE_ERROR;
 				}
 				// Check to see if the new time is before the start time.
 				if (listOfTasks[0]->getStart() != NULL && listOfTasks[0]->getStart()->compareTo(*input->getEditTime()) > 0) {
-					throw exception("Sorry, but the new end time is before the start time.");
+					throw MariaText::TASK_UPDATE_END_TIME_ERROR;
 				}
 				listOfTasks[0]->setEnd(input->getEditTime());
 				saveToFile();
-				return ("Consider it done!");
+				return MariaText::TASK_UPDATED_TIME;
 			}
 		} else if (listOfTasks.size() == 0) {
-			return ("I couldn't find anything related. Try again.");
+			return MariaText::TASK_NOT_FOUND;
 		} else {
 
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
-			return ("There are similar tasks, which one should I edit?");
+			return MariaText::TASK_UPDATE_CONFLICT;
 		}
 	}
 	
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaStateObject* state) {
@@ -513,7 +513,7 @@ string MariaLogic::runCommandShowDate(MariaInputObject* input, MariaStateObject*
 	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToDateString(startTime), listOfTasks));
 	mariaStateManager->transitState();
 
-	string toReturn = MariaText::format(MariaText::SHOW_DATE, MariaTime::convertToDateString(endTime));
+	string toReturn = MariaText::format(MariaText::SHOW_DATE, MariaTime::convertToDateString(endTime).c_str());
 
 	SAFE_DELETE(startTime);
 	SAFE_DELETE(endTime);
@@ -533,11 +533,10 @@ string MariaLogic::runCommandShowDateRange(MariaInputObject* input, MariaStateOb
 	endTime->setMin(59);
 	vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(startTime, endTime, true);
 
-	mariaUI->getCommandBar()->getTextbox()->setQuestionText("This is what you have from " + MariaTime::convertToDateString(startTime) + " to " + MariaTime::convertToDateString(endTime));
-	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, MariaTime::convertToDateString(startTime) + " to " + MariaTime::convertToDateString(endTime), listOfTasks));
-	mariaStateManager->transitState();
+	string toReturn = MariaText::format(MariaText::SHOW_RANGE, MariaTime::convertToDateString(startTime).c_str(), MariaTime::convertToDateString(endTime).c_str());
 
-	string toReturn = MariaText::format(MariaText::SHOW_DATE, MariaTime::convertToMonthString(startTime));
+	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, toReturn, listOfTasks));
+	mariaStateManager->transitState();
 
 	SAFE_DELETE(startTime);
 	SAFE_DELETE(endTime);
@@ -564,7 +563,7 @@ string MariaLogic::runCommandSearch(MariaInputObject* input, MariaStateObject* s
 	mariaStateManager->queueState(STATE_TYPE::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, input->getTitle(), listOfTasks));
 	mariaStateManager->transitState();
 
-	return MariaText::format(MariaText::SEARCH_RESULT,input->getTitle());
+	return MariaText::format(MariaText::SEARCH_RESULT,input->getTitle().c_str());
 }
 
 string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObject* state) {
@@ -582,7 +581,7 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
-			return ("Resolved! Anything else?");
+			return MariaText::TASK_RESOLVED_CONFLICT;
 		}
 	} else {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
@@ -594,7 +593,7 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 				if (mariaTaskManager->compareToPreviousQuery()) {
 					((MariaUIStateHome*)state)->eraseUITask(listOfTasks[0]);
 				}
-				return ("'" + input->getTitle() + "' has been deleted!");
+				return MariaText::format(MariaText::TASK_DELETED, input->getTitle().c_str());//("'" + input->getTitle() + "' has been deleted!");
 			}
 		} else if (listOfTasks.size() == 0) {
 			return MariaText::TASK_NOT_FOUND;
@@ -602,11 +601,11 @@ string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObjec
 
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
-			return ("There are similar tasks, which one should I remove?");
+			return MariaText::TASK_UPDATE_CONFLICT;
 		}
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state) {
@@ -642,7 +641,7 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
-			return ("Resolved! Anything else?");
+			return MariaText::TASK_RESOLVED_CONFLICT;
 		}
 	} else {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
@@ -651,18 +650,18 @@ string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject*
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setIsDone(true);
 				saveToFile();
-				return ("'" + input->getTitle() + "' has been completed!");
+				return MariaText::format(MariaText::TASK_MARK_COMPLETE, input->getTitle().c_str());
 			}
 		} else if (listOfTasks.size() == 0) {
-			return ("I couldn't find anything related. Try again.");
+			return MariaText::TASK_NOT_FOUND;
 		} else {
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
-			return ("There are similar tasks, which one should I mark?");
+			return MariaText::TASK_UPDATE_CONFLICT;
 		}
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state) {
@@ -680,7 +679,7 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 
 			mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 			mariaStateManager->transitState();
-			return ("Resolved! Anything else?");
+			return MariaText::TASK_RESOLVED_CONFLICT;
 		}
 	} else {
 		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
@@ -689,18 +688,18 @@ string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObjec
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
 				listOfTasks[0]->setIsDone(false);
 				saveToFile();
-				return ("'" + input->getTitle() + "' has been uncompleted!");
+				return MariaText::format(MariaText::TASK_UNMARK_COMPLETE, input->getTitle().c_str());
 			}
 		} else if (listOfTasks.size() == 0) {
-			return ("I couldn't find anything related. Try again.");
+			return MariaText::TASK_NOT_FOUND;
 		} else {
 			mariaStateManager->queueState(STATE_TYPE::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
 			mariaStateManager->transitState();
-			return ("There are similar tasks, which one should I mark?");
+			return MariaText::TASK_UPDATE_CONFLICT;
 		}
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* state) {
@@ -709,7 +708,7 @@ string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* sta
 
 	STATE_TYPE currentState = mariaStateManager->getCurrentState();
 	if (currentState != STATE_TYPE::HOME && currentState != STATE_TYPE::SHOW) {
-		return "Cannot perform Undo here.";
+		return MariaText::UNDO_ERROR;
 	}
 
 	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
@@ -720,16 +719,14 @@ string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* sta
 
 		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
 		if (taskCountDifference < 0) {
-			//refresh GUI!
 			((MariaUIStateHome*)currentObj)->eraseUITask(changed);
 		} else if (taskCountDifference > 0) {
-			//((MariaUIStateHome*)currentObj)->addUITask(changed, MariaUITask::DISPLAY_TYPE::NORMAL);
 			addTaskToUI(changed, state);
-			//((MariaUIStateHome*)currentObj)->setPageEnd();
 		} 
 		mariaTaskManager->compareToPreviousQuery();
+		return MariaText::UNDO_SUCCESS;
 	}
-	return ("Nothing to Undo.");
+	return MariaText::UNDO_EMPTY;
 }
 
 string MariaLogic::runCommandGoHome(MariaInputObject* input, MariaStateObject* state) {
@@ -754,7 +751,7 @@ string MariaLogic::runCommandGoHome(MariaInputObject* input, MariaStateObject* s
 		break;
 	}
 
-	return ("How can I help you?");
+	return MariaText::HOME;
 }
 
 string MariaLogic::runCommandGoCredits(MariaInputObject* input, MariaStateObject* state) {
@@ -765,7 +762,7 @@ string MariaLogic::runCommandGoCredits(MariaInputObject* input, MariaStateObject
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 	mariaStateManager->transitState();
 
-	return ("Sure.");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandGoHelp(MariaInputObject* input, MariaStateObject* state) {
@@ -776,7 +773,7 @@ string MariaLogic::runCommandGoHelp(MariaInputObject* input, MariaStateObject* s
 	mariaStateManager->queueState(STATE_TYPE::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 	mariaStateManager->transitState();
 
-	return ("Let me get you some help.");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* state) {
@@ -788,14 +785,14 @@ string MariaLogic::runCommandPageUp(MariaInputObject* input, MariaStateObject* s
 		if (tempObj->isAllTaskAtLocation()) {
 			if (tempObj->isPageValid(tempObj->getPage()-1)) {
 				tempObj->setPage(tempObj->getPage()-1);
-				return ("Going up.");
+				return MariaText::UP;
 			} else {
-				return ("There are no more items up there.");
+				return MariaText::UP_ERROR;
 			}
 		}
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject* state) {
@@ -807,14 +804,14 @@ string MariaLogic::runCommandPageDown(MariaInputObject* input, MariaStateObject*
 		if (tempObj->isAllTaskAtLocation()) {
 			if (tempObj->isPageValid(tempObj->getPage()+1)) {
 				tempObj->setPage(tempObj->getPage()+1);
-				return ("Going down.");
+				return MariaText::DOWN;
 			} else {
-				return ("There are no more items down there.");
+				return MariaText::DOWN_ERROR;
 			}
 		}
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject* state) {
@@ -832,11 +829,11 @@ string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject*
 
 	default:
 		SAFE_DELETE(input);
-		throw exception("");
+		throw MariaText::IGNORE_EXCEPTION;
 		break;
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject* state) {
@@ -848,17 +845,17 @@ string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject
 	switch (mariaStateManager->getCurrentState()) {
 	case STATE_TYPE::HELP:
 		if (tempObj != NULL) {
-			tempObj->setHelpIndex(tempObj->getHelpIndex()+1);
+			tempObj->setHelpIndex(tempObj->getHelpIndex() + 1);
 		}
 		break;
 
 	default:
 		SAFE_DELETE(input);
-		throw exception("");
+		throw MariaText::IGNORE_EXCEPTION;
 		break;
 	}
 
-	return ("");
+	return MariaText::EMPTY_STRING;
 }
 
 void MariaLogic::saveToFile() {

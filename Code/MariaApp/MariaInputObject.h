@@ -40,28 +40,28 @@ public:
 	~MariaInputObject();
 
 	void setOriginalInput(string originalInput);
-	void setCOMMAND_TYPE(COMMAND_TYPE newCOMMAND_TYPE);
+	void setCommandType(COMMAND_TYPE newCommandType);
 	void setTitle(string newTitle);
 	void setEditField(string newEditField);
 	void setOptionID(int newOptionID);
 	void setStartTime(MariaTime* newStartTime);
 	void setEndTime(MariaTime* newEndTime);
 	void setEditTime(MariaTime* newEditTime);
-	void setSTATE_TYPE(STATE_TYPE newSTATE_TYPE);
+	void setStateType(STATE_TYPE newStateType);
 
 	string getOriginalInput() const;
-	COMMAND_TYPE getCOMMAND_TYPE() const;
+	COMMAND_TYPE getCommandType() const;
 	string getTitle() const;
 	string getEditField() const;
 	int getOptionID() const;
 	MariaTime* getStartTime() const;
 	MariaTime* getEndTime() const;
 	MariaTime* getEditTime() const;
-	STATE_TYPE getSTATE_TYPE() const;
+	STATE_TYPE getStateType() const;
 
 private:
-	COMMAND_TYPE _COMMAND_TYPE;
-	STATE_TYPE _STATE_TYPE;
+	COMMAND_TYPE _commandType;
+	STATE_TYPE _stateType;
 
 	string _originalInput;
 	string _title;

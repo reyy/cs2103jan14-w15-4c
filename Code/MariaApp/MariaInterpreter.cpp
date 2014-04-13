@@ -113,7 +113,7 @@ MariaInputObject* MariaInterpreter::parseInput(string input, STATE_TYPE currentS
 	}
 
 	// Now remove that command keyword with the trailing space.
-	toReturn->setCOMMAND_TYPE(commandKeyword->second);
+	toReturn->setCommandType(commandKeyword->second);
 	removeTokens(tokenizedInput, 0, 1);
 	input = stitchString(tokenizedInput, 0, tokenizedInput.size());
 
@@ -169,17 +169,17 @@ void MariaInterpreter::parseAdd(string input, MariaInputObject* inputObject, STA
 		// Check if the substring after the last by/from/to contains a valid date/time.
 		if (hasDateTime(extractFromBackOfString(input, DELIMITER_ADD_TIMED_TASK_START, dummyVar)) && hasDateTime(extractFromBackOfString(input, DELIMITER_ADD_TIMED_TASK_END, dummyVar))) {
 			parseAddTimedTask(input, inputObject);
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_TIMED);
 		} else if (hasDateTime(extractFromBackOfString(input, DELIMITER_ADD_DEADLINE_TASK, dummyVar))) {
 			parseAddDeadlineTask(input, inputObject);
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_DEADLINE);
 		} else {
 			// Something's wrong with the string but nevermind. We'll just put it as a floating task.
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 			inputObject->setTitle(input);
 		}
 	} else {
-		inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::ADD_FLOATING);
 		inputObject->setTitle(input);
 	}
 }
@@ -372,7 +372,7 @@ void MariaInterpreter::parseEditTitle(string input, MariaInputObject* inputObjec
 		throw exception(MESSAGE_NO_ACTIVITY_TITLE_EDIT.c_str());
 	}
 	inputObject->setEditField(editFieldString);
-	inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
+	inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::EDIT_TITLE);
 }
 
 void MariaInterpreter::parseEditStartTime(string input, MariaInputObject* inputObject) {
@@ -400,7 +400,7 @@ void MariaInterpreter::parseEditStartTime(string input, MariaInputObject* inputO
 	}
 
 	inputObject->setEditTime(editTime);
-	inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
+	inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::EDIT_START_TIME);
 }
 
 void MariaInterpreter::parseEditEndTime(string input, MariaInputObject* inputObject) {
@@ -428,7 +428,7 @@ void MariaInterpreter::parseEditEndTime(string input, MariaInputObject* inputObj
 	}
 
 	inputObject->setEditTime(editTime);
-	inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
+	inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::EDIT_END_TIME);
 }
 
 void MariaInterpreter::parseEditDescription(string input, MariaInputObject* inputObject) {
@@ -448,7 +448,7 @@ void MariaInterpreter::parseEditDescription(string input, MariaInputObject* inpu
 		throw exception(MESSAGE_NO_DESCRIPTION.c_str());
 	}
 	inputObject->setEditField(editFieldString);
-	inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::EDIT_DESCRIPTION);
+	inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::EDIT_DESCRIPTION);
 }
 
 void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState) {
@@ -462,15 +462,15 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 	int dummyVar = 0;
 
 	if (input.size() == 0) {
-		inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
 	} else if (isStringEqual(input, MODIFIER_ALL_TASKS)) {
-		inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_ALL);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_ALL);
 	} else if (isStringEqual(input, EXPRESSION_TODAY)) {
-		inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
 	} else if (isStringEqual(input, EXPRESSION_TOMORROW)) {
-		inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+		inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1));
 	} else if (hasDate(input)) {
 		// Need to check if there are 1 or more dates.
@@ -526,7 +526,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 			}
 
 			inputObject->setStartTime(startTime);
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
 
 			while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
 				MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
@@ -571,7 +571,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 					break;
 				}
 			}
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		} else if (isStringContain(input, EXPRESSION_MONTHS_OF_YEAR)) {
 			int year = MariaTime::getCurrentTime().getYear();
 			int month;
@@ -590,7 +590,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 				// Need a function to get last day of month...
 				inputObject->setStartTime(new MariaTime(year, month, 1));
 				inputObject->setEndTime(new MariaTime(year, month, getLastDayOfMonth(year, month)));
-				inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
+				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE_RANGE);
 				return;
 			} else if (workingList.size() == 2) {
 				// Show date
@@ -609,7 +609,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 				}
 
 				inputObject->setEndTime(new MariaTime(year, month, day));
-				inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+				inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 			}
 
 			// Check to see if the month is past today's date.
@@ -637,7 +637,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, ST
 			// Also check if the preceding token is "next".
 			// If it is, add a week to this day.
 			inputObject->setEndTime(new MariaTime(year, month, day));
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::SHOW_DATE);
 		}
 	} else {
 		SAFE_DELETE(inputObject);
@@ -688,7 +688,7 @@ void MariaInterpreter::parseDelete(string input, MariaInputObject* inputObject, 
 			SAFE_DELETE(inputObject);
 			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 		} else if (isStringEqual(input, MODIFIER_ALL_TASKS)) {
-			inputObject->setCOMMAND_TYPE(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
+			inputObject->setCommandType(MariaInputObject::COMMAND_TYPE::DELETE_ALL);
 		} else {
 			inputObject->setTitle(input);
 		}

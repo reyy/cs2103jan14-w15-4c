@@ -130,8 +130,9 @@ void MariaUIStateLoading::animateLogo() {
 	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
 }
 
-void MariaUIStateLoading::setDisplayText(const QString text) {
-	_displayText->setText(text);
+void MariaUIStateLoading::setDisplayText(std::string text) {
+	QString qText = QString::fromStdString(text);
+	_displayText->setText(qText);
 }
 
 void MariaUIStateLoading::setLoadingDone() {
