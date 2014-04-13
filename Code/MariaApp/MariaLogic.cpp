@@ -374,7 +374,10 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
 		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
-
+			// Check to see if the task even has an start time to begin with.
+			if (toEditTask->getMariaTask()->getStart() == NULL) {
+				throw exception("Sorry, but please recreate the activity to insert time.");
+			}
 			// Check to see if the new time is past the end time.
 			if (toEditTask->getMariaTask()->getEnd()->compareTo(*input->getEditTime()) < 0) {
 				throw exception("Sorry, but the new start time is past the end time.");
@@ -395,6 +398,10 @@ string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateOb
 			//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
 			//still enable updating but no visual cues.
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+				// Check to see if the task even has an start time to begin with.
+				if (listOfTasks[0]->getStart() == NULL) {
+					throw exception("Sorry, but please recreate the activity to insert time.");
+				}
 				// Check to see if the new time is past the end time.
 				if (listOfTasks[0]->getEnd()->compareTo(*input->getEditTime()) < 0) {
 					throw exception("Sorry, but the new start time is past the end time.");
@@ -428,10 +435,14 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
 		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
 			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit-1);
-				// Check to see if the new time is before the start time.
-				if (toEditTask->getMariaTask()->getStart()->compareTo(*input->getEditTime()) > 0) {
-					throw exception("Sorry, but the new end time is before the start time.");
-				}
+			// Check to see if the task even has an end time to begin with.
+			if (toEditTask->getMariaTask()->getEnd() == NULL) {
+				throw exception("Sorry, but please recreate the activity to insert time.");
+			}
+			// Check to see if the new time is before the start time.
+			if (toEditTask->getMariaTask()->getStart() != NULL && toEditTask->getMariaTask()->getStart()->compareTo(*input->getEditTime()) > 0) {
+				throw exception("Sorry, but the new end time is before the start time.");
+			}
 			toEditTask->getMariaTask()->setEnd(input->getEditTime());
 			saveToFile();
 					
@@ -446,8 +457,12 @@ string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObje
 			//Jay: To do, change it to just check if currentObj is a stateDisplay and call updateUI, if not
 			//still enable updating but no visual cues.
 			if (mariaStateManager->getCurrentState() == STATE_TYPE::HOME || mariaStateManager->getCurrentState() == STATE_TYPE::SHOW) {
+				// Check to see if the task even has an end time to begin with.
+				if (listOfTasks[0]->getEnd() == NULL) {
+					throw exception("Sorry, but please recreate the activity to insert time.");
+				}
 				// Check to see if the new time is before the start time.
-				if (listOfTasks[0]->getStart()->compareTo(*input->getEditTime()) > 0) {
+				if (listOfTasks[0]->getStart() != NULL && listOfTasks[0]->getStart()->compareTo(*input->getEditTime()) > 0) {
 					throw exception("Sorry, but the new end time is before the start time.");
 				}
 				listOfTasks[0]->setEnd(input->getEditTime());
