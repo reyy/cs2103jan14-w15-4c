@@ -4,7 +4,7 @@
 
 const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
 const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.23;
-const float MariaUIStateShow::TITLE_WIDTH = 220.0;
+const float MariaUIStateShow::TITLE_WIDTH = 420.0;
 const float MariaUIStateShow::TITLE_HEIGHT = 50.0;
 const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.15;
 
@@ -14,7 +14,6 @@ MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, string title, vecto
 	_titleLabel = new QLabel(_qmainWindow);
 	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
 	_titleLabel->setAlignment(Qt::AlignCenter);
-	_titleLabel->setWordWrap(true);
 	_titleLabel->setText(QString::fromStdString(title));
 	_titleLabel->hide();
 }
@@ -33,7 +32,7 @@ void MariaUIStateShow::initBeginState() {
 
 void MariaUIStateShow::initActiveState() {
 	for(MariaTask* temp : _listOfTasks) {
-		addUITask(temp, MariaUITask::DISPLAY_TYPE::CONTRACTED);
+		addUITask(temp, MariaUITask::DISPLAY_TYPE::DETAILED);
 	}
 
 	updateUITaskPosition();
