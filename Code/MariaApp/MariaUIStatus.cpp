@@ -20,7 +20,7 @@ MariaUIStatus::MariaUIStatus(QMainWindow* qmainWindow) {
 }
 
 MariaUIStatus::~MariaUIStatus(void) {
-	for (int i = 0; i < AMOUNT_OF_IMAGES;i++) {
+	for (int i = 0; i < AMOUNT_OF_IMAGES; i++) {
 		SAFE_DELETE(_imageHandle[i]);
 	}
 	SAFE_DELETE(_statusAnimationTimer);
