@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUIClock.h"
@@ -21,6 +22,7 @@ const float MariaUIClock::LINE_HEIGHT = 42;
 const float MariaUIClock::LINE_X_OFFSET = -5;
 const float MariaUIClock::LINE_Y_OFFSET = 5;
 
+//@author generated
 MariaUIClock::MariaUIClock(QMainWindow *qmainWindow) {
 	assert(qmainWindow != NULL);
 	
@@ -46,6 +48,7 @@ MariaUIClock::MariaUIClock(QMainWindow *qmainWindow) {
 	connect(_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
 }
 
+//@author A0111784H
 MariaUIClock::~MariaUIClock(void) {
 	if(_clockTimer->isActive()) {
 		_clockTimer->stop();

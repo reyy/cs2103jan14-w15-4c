@@ -1,6 +1,6 @@
+//@author A0111784H
 #pragma once
 
-#include <algorithm> 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include "MariaUIStateDisplay.h"

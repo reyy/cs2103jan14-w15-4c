@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h> 
 #include "MariaMacros.h"
 #include "MariaUIStateDisplay.h"
@@ -13,6 +14,7 @@ const float MariaUIStateDisplay::TITLE_WIDTH = 400.0;
 const float MariaUIStateDisplay::TITLE_HEIGHT = 40.0;
 const float MariaUIStateDisplay::FONT_SIZE = 12.0;
 
+//@author generated
 MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay) : MariaStateObject(qmainWindow) {
 	assert(qmainWindow != NULL);
 
@@ -32,6 +34,7 @@ MariaUIStateDisplay::~MariaUIStateDisplay() {
 	SAFE_DELETE(_pageText);
 }
 
+//@author A0111784H
 void MariaUIStateDisplay::updateUITaskNumber() {
 	int maxShown = _taskStack.size() - _page*_maxTaskDisplay;
 	if(maxShown > _maxTaskDisplay) {

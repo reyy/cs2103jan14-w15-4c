@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUITextbox.h"
@@ -13,6 +14,7 @@ const string MariaUITextbox::SUGGEST_TEXT_SAMPLE[] = {
 	"quit",
 };
 
+//@author generated
 const float MariaUITextbox::FONT_SIZE_TYPED_TEXT = 14.0;
 const float MariaUITextbox::FONT_SIZE_QUESTION_TEXT = 16.0;
 
@@ -50,6 +52,7 @@ MariaUITextbox::~MariaUITextbox() {
 	SAFE_DELETE(_questionText);
 }
 
+//@author A0111784H
 void MariaUITextbox::setQuestionText(const string text) {
 	QFontMetrics fm = QFontMetrics(_questionText->font());
 	_questionText->setText(fm.elidedText(QString::fromStdString(text),Qt::ElideRight, _questionText->width()));

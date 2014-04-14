@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUITask.h"
@@ -27,7 +28,7 @@ const string MariaUITask::MESSAGE_TIME_START = "Start: ";
 const string MariaUITask::MESSAGE_TIME_END = "End: ";
 const string MariaUITask::MESSAGE_TIME_DUE = "Due: ";
 
-MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, DISPLAY_TYPE type) {
+MariaUITask::MariaUITask(QMainWindow *qmainWindow, MariaTask *task, DisplayType type) {
 	assert(qmainWindow != NULL);
 	assert(task!=NULL);
 
@@ -322,6 +323,7 @@ MariaTask * MariaUITask::getMariaTask() {
 	return _taskReference;
 }
 
+//@author generated
 bool MariaUITask::updatePosition() {
 	if(_active) {
 		if(abs(_position.x()-_destination.x())>VALUE_THRESHOLD||
@@ -368,6 +370,7 @@ bool MariaUITask::updatePosition() {
 	return false;
 }
 
+//@author A0111784H
 void MariaUITask::updateTimeText() {
 	if(_active && _taskReference != NULL&&_currentDisplayType == NORMAL) {
 		string timeFormatted = _taskReference->getTimeFromNow();
@@ -391,6 +394,7 @@ void MariaUITask::updateTimeText() {
 	}	
 }
 
+//@author generated
 void MariaUITask::setDisplayTitle() {
 
 	_displayTitle = new QLabel(_qmainWindow);

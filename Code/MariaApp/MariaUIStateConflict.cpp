@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h> 
 #include "MariaUIStateConflict.h"
 
@@ -27,7 +28,7 @@ void MariaUIStateConflict::initBeginState() {
 
 void MariaUIStateConflict::initActiveState() {
 	for(MariaTask* temp : _conflictedTask) {
-		addUITask(temp, MariaUITask::DISPLAY_TYPE::EXPANDED);
+		addUITask(temp, MariaUITask::DisplayType::EXPANDED);
 	}
 
 	updateUITaskNumber();

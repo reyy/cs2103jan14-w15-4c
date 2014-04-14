@@ -1,3 +1,4 @@
+//@author A0111784H
 #pragma once
 
 #include <QtWidgets/QMainWindow>
@@ -6,6 +7,7 @@
 
 class MariaUIStatus : QWidget {
 	Q_OBJECT
+
 public:
 	typedef enum{
 		OK,

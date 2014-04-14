@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUI.h"
@@ -39,6 +40,7 @@ void MariaUIStateCredits::setDoneAnimating() {
 	_doneAnimating = true;
 }
 
+//@author generated
 void MariaUIStateCredits::initBeginState() {
 	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
 
@@ -62,6 +64,7 @@ void MariaUIStateCredits::initBeginState() {
 	_logo->show();
 }
 
+//@author A0111784H
 void MariaUIStateCredits::initActiveState() {
 }
 

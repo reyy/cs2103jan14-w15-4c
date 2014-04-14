@@ -201,6 +201,7 @@ void MariaUI::initButton() {
 	connect(_btClose, SIGNAL(clicked()), this , SLOT(quitAction()));
 }
 
+//@author A0111784H
 void MariaUI::initBackgroundColor(int r, int g, int b) {
 	_bkgColor.setRed(r);
 	_bkgColor.setGreen(g);
@@ -220,6 +221,7 @@ void MariaUI::initCommandBar() {
 	_commandBar->getTextbox()->setQuestionText(MariaText::HOME);
 }
 
+//@author generated
 void MariaUI::initTrayIcon() {
 	_trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
 	_trayIcon->setToolTip("MARIA - Press Ctrl + Space to unhide");

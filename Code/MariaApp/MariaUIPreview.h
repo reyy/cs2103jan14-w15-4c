@@ -1,4 +1,6 @@
+//@author A0111784H
 #pragma once
+
 #include <string>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
@@ -16,6 +18,7 @@ public:
 	static const int MAX_TASK_SHOWN = 3;
 	static const int DAY_OFFSET = 1;
 	static const int DAY_OF_WEEK = 7;
+	static const int MINUTES_IN_HOURS = 60;
 
 	static const string PREVIEW_EVENT_TODAY_NONE;
 	static const string PREVIEW_EVENT_TODAY_FIRST_AT;

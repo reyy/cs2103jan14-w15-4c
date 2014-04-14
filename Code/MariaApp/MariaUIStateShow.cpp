@@ -1,8 +1,10 @@
+//@author A0111784H
 #include <assert.h> 
 #include "MariaMacros.h"
 #include "MariaUIStateShow.h"
 #include "MariaUI.h"
 
+//@author generated
 const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
 const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.23;
 const float MariaUIStateShow::TITLE_WIDTH = 420.0;
@@ -26,6 +28,7 @@ MariaUIStateShow::~MariaUIStateShow() {
 	SAFE_DELETE(_titleLabel);
 }
 
+//@author A0111784H
 void MariaUIStateShow::updateGUI() {
 }
 

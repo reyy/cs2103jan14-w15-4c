@@ -1,3 +1,4 @@
+//@author generated
 #pragma once
 
 typedef enum {

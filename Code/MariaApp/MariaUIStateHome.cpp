@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUIStateHome.h"
@@ -39,7 +40,7 @@ void MariaUIStateHome::initBeginState() {
 
 void MariaUIStateHome::initActiveState() {
 	for(MariaTask* temp : _weekTask) {
-		addUITask(temp, MariaUITask::DISPLAY_TYPE::NORMAL);
+		addUITask(temp, MariaUITask::DisplayType::NORMAL);
 	}
 
 	updateUITaskPosition();

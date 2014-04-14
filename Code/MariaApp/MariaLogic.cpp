@@ -28,6 +28,7 @@ bool MariaLogic::checkValidCommand(string inputText) {
 	return mariaInterpreter->checkValidCommand(inputText);
 }
 
+//@author A0111821X
 string MariaLogic::processCommand(string inputText) {
 	string output = MariaText::EMPTY_STRING;
 	MariaInputObject* input = NULL;
@@ -137,7 +138,6 @@ string MariaLogic::processCommand(string inputText) {
 		break;
 	}
 
-	// Rey: Refactoring needed for this line.
 	mariaUI->getCommandBar()->getTextbox()->setUserInput(MariaText::EMPTY_STRING);
 
 	//Overall UI Refresh
@@ -235,6 +235,7 @@ void MariaLogic::initTaskManager() {
 	}
 }
 
+//@author A0111784H
 void MariaLogic::initStartingState() {
 	MariaUIStateLoading *temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
 	mariaStateManager->queueState(StateType::LOADING, temp);
@@ -244,6 +245,7 @@ void MariaLogic::initStartingState() {
 	mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
 }
 
+//@author A0111823U
 void MariaLogic::initShowHideWrapper() {
 	_beginthread(&MariaLogic::doShowHideWrapper, 0, this);
 }

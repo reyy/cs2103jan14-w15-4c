@@ -1,4 +1,6 @@
+//@author A0111784H
 #pragma once
+
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qlabel.h>
 #include <QtCore/QTimer>

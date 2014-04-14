@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUIPreview.h"
@@ -34,6 +35,7 @@ const float MariaUIPreview::TITLE_AREA_HEIGHT = 128.0;
 const float MariaUIPreview::BODY_XOFFSET = 10.0;
 const float MariaUIPreview::DIVIDER_HEIGHT = 4.0;
 
+//@author generated
 MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	assert(qmainWindow != NULL);
 
@@ -98,6 +100,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	_generatedSuggestionText = "";
 }
 
+//@author A0111784H
 MariaUIPreview::~MariaUIPreview() {
 	SAFE_DELETE(_lineCalendar);
 	SAFE_DELETE(_textCalendarBody);
@@ -136,8 +139,8 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 
 		if(taskListAll.size() - taskListNow.size() == 0) {
 			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/60).c_str());
+				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
@@ -145,8 +148,8 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 			}
 		} else {
 			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/60).c_str());
+				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
@@ -168,8 +171,8 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 			}
 
 			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < 60 * 60 && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/60).c_str());
+				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
 				}
@@ -192,8 +195,8 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 				}
 
 				if(withinTheHour >= 0 ) {//Check if event has passed.
-					if(withinTheHour < 60 * 60 && withinTheHour > 1) {
-						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/60).c_str());
+					if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
 					} else {
 						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(i)->getEnd()).c_str());
 					}

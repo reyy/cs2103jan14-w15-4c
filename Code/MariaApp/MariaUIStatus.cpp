@@ -1,3 +1,4 @@
+//@author A0111784H
 #include <assert.h>
 #include "MariaMacros.h"
 #include "MariaUIStatus.h"
@@ -77,6 +78,7 @@ void MariaUIStatus::updateStatusAnimation() {
 	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
 }
 
+//@author generated
 void MariaUIStatus::loadImages() {
 	_imageHandle[IMAGE_INDEX_OK] = new QPixmap("./Resources/ui_status_recognise.png");
 	_imageHandle[IMAGE_INDEX_UNKNOWN] = new QPixmap("./Resources/ui_status_unknown.png");
