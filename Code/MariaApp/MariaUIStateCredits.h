@@ -36,11 +36,11 @@ private:
 	static const float TEXT_STAGE_Y_SCALE;
 	static const float TEXTBODY_STAGE_Y_SCALE;
 	
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 	
-	QLabel *_displayText;
-	QLabel *_displayTextBody;
-	QLabel *_logo;
+	QLabel* _displayText;
+	QLabel* _displayTextBody;
+	QLabel* _logo;
 	int _logoImageIndex;
 	bool _doneAnimating;
 

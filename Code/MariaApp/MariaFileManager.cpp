@@ -46,11 +46,11 @@ vector<MariaTask*>* MariaFileManager::createNewFile() {
 // with the current data from messageList.
 bool MariaFileManager::writeFile(vector<MariaTask*> taskList) {
 	ofstream fileWriter(INPUT_FILE);
-	if(!fileWriter.is_open()) {
+	if (!fileWriter.is_open()) {
 		return false;
 	}
 
-	for(MariaTask* task : taskList) {
+	for (MariaTask* task : taskList) {
 		fileWriter << taskToString(task);
 	}
 	fileWriter.close();
@@ -68,9 +68,9 @@ vector<MariaTask*>* MariaFileManager::readFile(ifstream *fileReader) {
 		string lineRead;
 		string inputText[ATTRIBUTES_PER_TASK] = {""};
 
-		for( int i = 0; i< ATTRIBUTES_PER_TASK; i++ ) {
-			if(getline (*fileReader, lineRead)) {
-				if(lineRead == TASK_CLOSE_FIELD) {
+		for (int i = 0; i< ATTRIBUTES_PER_TASK; i++) {
+			if (getline (*fileReader, lineRead)) {
+				if (lineRead == TASK_CLOSE_FIELD) {
 					break;
 				}
 				inputText[i] = lineRead;
@@ -90,11 +90,11 @@ bool MariaFileManager::fileExists() {
 
 MariaTask* MariaFileManager::stringToTask(string inputText[]) {
 	MariaTask* newTask = new MariaTask();
-	for( int i = 0; i < ATTRIBUTES_PER_TASK; i++ ) {
+	for (int i = 0; i < ATTRIBUTES_PER_TASK; i++) {
 		string field = getFirstWord(inputText[i]);
 		string value = removeFirstWord(inputText[i], field);
 
-		if(field == TASK_TITLE_FIELD) {
+		if (field == TASK_TITLE_FIELD) {
 			newTask->setTitle(value);
 		} else if (field == TASK_DESC_FIELD) {
 			newTask->setDescription(value);
@@ -114,7 +114,7 @@ MariaTask* MariaFileManager::stringToTask(string inputText[]) {
 }
 
 MariaTime* MariaFileManager::stringToTime(string inputText) {
-	if(inputText == "") {
+	if (inputText == "") {
 		return NULL;
 	} else {
 		return new MariaTime(inputText);
@@ -122,31 +122,31 @@ MariaTime* MariaFileManager::stringToTime(string inputText) {
 }
 
 bool MariaFileManager::stringToBool(string inputText) {
-	if(inputText == TASK_COMPLETED) {
+	if (inputText == TASK_COMPLETED) {
 		return true;
-	} else if(inputText == TASK_NOT_COMPLETED) {
+	} else if (inputText == TASK_NOT_COMPLETED) {
 		return false;
 	} else {
 		throw exception("Corrupted File!");
 	}
 }
 
-string MariaFileManager::taskToString(MariaTask *task) {
+string MariaFileManager::taskToString(MariaTask* task) {
 	
 	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE + 
 							TASK_TITLE_FIELD	 + task->getTitle()					 + NEW_LINE + 
 							TASK_DESC_FIELD		 + task->getDescription()			 + NEW_LINE + 
 							TASK_STARTTIME_FIELD + timeToString(task->getStart())	 + NEW_LINE + 
 							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		 + NEW_LINE + 
-							TASK_CREATED_FIELD	 + timeToString(task->getCreated())	 + NEW_LINE +
-							TASK_ISDONE_FIELD	 + boolToString(task->getIsDone())	 + NEW_LINE +
+							TASK_CREATED_FIELD	 + timeToString(task->getCreated())	 + NEW_LINE + 
+							TASK_ISDONE_FIELD	 + boolToString(task->getIsDone())	 + NEW_LINE + 
 							TASK_CLOSE_FIELD + NEW_LINE;
 
 	return returnString;
 }
 
 string MariaFileManager::timeToString(MariaTime* inputTime) {
-	if(inputTime == NULL) {
+	if (inputTime == NULL) {
 		return ("");
 	} else {
 		return inputTime->get(TIME_FORMAT);
@@ -154,7 +154,7 @@ string MariaFileManager::timeToString(MariaTime* inputTime) {
 }
 
 string MariaFileManager::boolToString(bool input) {
-	if(input) {
+	if (input) {
 		return TASK_COMPLETED;
 	} else {
 		return TASK_NOT_COMPLETED;
@@ -163,8 +163,8 @@ string MariaFileManager::boolToString(bool input) {
 
 // This method returns the first word from input string
 string MariaFileManager::getFirstWord(string inputText) {
-	for( int i = 0; i<inputText.length(); i++ ) {
-		if(inputText[i] == ']') {
+	for (int i = 0; i<inputText.length(); i++) {
+		if (inputText[i] == ']') {
 			return inputText.substr(0, i + 1);
 		}
 	}
@@ -173,7 +173,7 @@ string MariaFileManager::getFirstWord(string inputText) {
 
 // This method returns the input string without its first word 
 string MariaFileManager::removeFirstWord(string inputText, string firstWord) {
-	if(inputText.length() <= firstWord.length()) {
+	if (inputText.length() <= firstWord.length()) {
 		return ("");
 	}
 	return inputText.substr(firstWord.length());

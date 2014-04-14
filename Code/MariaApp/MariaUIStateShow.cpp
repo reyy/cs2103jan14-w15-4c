@@ -33,14 +33,14 @@ void MariaUIStateShow::updateGUI() {
 }
 
 void MariaUIStateShow::initBeginState() {
-	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height() * TASKBAR_STARTHEIGHT_SCALE);
 	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 
 	_titleLabel->show();
 }
 
 void MariaUIStateShow::initActiveState() {
-	for(MariaTask* temp : _listOfTasks) {
+	for (MariaTask* temp : _listOfTasks) {
 		addUITask(temp, MariaUITask::DisplayType::DETAILED);
 	}
 
@@ -53,7 +53,7 @@ void MariaUIStateShow::initEndState() {
 }
 
 bool MariaUIStateShow::timerBeginState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	updatePageTitleGUI();
 	return false;
 }
@@ -63,7 +63,7 @@ bool MariaUIStateShow::timerActiveState() {
 }
 
 bool MariaUIStateShow::timerEndState() {
-	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height()*TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
 	updatePageTitleGUI();
 	return false;
 }

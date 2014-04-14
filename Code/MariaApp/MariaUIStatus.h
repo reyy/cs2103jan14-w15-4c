@@ -10,14 +10,14 @@ class MariaUIStatus : QWidget {
 
 public:
 	typedef enum{
-		OK,
-		INVALID,
-		WAIT,
-		UNKNOWN,
+		OK, 
+		INVALID, 
+		WAIT, 
+		UNKNOWN, 
 		NONE
 	} StatusType;
 
-	MariaUIStatus(QMainWindow *qmainWindow);
+	MariaUIStatus(QMainWindow* qmainWindow);
 	~MariaUIStatus();
 
 	void setStatus(StatusType type);
@@ -42,13 +42,13 @@ private:
 	//Animation speed in milliseconds.
 	static const int ANIMATION_SPEED = 500;
 
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 
 	StatusType _currentStatus;
 	int _statusImageIndex;
-	QPixmap *_imageHandle[AMOUNT_OF_IMAGES];
-	QLabel *_statusIcon;
-	QTimer *_statusAnimationTimer;
+	QPixmap* _imageHandle[AMOUNT_OF_IMAGES];
+	QLabel* _statusIcon;
+	QTimer* _statusAnimationTimer;
 
 	void loadImages();
 };

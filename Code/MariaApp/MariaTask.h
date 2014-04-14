@@ -13,11 +13,11 @@ public:
 	typedef enum {
 		FLOATING, 
 		DEADLINE, 
-		TIMED,
+		TIMED, 
 		INVALID
 	} TaskType;
 	
-	MariaTask(string title = "", MariaTime *start = NULL, MariaTime* end = NULL);
+	MariaTask(string title = "", MariaTime* start = NULL, MariaTime* end = NULL);
 	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL, bool isDone = false);
 	~MariaTask();
 	
@@ -26,11 +26,11 @@ public:
 	string		getTitle();
 	string		getDescription();
 	string		getTimeFromNow();
-	MariaTime*	getStart();
-	MariaTime*	getEnd();
-	MariaTime*	getCreated();
+	MariaTime* 	getStart();
+	MariaTime* 	getEnd();
+	MariaTime* 	getCreated();
 	double		getDuration();
-	MariaTask*	getClone();
+	MariaTask* 	getClone();
 	bool		getIsDone();
 	
 	void setTitle(string);
@@ -45,17 +45,17 @@ public:
 
 	bool operator<(MariaTask rhs);
 
-	static void initObserver(MariaUndoObserver*);
+	static void initObserver(MariaUndoObserver * );
 	
 
 private:
 	TaskType	type;
 	string		title;
 	string		description;
-	MariaTime*	start;
-	MariaTime*	end;
-	MariaTime*	created;
+	MariaTime* 	start;
+	MariaTime* 	end;
+	MariaTime* 	created;
 	bool		isDone;
 
-	static MariaUndoObserver *observer;
+	static MariaUndoObserver* observer;
 };

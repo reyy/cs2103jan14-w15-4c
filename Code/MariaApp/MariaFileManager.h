@@ -39,7 +39,7 @@ private:
 	MariaTime* stringToTime(string inputText);
 	bool	   stringToBool(string inputText);
 	
-	string taskToString(MariaTask *task);
+	string taskToString(MariaTask* task);
 	string timeToString(MariaTime* inputTime);
 	string boolToString(bool input);
 

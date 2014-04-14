@@ -27,7 +27,7 @@ void MariaUIStateConflict::initBeginState() {
 }
 
 void MariaUIStateConflict::initActiveState() {
-	for(MariaTask* temp : _conflictedTask) {
+	for (MariaTask* temp : _conflictedTask) {
 		addUITask(temp, MariaUITask::DisplayType::EXPANDED);
 	}
 

@@ -34,12 +34,12 @@ void MariaUIStateHome::initBeginState() {
 	clearUITask();
 	_clock->startUpdating();
 
-	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height()*TASKBAR_STARTHEIGHT_SCALE);
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height() * TASKBAR_STARTHEIGHT_SCALE);
 	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
 }
 
 void MariaUIStateHome::initActiveState() {
-	for(MariaTask* temp : _weekTask) {
+	for (MariaTask* temp : _weekTask) {
 		addUITask(temp, MariaUITask::DisplayType::NORMAL);
 	}
 

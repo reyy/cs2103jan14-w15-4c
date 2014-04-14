@@ -10,7 +10,7 @@ class MariaUIClock : QWidget {
 	Q_OBJECT
 
 public:
-	MariaUIClock(QMainWindow *qmainWindow);
+	MariaUIClock(QMainWindow* qmainWindow);
 	~MariaUIClock();
 
 	void startUpdating();
@@ -41,11 +41,11 @@ private:
 	static const float LINE_X_OFFSET;
 	static const float LINE_Y_OFFSET;
 
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 	
-	QLabel *_currentTime;
-	QLabel *_currentDate;
-	QLabel *_currentDay;
-	QTimer *_clockTimer;
-	QLabel *_line;
+	QLabel* _currentTime;
+	QLabel* _currentDate;
+	QLabel* _currentDay;
+	QTimer* _clockTimer;
+	QLabel* _line;
 };

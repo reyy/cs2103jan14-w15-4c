@@ -28,11 +28,11 @@ public slots:
 	void doShowHide();
 
 private:
-	MariaUI				*mariaUI;
-	MariaStateManager	*mariaStateManager;
-	MariaInterpreter	*mariaInterpreter;
-	MariaTaskManager	*mariaTaskManager;
-	MariaFileManager	*mariaFileManager;
+	MariaUI*				mariaUI;
+	MariaStateManager*		mariaStateManager;
+	MariaInterpreter*		mariaInterpreter;
+	MariaTaskManager*		mariaTaskManager;
+	MariaFileManager*		mariaFileManager;
 
 	void initWindowIcon();
 	void initComponents();
@@ -70,6 +70,5 @@ private:
 	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks, int maxTask);
 	//void addStateToQueue(StateType type, );
 	
-
 	static void __cdecl doShowHideWrapper(void* mariaLogic);
 };

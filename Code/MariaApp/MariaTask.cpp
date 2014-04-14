@@ -62,46 +62,46 @@ double MariaTask::getDuration() {
 }
 
 MariaTask* MariaTask::getClone() {
-	MariaTime *clonedStart = NULL;
-	MariaTime *clonedEnd = NULL;
+	MariaTime* clonedStart = NULL;
+	MariaTime* clonedEnd = NULL;
 
-	if(start != NULL) {
+	if (start != NULL) {
 		clonedStart = new MariaTime(start->get());
 	}
-	if(end != NULL) {
+	if (end != NULL) {
 		clonedEnd = new MariaTime(end->get());
 	}
 
-	MariaTask *clonedTask = new MariaTask(title, description, clonedStart, clonedEnd, isDone);
+	MariaTask* clonedTask = new MariaTask(title, description, clonedStart, clonedEnd, isDone);
 	clonedTask->setCreated(new MariaTime(created->get()));
 	return clonedTask;
 }
 
 string MariaTask::getTimeFromNow() {
-	if(type == DEADLINE) {
+	if (type == DEADLINE) {
 		return getEnd()->getTimeFromNow();
-	}else if(type == TIMED) {
+	}else if (type == TIMED) {
 		return getStart()->getTimeFromNow();
 	}
 	return "";
 }
 
 void MariaTask::setTitle(string title) {
-	if(MariaTask::observer != NULL){
+	if (MariaTask::observer != NULL) {
 		MariaTask::observer->notifyAction(this);
 	}
 	this->title = title;
 }
 
 void MariaTask::setDescription(string description) {
-	if(MariaTask::observer != NULL){
+	if (MariaTask::observer != NULL) {
 		MariaTask::observer->notifyAction(this);
 	}
 	this->description = description;
 }
 
 void MariaTask::setStart(MariaTime* start) {
-	if(MariaTask::observer != NULL){
+	if (MariaTask::observer != NULL) {
 		MariaTask::observer->notifyAction(this);
 	}
 	delete this->start;
@@ -110,7 +110,7 @@ void MariaTask::setStart(MariaTime* start) {
 }
 
 void MariaTask::setEnd(MariaTime* end) {
-	if(MariaTask::observer != NULL){
+	if (MariaTask::observer != NULL) {
 		MariaTask::observer->notifyAction(this);
 	}
 	delete this->end;
@@ -124,7 +124,7 @@ void MariaTask::setCreated(MariaTime* created) {
 }
 
 void MariaTask::setIsDone(bool isDone) {
-	if(MariaTask::observer != NULL){
+	if (MariaTask::observer != NULL) {
 		MariaTask::observer->notifyAction(this);
 	}
 	this->isDone = isDone;
@@ -136,14 +136,14 @@ void MariaTask::setAll(MariaTask* other) {
 	isDone = (other->getIsDone());
 
 	delete start;
-	if(other->getStart() != NULL) {
+	if (other->getStart() != NULL) {
 		start = new MariaTime(other->getStart()->get());
 	} else {
 		start = NULL;
 	}
 	
 	delete end;
-	if(other->getEnd() != NULL) {
+	if (other->getEnd() != NULL) {
 		end = new MariaTime(other->getEnd()->get());
 	} else {
 		end = NULL;
@@ -152,9 +152,9 @@ void MariaTask::setAll(MariaTask* other) {
 }
 
 void MariaTask::refreshTaskType() {
-	if(start == NULL && end == NULL) {
+	if (start == NULL && end == NULL) {
 		type = TaskType::FLOATING;
-	}else if(start == NULL) {
+	}else if (start == NULL) {
 		type = TaskType::DEADLINE;
 	} else {
 		type = TaskType::TIMED;
@@ -163,10 +163,10 @@ void MariaTask::refreshTaskType() {
 
 bool MariaTask::operator<(MariaTask rhs) { 
 	
-	if(type == rhs.getType()){
-		if(type == MariaTask::TIMED){
+	if (type == rhs.getType()) {
+		if (type == MariaTask::TIMED) {
 			return start->get() < rhs.getStart()->get();
-		}else if(type == MariaTask::DEADLINE){
+		}else if (type == MariaTask::DEADLINE) {
 			return end->get() < rhs.getEnd()->get();
 		}else{
 			return title < rhs.getTitle(); 
@@ -181,4 +181,4 @@ void MariaTask::initObserver(MariaUndoObserver* observer) {
 	MariaTask::observer = observer;
 }
 
-MariaUndoObserver *MariaTask::observer = NULL;
+MariaUndoObserver * MariaTask::observer = NULL;

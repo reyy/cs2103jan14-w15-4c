@@ -13,10 +13,10 @@ const float MariaUI::VALUE_THRESHOLD = 1.0;
 const float MariaUI::CLOSE_BUTTON_X_OFFSET = 0.0;
 const float MariaUI::CLOSE_BUTTON_Y_OFFSET = 0.0;
 
-QPixmap *MariaUI::_taskTypeIconHandler[AMOUNT_OF_IMAGES]={};
+QPixmap* MariaUI::_taskTypeIconHandler[AMOUNT_OF_IMAGES]={};
 
-MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
-	assert(mariaLogic !=NULL);
+MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget * parent) : QMainWindow(parent) {
+	assert(mariaLogic != NULL);
 
 	_mariaLogic = mariaLogic;
 
@@ -47,7 +47,7 @@ void MariaUI::setBackgroundColor(int r, int g, int b) {
 	_targetBkgColor.setGreen(g);
 	_targetBkgColor.setBlue(b);
 
-	if(!_bkgColorUpdateTimer->isActive()) {
+	if (!_bkgColorUpdateTimer->isActive()) {
 		_bkgColorUpdateTimer->start(BACKGROUND_UPDATE_FREQUENCY);
 	}
 }
@@ -64,14 +64,14 @@ void MariaUI::quitAction() {
 	_mariaLogic->terminateProgram();
 }
 
-bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
+bool MariaUI::eventFilter(QObject * obj, QEvent * event) {
 	if (obj == _commandBar->getTextbox()->getInputBoxReference()) {
 		if (event->type() == QEvent::KeyPress) {
-			QKeyEvent* keyPressed = static_cast<QKeyEvent*>(event);
-			if(keyPressed->key() == Qt::Key_Backspace) {
+			QKeyEvent * keyPressed = static_cast<QKeyEvent*>(event);
+			if (keyPressed->key() == Qt::Key_Backspace) {
 				//Checks the length of the input BEFORE backspace is pressed.
-				//-1 is used to check what happens AFTER if its pressed.
-				if(_commandBar->getTextbox()->getUserInput().length()-1 == 0) {
+				// - 1 is used to check what happens AFTER if its pressed.
+				if (_commandBar->getTextbox()->getUserInput().length() - 1 == 0) {
 					_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
 				}
 			} else {
@@ -82,12 +82,12 @@ bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
 	return QMainWindow::eventFilter(obj, event);
 }
 
-void MariaUI::keyReleaseEvent(QKeyEvent* event) {
+void MariaUI::keyReleaseEvent(QKeyEvent * event) {
 	int keyPressed = event->key();
 	string result;
 	switch(event->key()) {
 	case Qt::Key_Z:
-		if(event->modifiers().testFlag(Qt::ControlModifier)) {
+		if (event->modifiers().testFlag(Qt::ControlModifier)) {
 			result = _mariaLogic->processCommand("undo");
 		}
 		break;
@@ -125,10 +125,10 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
 		break;
 	default:
-		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
+		if (_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
 			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
 		} else {
-			if(_commandBar->getTextbox()->getUserInput().length() > 0) {
+			if (_commandBar->getTextbox()->getUserInput().length() > 0) {
 				_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
 			} else {
 				_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
@@ -138,20 +138,20 @@ void MariaUI::keyReleaseEvent(QKeyEvent* event) {
 		break;
 	}
 
-	if(result.length() > 0) {
+	if (result.length() > 0) {
 		_commandBar->getTextbox()->setQuestionText(result);
 	}
 }
 
 void MariaUI::updateBackgroundColor() {
-	if(abs(_bkgColor.red() - _targetBkgColor.red()) > VALUE_THRESHOLD ||
-		abs(_bkgColor.green() - _targetBkgColor.green()) > VALUE_THRESHOLD ||
+	if (abs(_bkgColor.red() - _targetBkgColor.red()) > VALUE_THRESHOLD || 
+		abs(_bkgColor.green() - _targetBkgColor.green()) > VALUE_THRESHOLD || 
 		abs(_bkgColor.blue() - _targetBkgColor.blue())>VALUE_THRESHOLD) {
-			_bkgColor.setRed(_bkgColor.red() + (_targetBkgColor.red()-_bkgColor.red()) * FLOW_FACTOR);
-			_bkgColor.setGreen(_bkgColor.green() + (_targetBkgColor.green()-_bkgColor.green()) * FLOW_FACTOR);
-			_bkgColor.setBlue(_bkgColor.blue() + (_targetBkgColor.blue()-_bkgColor.blue()) * FLOW_FACTOR);
+			_bkgColor.setRed(_bkgColor.red() + (_targetBkgColor.red() - _bkgColor.red()) * FLOW_FACTOR);
+			_bkgColor.setGreen(_bkgColor.green() + (_targetBkgColor.green() - _bkgColor.green()) * FLOW_FACTOR);
+			_bkgColor.setBlue(_bkgColor.blue() + (_targetBkgColor.blue() - _bkgColor.blue()) * FLOW_FACTOR);
 	} else {
-		if(_bkgColorUpdateTimer->isActive()) {
+		if (_bkgColorUpdateTimer->isActive()) {
 			_bkgColorUpdateTimer->stop();
 		}
 	}
@@ -161,7 +161,7 @@ void MariaUI::updateBackgroundColor() {
 
 //@author generated
 void MariaUI::showHideEvent() {
-	if(isVisible()) {
+	if (isVisible()) {
 		setWindowState(Qt::WindowState::WindowMinimized);
 		_trayIcon->show();
 		_trayIcon->showMessage("MARIA is still running!", "Press Ctrl + Space to show MARIA\nType \'exit\' to quit the program.");
@@ -196,7 +196,7 @@ void MariaUI::initButton() {
 	_btClose->setFixedSize(QSize(imageHandleCloseButton.width(), imageHandleCloseButton.height()));
 	_btClose->setToolTip("Close Program");
 	_btClose->setStyleSheet("border:0px;");
-	_btClose->setGeometry(QRect(width()-imageHandleCloseButton.width() + CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
+	_btClose->setGeometry(QRect(width() - imageHandleCloseButton.width() + CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
 
 	connect(_btClose, SIGNAL(clicked()), this , SLOT(quitAction()));
 }
@@ -251,7 +251,7 @@ void MariaUI::loadImages() {
 }
 
 void MariaUI::unloadImages() {
-	for(int i = 0 ; i < AMOUNT_OF_IMAGES ; i++ ) {
+	for (int i = 0; i < AMOUNT_OF_IMAGES; i++) {
 		SAFE_DELETE(_taskTypeIconHandler[i]);
 	}
 }

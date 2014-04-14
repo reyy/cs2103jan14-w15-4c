@@ -12,7 +12,7 @@ public:
 	MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay);
 	~MariaUIStateDisplay();
 
-	MariaUITask* addUITask(MariaTask *task, MariaUITask::DisplayType type);
+	MariaUITask* addUITask(MariaTask* task, MariaUITask::DisplayType type);
 	void updateUITaskPosition();
 	void updateUITaskNumber();
 	MariaUITask* eraseUITask(int index);
@@ -35,7 +35,7 @@ public:
 	virtual void updateGUI();
 
 protected:
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 	int _maxTaskDisplay;
 
 private:
@@ -54,6 +54,6 @@ private:
 
 	float _taskStartHeight;
 	int _page;
-	QLabel *_pageText;
+	QLabel* _pageText;
 	void updateTitleText();
 };

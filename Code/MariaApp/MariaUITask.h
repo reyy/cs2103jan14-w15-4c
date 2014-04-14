@@ -46,11 +46,11 @@ public:
 
 	typedef enum{
 		NORMAL, 
-		EXPANDED,
+		EXPANDED, 
 		DETAILED
 	} DisplayType;
 
-	MariaUITask(QMainWindow *qmainWindow, MariaTask *task, DisplayType type);
+	MariaUITask(QMainWindow* qmainWindow, MariaTask* task, DisplayType type);
 	~MariaUITask();
 
 	bool setTitlePretext(string pretext);
@@ -73,33 +73,33 @@ public:
 	void deactivate();
 	bool isActivated();
 
-	MariaTask * getMariaTask();
+	MariaTask* getMariaTask();
 
 protected slots:
 	bool updatePosition();
 	void updateTimeText();
 
 private:
-	QMainWindow * _qmainWindow;
-	MariaTask *_taskReference;
+	QMainWindow* _qmainWindow;
+	MariaTask* _taskReference;
 	DisplayType _currentDisplayType;
 	MariaTask::TaskType _taskType;
 	
 	QPointF _destination;
 	QPointF _position;
 
-	QLabel *_displayTitle;
-	QLabel *_timeText;
-	QLabel *_desciptionText;
-	QLabel *_typeOfTask;
-	QLabel *_startEndText;
-	QLabel *_completed;
+	QLabel* _displayTitle;
+	QLabel* _timeText;
+	QLabel* _desciptionText;
+	QLabel* _typeOfTask;
+	QLabel* _startEndText;
+	QLabel* _completed;
 
 	bool _active;
 	bool _atLocation;
 	
-	QTimer *_updatePositionTimer;
-	QTimer *_updateTimeTextTimer;
+	QTimer* _updatePositionTimer;
+	QTimer* _updateTimeTextTimer;
 
 	void setDisplayTitle();
 	void setTimeTitle();

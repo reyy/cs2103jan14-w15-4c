@@ -5,7 +5,7 @@
 #include "MariaUI.h"
 
 MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : MariaStateObject(qmainWindow) {
-	assert(qmainWindow !=NULL);
+	assert(qmainWindow != NULL);
 
 	_qmainWindow = qmainWindow;
 
@@ -27,7 +27,7 @@ int MariaUIStateHelp::getHelpIndex() {
 }
 
 void MariaUIStateHelp::setHelpIndex(int index) {
-	if(index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
+	if (index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
 		_helpIndex = index;
 		_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + index));
 	}
@@ -56,7 +56,7 @@ bool MariaUIStateHelp::timerBeginState() {
 }
 
 bool MariaUIStateHelp::timerActiveState() {
-	if(_doneViewing) {
+	if (_doneViewing) {
 		return false;
 	} else {
 		return true;

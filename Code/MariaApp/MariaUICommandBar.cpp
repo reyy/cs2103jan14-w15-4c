@@ -4,11 +4,11 @@
 #include "MariaUICommandBar.h"
 
 const float MariaUICommandBar::DEFAULT_X_POSITION = 0.0;
-const float MariaUICommandBar::DEFAULT_Y_POSITION = -200.0;
+const float MariaUICommandBar::DEFAULT_Y_POSITION = - 200.0;
 const float MariaUICommandBar::FLOW_FACTOR = 0.05;
 const float MariaUICommandBar::VALUE_THRESHOLD = 5.0;
 
-MariaUICommandBar::MariaUICommandBar(QMainWindow *qmainWindow) {
+MariaUICommandBar::MariaUICommandBar(QMainWindow* qmainWindow) {
 	assert(qmainWindow != NULL);
 
 	_qmainWindow = qmainWindow;
@@ -36,7 +36,7 @@ float MariaUICommandBar::getPosition() {
 
 void MariaUICommandBar::setDestination(float yPosition) {
 	_yDestination = yPosition;
-	if(!_updateGUITimer->isActive()) {
+	if (!_updateGUITimer->isActive()) {
 		_updateGUITimer->start(GUI_UPDATE_FREQUENCY);
 	}
 }
@@ -50,7 +50,7 @@ MariaUIStatus* MariaUICommandBar::getStatus() {
 }
 
 void MariaUICommandBar::updateGUI() {
-	if(abs(_yPosition - _yDestination)>VALUE_THRESHOLD) {
+	if (abs(_yPosition - _yDestination)>VALUE_THRESHOLD) {
 		_yPosition += (_yDestination - _yPosition) * FLOW_FACTOR;
 	} else {
 		_updateGUITimer->stop();

@@ -26,8 +26,8 @@ private:
 	static const float TASK_STARTHEIGHT_SCALE;
 	static const float TASKBAR_STARTHEIGHT_SCALE;
 
-	MariaUIPreview *_preview;
-	MariaUIClock *_clock;
+	MariaUIPreview* _preview;
+	MariaUIClock * _clock;
 	vector<MariaTask*> _weekTask;
 
 	void initBeginState();

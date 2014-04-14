@@ -17,7 +17,7 @@ public:
 	static const float FLOW_FACTOR;
 	static const float VALUE_THRESHOLD;
 
-	MariaUICommandBar(QMainWindow *qmainWindow);
+	MariaUICommandBar(QMainWindow* qmainWindow);
 	~MariaUICommandBar();
 
 	float getPosition();
@@ -30,11 +30,11 @@ protected slots:
 	void updateGUI();
 
 private:
-	QMainWindow *_qmainWindow;
-	MariaUITextbox *_textbox;
-	MariaUIStatus *_status;
+	QMainWindow* _qmainWindow;
+	MariaUITextbox* _textbox;
+	MariaUIStatus* _status;
 
-	QTimer *_updateGUITimer;
+	QTimer* _updateGUITimer;
 
 	float _yPosition;
 	float _yDestination;

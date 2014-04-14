@@ -25,10 +25,10 @@ void MariaStateObject::setEndDestination() {
 
 bool MariaStateObject::updatePosition() {
 	
-	if(abs(_position.x()-_destination.x())>VALUE_THRESHOLD||
-		abs(_position.y()-_destination.y())>VALUE_THRESHOLD) {
-		_position.setX(_position.x() + (_destination.x()-_position.x())*FLOW_FACTOR);
-		_position.setY(_position.y() + (_destination.y()-_position.y())*FLOW_FACTOR);
+	if (abs(_position.x() - _destination.x())>VALUE_THRESHOLD || 
+		abs(_position.y() - _destination.y())>VALUE_THRESHOLD) {
+		_position.setX(_position.x() + (_destination.x() - _position.x()) * FLOW_FACTOR);
+		_position.setY(_position.y() + (_destination.y() - _position.y()) * FLOW_FACTOR);
 		return true;
 	} else {
 		return false;

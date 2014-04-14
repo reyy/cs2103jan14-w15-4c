@@ -271,7 +271,7 @@ void MariaInterpreter::parseAddTimedTask(string input, MariaInputObject* inputOb
 	inputObject->setStartTime(startTime);
 
 	while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
-		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
+		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay() + 7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
 
 		inputObject->setEndTime(newEndTime);
 	}
@@ -328,24 +328,24 @@ void MariaInterpreter::parseEdit(string input, MariaInputObject* inputObject, St
 void MariaInterpreter::parseEditType(string input, MariaInputObject* inputObject, int changeTitlePos, int changeStartPos, int changeEndPos, int changeDescPos) {
 	int inputSize = input.size();
 
-	if (changeTitlePos != inputSize &&
-		changeStartPos == inputSize &&
-		changeEndPos == inputSize &&
+	if (changeTitlePos != inputSize && 
+		changeStartPos == inputSize && 
+		changeEndPos == inputSize && 
 		changeDescPos == inputSize) {
 			parseEditTitle(input, inputObject);
-	} else if (changeTitlePos == inputSize &&
-		changeStartPos != inputSize &&
-		changeEndPos == inputSize &&
+	} else if (changeTitlePos == inputSize && 
+		changeStartPos != inputSize && 
+		changeEndPos == inputSize && 
 		changeDescPos == inputSize) {
 			parseEditStartTime(input, inputObject);
-	} else if (changeTitlePos == inputSize &&
-		changeStartPos == inputSize &&
-		changeEndPos != inputSize &&
+	} else if (changeTitlePos == inputSize && 
+		changeStartPos == inputSize && 
+		changeEndPos != inputSize && 
 		changeDescPos == inputSize) {
 			parseEditEndTime(input, inputObject);
-	} else if (changeTitlePos == inputSize &&
-		changeStartPos == inputSize &&
-		changeEndPos == inputSize &&
+	} else if (changeTitlePos == inputSize && 
+		changeStartPos == inputSize && 
+		changeEndPos == inputSize && 
 		changeDescPos != inputSize) {
 			parseEditDescription(input, inputObject);
 	} else {
@@ -472,7 +472,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, St
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
 	} else if (isStringEqual(input, EXPRESSION_TOMORROW)) {
 		inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
-		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1));
+		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay() + 1));
 	} else if (hasDate(input)) {
 		// Need to check if it is a SHOW_DATE_RANGE command
 		if (hasDateTime(extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_START, dummyVar)) && hasDateTime(extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_END, dummyVar))) {
@@ -641,7 +641,7 @@ void MariaInterpreter::parseShowDateRange(string input, MariaInputObject* inputO
 	inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE_RANGE);
 
 	while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
-		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
+		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay() + 7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
 
 		inputObject->setEndTime(newEndTime);
 	}
@@ -691,7 +691,7 @@ void MariaInterpreter::parseDelete(string input, MariaInputObject* inputObject, 
 			throw exception(MESSAGE_NO_ACTIVITY_TITLE.c_str());
 		} /*else if (isStringEqual(input, MODIFIER_ALL_TASKS)) {
 			inputObject->setCommandType(MariaInputObject::CommandType::DELETE_ALL);
-		}*/ else {
+		}*/else {
 			inputObject->setTitle(input);
 		}
 		break;
@@ -780,8 +780,8 @@ void MariaInterpreter::parseTime(string input, int& hour, int& min) {
 	if (colonPos != string::npos) {
 		workingList = tokenizeString(input, colon);
 
-		if (workingList.size() != 2 ||
-			!isInteger(workingList[hourPos]) ||
+		if (workingList.size() != 2 || 
+			!isInteger(workingList[hourPos]) || 
 			!isInteger(workingList[minPos])) {
 			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
 		}
@@ -796,9 +796,9 @@ void MariaInterpreter::parseTime(string input, int& hour, int& min) {
 		// 9.30pm
 		workingList = tokenizeString(input, period);
 
-		if (workingList.size() != 2 ||
-			!isInteger(workingList[hourPos]) ||
-			(workingList[minPos].size() != 2 &&
+		if (workingList.size() != 2 || 
+			!isInteger(workingList[hourPos]) || 
+			(workingList[minPos].size() != 2 && 
 			workingList[minPos].size() != 4)) {
 			throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
 		}
@@ -954,8 +954,8 @@ MariaTime* MariaInterpreter::parseDateTimeString(vector<string> tokenizedDateTim
 
 			// Check the previous token if it is a valid day.
 			// If it isn't, just set it to 1st of whatever month this is.
-			if (i >= 1 && isInteger(tokenizedDateTime[i-1])) {
-				day = atoi(tokenizedDateTime[i-1].c_str());
+			if (i >= 1 && isInteger(tokenizedDateTime[i - 1])) {
+				day = atoi(tokenizedDateTime[i - 1].c_str());
 
 				if (day <= 0) {
 					day = 1;
@@ -996,10 +996,10 @@ MariaTime* MariaInterpreter::parseDateTimeString(vector<string> tokenizedDateTim
 	}
 
 	if (hasDateString && !hasTimeString) {
-		if (year == MariaTime::getCurrentTime().getYear() &&
-			month == MariaTime::getCurrentTime().getMonth() &&
+		if (year == MariaTime::getCurrentTime().getYear() && 
+			month == MariaTime::getCurrentTime().getMonth() && 
 			day == MariaTime::getCurrentTime().getDay()) {
-				hour = MariaTime::getCurrentTime().getHour()+1;
+				hour = MariaTime::getCurrentTime().getHour() + 1;
 		} else {
 			hour = 9;
 		}
@@ -1010,7 +1010,7 @@ MariaTime* MariaInterpreter::parseDateTimeString(vector<string> tokenizedDateTim
 		month = MariaTime::getCurrentTime().getMonth();
 		day = MariaTime::getCurrentTime().getDay();
 
-		if ((hour < MariaTime::getCurrentTime().getHour()) ||
+		if ((hour < MariaTime::getCurrentTime().getHour()) || 
 			(hour == MariaTime::getCurrentTime().getHour() && min <= MariaTime::getCurrentTime().getMin())){
 			day++;
 		}
@@ -1084,7 +1084,7 @@ string MariaInterpreter::extractFromBackOfString(string text, string delimiter, 
 
 	if (occ1 != string::npos) {
 		do {
-			occ2 = text.find(delimiter.c_str(), occ1+1, delimiter.size());
+			occ2 = text.find(delimiter.c_str(), occ1 + 1, delimiter.size());
 
 			if (occ2 != string::npos) {
 				occ1 = occ2;
@@ -1105,7 +1105,7 @@ int MariaInterpreter::getDayOfWeek(string text) {
 	if (regex_match(text, matches, dayExpression)) {
 		for (int i = 0; i < 7; i++) {
 			if (isStringEqual(matches[0], EXPRESSION_DAYS_OF_WEEK_INDIVIDUAL[i])) {
-				return i+1;
+				return i + 1;
 			}
 		}
 	}
@@ -1114,7 +1114,7 @@ int MariaInterpreter::getDayOfWeek(string text) {
 }
 
 int MariaInterpreter::getLastDayOfMonth(int year, int month) {
-	MariaTime* tempDate = new MariaTime(year, month+1, 0);
+	MariaTime* tempDate = new MariaTime(year, month + 1, 0);
 
 	int day = tempDate->getDay();
 
@@ -1130,7 +1130,7 @@ int MariaInterpreter::getMonth(string text) {
 	if (regex_match(text, matches, monthExpression)) {
 		for (int i = 0; i < 12; i++) {
 			if (isStringEqual(matches[0], EXPRESSION_MONTHS_OF_YEAR_INDIVIDUAL[i])) {
-				return i+1;
+				return i + 1;
 			}
 		}
 	}
@@ -1139,7 +1139,7 @@ int MariaInterpreter::getMonth(string text) {
 }
 
 bool MariaInterpreter::isInteger(string text) {
-	return !text.empty() &&
+	return !text.empty() && 
 		text.find_first_not_of("0123456789") == string::npos;
 }
 
@@ -1178,7 +1178,7 @@ bool MariaInterpreter::isStringEqual(string text, string expr, bool ignoreCasing
 string MariaInterpreter::lowercaseString(string text) {
 	string toReturn = "";
 
-	for (int i = 0; i < text.size(); i++ ) {
+	for (int i = 0; i < text.size(); i++) {
 		toReturn += tolower(text[i]);
 	}
 
@@ -1189,7 +1189,7 @@ void MariaInterpreter::removeTokens(vector<string> &input, int startPos, int end
 	int lengthToRemove = endPos - startPos;
 
 	for (int i = 0; i < lengthToRemove; i++) {
-		input.erase(input.begin()+startPos);
+		input.erase(input.begin() + startPos);
 	}
 }
 

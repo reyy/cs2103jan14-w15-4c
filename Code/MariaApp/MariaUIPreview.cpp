@@ -23,6 +23,7 @@ const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_REMAINING_TIME = "'%s' is due
 const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_TRIM = "Here are some of the tasks:\n";
 
 const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was created since %s, was it done yet?\n";
+const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_NO_DATE = "'%s' was created for some time, was it done yet?\n";
 const string MariaUIPreview::PREVIEW_FREE_DAY = "You are free on %s.\n";
 const string MariaUIPreview::PREVIEW_FREE_DAY_TODAY = "You are free today.\n";
 
@@ -36,7 +37,7 @@ const float MariaUIPreview::BODY_XOFFSET = 10.0;
 const float MariaUIPreview::DIVIDER_HEIGHT = 4.0;
 
 //@author generated
-MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
+MariaUIPreview::MariaUIPreview(QMainWindow* qmainWindow) {
 	assert(qmainWindow != NULL);
 
 	_qmainWindow=qmainWindow;
@@ -48,7 +49,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	_textToday->show();
 
 	_textTodayBody = new QLabel(_qmainWindow);
-	_textTodayBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE)+ "px;");
+	_textTodayBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
 	_textTodayBody->setAlignment(Qt::AlignTop);
 	_textTodayBody->setWordWrap(true);
 	_textTodayBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
@@ -66,7 +67,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	_textTomorrow->show();
 
 	_textTomorrowBody = new QLabel(_qmainWindow);
-	_textTomorrowBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE)+ "px;");
+	_textTomorrowBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
 	_textTomorrowBody->setAlignment(Qt::AlignTop);
 	_textTomorrowBody->setWordWrap(true);
 	_textTomorrowBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
@@ -84,7 +85,7 @@ MariaUIPreview::MariaUIPreview(QMainWindow *qmainWindow) {
 	_textCalendar->show();
 
 	_textCalendarBody = new QLabel(_qmainWindow);
-	_textCalendarBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE)+ "px;");
+	_textCalendarBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
 	_textCalendarBody->setAlignment(Qt::AlignTop);
 	_textCalendarBody->setWordWrap(true);
 	_textCalendarBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
@@ -130,77 +131,77 @@ string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<
 	char buffer[STRING_BUFFER_SIZE];
 
 	//Today's Task.
-	if(taskListNow.size() > 0) {
+	if (taskListNow.size() > 0) {
 		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &MariaTime::getCurrentTime());
 		string toShow = taskListNow.at(0)->getTitle();
-		if(toShow.length() > MAX_CHAR_LENGTH) {
-			toShow = toShow.substr(0,MAX_CHAR_LENGTH) + "...";
+		if (toShow.length() > MAX_CHAR_LENGTH) {
+			toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
 		}
 
-		if(taskListAll.size() - taskListNow.size() == 0) {
-			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
+		if (taskListAll.size() - taskListNow.size() == 0) {
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
-				toReturn+=buffer;
+				toReturn += buffer;
 			}
 		} else {
-			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
 				}
-				toReturn+=buffer;
+				toReturn += buffer;
 			}
 		}
 	} else {
 		sprintf_s(buffer, PREVIEW_EVENT_TODAY_NONE.c_str());
-		toReturn+=buffer;
+		toReturn += buffer;
 	}
 
 	//Today's Deadline.
-	if(taskListDeadLine.size() > 0) {
-		if(taskListDeadLine.size() == 1) {
+	if (taskListDeadLine.size() > 0) {
+		if (taskListDeadLine.size() == 1) {
 			int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &MariaTime::getCurrentTime());
 			string toShow = taskListDeadLine.at(0)->getTitle();
-			if(toShow.length() > MAX_CHAR_LENGTH) {
-				toShow = toShow.substr(0,MAX_CHAR_LENGTH) + "...";
+			if (toShow.length() > MAX_CHAR_LENGTH) {
+				toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
 			}
 
-			if(withinTheHour >= 0 ) {//Check if event has passed.
-				if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
-					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
 				} else {
 					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
 				}
-				toReturn+=buffer;
+				toReturn += buffer;
 			}
 		} else {
 			sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_MUTIPLE.c_str(), taskListDeadLine.size());
-			toReturn+=buffer;
+			toReturn += buffer;
 
 			int maxTask = taskListDeadLine.size();
-			if(maxTask > MAX_TASK_SHOWN) {
+			if (maxTask > MAX_TASK_SHOWN) {
 				maxTask = MAX_TASK_SHOWN;
 				toReturn += PREVIEW_DEADLINE_ITEM_TRIM;
 			}
-			for(int i = 0; i < maxTask; i++){
+			for (int i = 0; i < maxTask; i++){
 				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(i)->getEnd(), &MariaTime::getCurrentTime());
 				string toShow = taskListDeadLine.at(i)->getTitle();
-				if(toShow.length() > MAX_CHAR_LENGTH) {
-					toShow = toShow.substr(0,MAX_CHAR_LENGTH) + "...";
+				if (toShow.length() > MAX_CHAR_LENGTH) {
+					toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
 				}
 
-				if(withinTheHour >= 0 ) {//Check if event has passed.
-					if(withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
-						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour/MINUTES_IN_HOURS).c_str());
+				if (withinTheHour >= 0 ) {//Check if event has passed.
+					if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
 					} else {
 						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(i)->getEnd()).c_str());
 					}
-					toReturn+=buffer;
+					toReturn += buffer;
 				}
 			}
 		}
@@ -215,27 +216,27 @@ string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow,
 	char buffer[STRING_BUFFER_SIZE];
 
 	//Tomorrow's Task
-	if(taskListTomorrow.size()>0) {
-		if(taskListTomorrow.size()==1) {
+	if (taskListTomorrow.size()>0) {
+		if (taskListTomorrow.size() == 1) {
 			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
-			toReturn+=buffer;
+			toReturn += buffer;
 		} else {
 			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskListTomorrow.size(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
-			toReturn+=buffer;
+			toReturn += buffer;
 		}
 	} else {
 		sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_NONE.c_str());
-		toReturn+=buffer;
+		toReturn += buffer;
 	}
 
 	//Tomorrow's Deadline
-	if(taskListTomorrowDeadLine.size() > 0) {
-		if(taskListTomorrowDeadLine.size() == 1) {
+	if (taskListTomorrowDeadLine.size() > 0) {
+		if (taskListTomorrowDeadLine.size() == 1) {
 			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrowDeadLine.at(0)->getEnd()).c_str());
-			toReturn+=buffer;
+			toReturn += buffer;
 		} else {
 			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW_MUTIPLE.c_str(), taskListTomorrowDeadLine.size());
-			toReturn+=buffer;
+			toReturn += buffer;
 		}
 	}
 
@@ -246,36 +247,43 @@ string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow,
 string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskListSuggest) {
 	string toReturn;
 	char buffer[STRING_BUFFER_SIZE];
-	
+
 	//Find an empty day of the week.
-	if(day >= 0 && day <=6) {
-		if(MariaTime::getCurrentTime().getDayWeek() != (day + DAY_OFFSET) % DAY_OF_WEEK) {
+	if (day >= 0 && day <= 6) {
+		if (MariaTime::getCurrentTime().getDayWeek() != (day + DAY_OFFSET) % DAY_OF_WEEK) {
 			sprintf_s(buffer, PREVIEW_FREE_DAY.c_str(), MariaTime::DAYS[day]);
-			toReturn+=buffer;
+			toReturn += buffer;
 		} else {
 			sprintf_s(buffer, PREVIEW_FREE_DAY_TODAY.c_str());
-			toReturn+=buffer;
+			toReturn += buffer;
 		}
 	}
 
 	//Suggest a task from the list of floating.
-	if(taskListSuggest.size() > 0) {
+	if (taskListSuggest.size() > 0) {
 		MariaTask* generatedSuggestionTask = taskListSuggest.at(rand() % taskListSuggest.size());
 
-		string dateCreated = MariaTime::convertToDateString(generatedSuggestionTask->getCreated());
-		sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
-		toReturn+=buffer;
+
+		if(generatedSuggestionTask->getCreated() == NULL) {
+			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_NO_DATE.c_str(), generatedSuggestionTask->getTitle().c_str());
+			toReturn += buffer;
+
+		} else {
+			string dateCreated = MariaTime::convertToDateString(generatedSuggestionTask->getCreated());
+			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
+			toReturn += buffer;
+		}
 	}
-	
+
 	_generatedSuggestionText = toReturn;
 	return toReturn;
 }
 
 void MariaUIPreview::updateGUI(QPointF statePosition) {
-	_textToday->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y() + _qmainWindow->height()*START_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textToday->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
 	_textTodayBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
 	_lineToday->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
-	
+
 	//Calculate spaces inbetween today and tomorrow text with a minimum of 1 space.
 	int spaces = endLineCount(_textTodayBody->text().toStdString()) + 1;
 
@@ -283,7 +291,7 @@ void MariaUIPreview::updateGUI(QPointF statePosition) {
 	_textTomorrowBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
 	_lineTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
 
-	_textCalendar->setGeometry(QRect(_textToday->geometry().x(), statePosition.y() + _qmainWindow->height()*CALENDAR_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textCalendar->setGeometry(QRect(_textToday->geometry().x(), statePosition.y() + _qmainWindow->height() * CALENDAR_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
 	_textCalendarBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
 	_lineCalendar->setGeometry(QRect(_textToday->geometry().x(), _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
 }

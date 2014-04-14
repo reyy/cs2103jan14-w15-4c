@@ -24,7 +24,7 @@ MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateO
 	_displayText = new QLabel(_qmainWindow);
 	_logo = new QLabel(_qmainWindow);
 
-	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
+	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
 		_loadingDots[i] = new QLabel(_qmainWindow);
 	}
 
@@ -35,7 +35,7 @@ MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateO
 }
 
 MariaUIStateLoading::~MariaUIStateLoading() {
-	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
+	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
 		SAFE_DELETE(_loadingDots[i]);
 	}
 	SAFE_DELETE(_logo);
@@ -62,30 +62,30 @@ void MariaUIStateLoading::initBeginState() {
 
 	_displayText->setStyleSheet("color:#ffffff;");
 	_displayText->setAlignment(Qt::AlignCenter);
-	_displayText->setGeometry(QRect(_qmainWindow->width()*0.5-DISPLAY_TEXT_WIDTH*0.5, _qmainWindow->height()*TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
+	_displayText->setGeometry(QRect(_qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, _qmainWindow->height() * TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
 	_displayText->hide();
 
 	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON));
 	_logo->setAlignment(Qt::AlignCenter);
 	_logoYPos = LOGO_START_Y;
-	_logo->setGeometry(QRect(_qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, _logoYPos, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+	_logo->setGeometry(QRect(_qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, _logoYPos, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
 	_logo->show();
 }
 
 void MariaUIStateLoading::initActiveState() {
 	_displayText->show();
 	
-	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
+	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
 		_loadingDots[i]->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS));
 		_loadingDots[i]->show();
-		_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET + DOTS_SEPARATION_WIDTH*i;
+		_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET + DOTS_SEPARATION_WIDTH * i;
 	}
 }
 
 void MariaUIStateLoading::initEndState() {
 	_displayText->hide();
 
-	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
+	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
 		_loadingDots[i]->hide();
 	}
 }
@@ -93,8 +93,8 @@ void MariaUIStateLoading::initEndState() {
 bool MariaUIStateLoading::timerBeginState() {
 	animateLogo();
 
-	if(abs(_logoYPos-_qmainWindow->height()*LOGO_STAGE_Y_SCALE)>VALUE_THRESHOLD) {
-		_logoYPos += (_qmainWindow->height()*LOGO_STAGE_Y_SCALE-_logoYPos)*FLOW_FACTOR;
+	if (abs(_logoYPos -_qmainWindow->height() * LOGO_STAGE_Y_SCALE)>VALUE_THRESHOLD) {
+		_logoYPos += (_qmainWindow->height() * LOGO_STAGE_Y_SCALE - _logoYPos) * FLOW_FACTOR;
 		updateGUIPosition();
 
 		return true;
@@ -106,7 +106,7 @@ bool MariaUIStateLoading::timerActiveState() {
 	animateLogo();
 	bool allDotsLeft = animateDots();
 
-	if(allDotsLeft&&_doneLoading) {
+	if (allDotsLeft && _doneLoading) {
 		return false;
 	} else {
 		return true;
@@ -116,13 +116,13 @@ bool MariaUIStateLoading::timerActiveState() {
 bool MariaUIStateLoading::timerEndState() {
 	animateLogo();
 
-	if(abs(_logoYPos-LOGO_START_Y)>VALUE_THRESHOLD) {
-		_logoYPos += (LOGO_START_Y-_logoYPos)*FLOW_FACTOR;
+	if (abs(_logoYPos - LOGO_START_Y)>VALUE_THRESHOLD) {
+		_logoYPos += (LOGO_START_Y - _logoYPos) * FLOW_FACTOR;
 		updateGUIPosition();
 		
 		return true;
 	} else {
-		if(_quitAfterLoading) {
+		if (_quitAfterLoading) {
 			((MariaUI*)_qmainWindow)->quitAction();
 		}
 
@@ -131,7 +131,7 @@ bool MariaUIStateLoading::timerEndState() {
 }
 
 void MariaUIStateLoading::animateLogo() {
-	if(_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
+	if (_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
 		_logoImageIndex++;
 	} else {
 		_logoImageIndex = 0;
@@ -141,24 +141,24 @@ void MariaUIStateLoading::animateLogo() {
 
 bool MariaUIStateLoading::animateDots() {
 	bool allDotsLeft = true;
-	for( int i = 0 ; i < AMOUNT_OF_DOTS;i++ ) {
-		if(_dotsXPos[i]<-DOTS_X_OFFSET-AMOUNT_OF_DOTS*DOTS_SEPARATION_WIDTH) {
+	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+		if (_dotsXPos[i]< - DOTS_X_OFFSET - AMOUNT_OF_DOTS * DOTS_SEPARATION_WIDTH) {
 			_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET;
 		} else {
-			float newSpeed = (_dotsXPos[i]-_qmainWindow->width()*0.5)/_qmainWindow->width();
-			_dotsXPos[i] -= abs(newSpeed)*DOTS_X_VARIABLE_SPEED + DOTS_X_SPEED;
+			float newSpeed = (_dotsXPos[i] -_qmainWindow->width() * 0.5) / _qmainWindow->width();
+			_dotsXPos[i] -= abs(newSpeed) * DOTS_X_VARIABLE_SPEED + DOTS_X_SPEED;
 		}
 
-		if(_dotsXPos[i]>-DOTS_X_OFFSET) {
+		if (_dotsXPos[i]> - DOTS_X_OFFSET) {
 			allDotsLeft = false;
 		}
 
-		_loadingDots[i]->setGeometry(QRect(_dotsXPos[i]-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width()*0.5, _qmainWindow->height()*DOTS_STAGE_Y_SCALE , MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->height()));
+		_loadingDots[i]->setGeometry(QRect(_dotsXPos[i] - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width() * 0.5, _qmainWindow->height() * DOTS_STAGE_Y_SCALE , MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->height()));
 	}
 
 	return allDotsLeft;
 }
 
 void MariaUIStateLoading::updateGUIPosition() {
-	_logo->setGeometry(QRect(_qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, _logoYPos-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()*0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+	_logo->setGeometry(QRect(_qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, _logoYPos - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height() * 0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
 }

@@ -25,7 +25,7 @@ public:
 	static const float FONT_SIZE_TYPED_TEXT;
 	static const float FONT_SIZE_QUESTION_TEXT;
 
-	MariaUITextbox(QMainWindow * qmainWindow);
+	MariaUITextbox(QMainWindow* qmainWindow);
 	~MariaUITextbox();
 	
 	void setQuestionText(const string text);
@@ -34,16 +34,16 @@ public:
 	string getUserInput();
 	void updateGUI(QPointF statePosition);
 	void setFocus();
-	QLineEdit * getInputBoxReference();
+	QLineEdit* getInputBoxReference();
 
 private:
-	QMainWindow * _qmainWindow;
+	QMainWindow* _qmainWindow;
 
-	QLineEdit *_inputBox;
-	QLabel *_questionText;
-	QLabel *_suggestText;
+	QLineEdit* _inputBox;
+	QLabel* _questionText;
+	QLabel* _suggestText;
 
-	QTimer *_updateSuggestTextTimer;
+	QTimer* _updateSuggestTextTimer;
 
 private slots:
 	void updateSuggestText();

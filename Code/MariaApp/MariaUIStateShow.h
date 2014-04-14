@@ -27,7 +27,7 @@ private:
 	static const float TITLE_HEIGHT;
 	static const float TITLE_HEIGHT_SCALE;
 
-	QLabel *_titleLabel;
+	QLabel* _titleLabel;
 	vector<MariaTask*> _listOfTasks;
 
 	void initBeginState();

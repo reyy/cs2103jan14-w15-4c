@@ -34,14 +34,14 @@ private:
 	static const float DOTS_X_SPEED;
 	static const float DOTS_X_VARIABLE_SPEED;
 	
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 
-	QLabel *_displayText;
-	QLabel *_logo;
+	QLabel* _displayText;
+	QLabel* _logo;
 	float _logoYPos;
 	int _logoImageIndex;
 
-	QLabel *_loadingDots[AMOUNT_OF_DOTS];
+	QLabel* _loadingDots[AMOUNT_OF_DOTS];
 	float _dotsXPos[AMOUNT_OF_DOTS];
 
 	bool _doneLoading;

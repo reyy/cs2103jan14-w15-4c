@@ -3,7 +3,7 @@
 #include "MariaMacros.h"
 #include "MariaUIStatus.h"
 
-MariaUIStatus::MariaUIStatus(QMainWindow * qmainWindow) {
+MariaUIStatus::MariaUIStatus(QMainWindow* qmainWindow) {
 	assert(qmainWindow != NULL);
 	
 	_qmainWindow = qmainWindow;
@@ -20,7 +20,7 @@ MariaUIStatus::MariaUIStatus(QMainWindow * qmainWindow) {
 }
 
 MariaUIStatus::~MariaUIStatus(void) {
-	for( int i = 0 ; i < AMOUNT_OF_IMAGES;i++ ) {
+	for (int i = 0; i < AMOUNT_OF_IMAGES;i++) {
 		SAFE_DELETE(_imageHandle[i]);
 	}
 	SAFE_DELETE(_statusAnimationTimer);
@@ -28,10 +28,10 @@ MariaUIStatus::~MariaUIStatus(void) {
 }
 
 void MariaUIStatus::setStatus(StatusType type) {
-	if(_currentStatus != type) {
+	if (_currentStatus != type) {
 		_currentStatus = type;
 		updateStatusAnimation();
-		if(!_statusAnimationTimer->isActive())
+		if (!_statusAnimationTimer->isActive())
 			_statusAnimationTimer->start(ANIMATION_SPEED);
 	}
 }
@@ -56,10 +56,10 @@ void MariaUIStatus::updateStatusAnimation() {
 		_statusAnimationTimer->stop();
 		break;
 	case WAIT:
-		if(_statusImageIndex<IMAGE_INDEX_WAIT_0||_statusImageIndex>IMAGE_INDEX_WAIT_3)
+		if (_statusImageIndex<IMAGE_INDEX_WAIT_0 || _statusImageIndex>IMAGE_INDEX_WAIT_3)
 			_statusImageIndex = IMAGE_INDEX_WAIT_0;
-		if(_statusImageIndex<IMAGE_INDEX_WAIT_3)
-			_statusImageIndex++ ;
+		if (_statusImageIndex<IMAGE_INDEX_WAIT_3)
+			_statusImageIndex++;
 		else
 			_statusImageIndex = IMAGE_INDEX_WAIT_0;
 		break;

@@ -11,15 +11,15 @@ public:
 	TEST_METHOD(MSSTest_AddRemoveTask) {
 		string inputString = "create UniqueTask101";
 
-		MariaInterpreter *interpreter = new MariaInterpreter();
-		MariaFileManager *fileManager = new MariaFileManager();
-		MariaTaskManager *taskManager = new MariaTaskManager(fileManager->openFile());
+		MariaInterpreter* interpreter = new MariaInterpreter();
+		MariaFileManager* fileManager = new MariaFileManager();
+		MariaTaskManager* taskManager = new MariaTaskManager(fileManager->openFile());
 
 		MariaInputObject* input = interpreter->parseInput(inputString);
 
-		if(input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING) {
-			MariaTask *toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
-			if(toAdd != NULL) {
+		if (input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING) {
+			MariaTask* toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
+			if (toAdd != NULL) {
 				fileManager->writeFile(taskManager->getAllTasks());
 			}
 
@@ -51,22 +51,22 @@ public:
 
 	//Integrated Test Case that simulates adding and removing a task
 	TEST_METHOD(MSSTest_AddEditRemoveTask) {
-		string inputString[4] = {"create UniqueTask101",
-								"edit UniqueTask101 change title UnqiueTask202",
-								"delete UnqiueTask101",
+		string inputString[4] = {"create UniqueTask101", 
+								"edit UniqueTask101 change title UnqiueTask202", 
+								"delete UnqiueTask101", 
 								"delete UnqiueTask202"};
 
-		MariaInterpreter *interpreter = new MariaInterpreter();
-		MariaFileManager *fileManager = new MariaFileManager();
-		MariaTaskManager *taskManager = new MariaTaskManager(fileManager->openFile());
+		MariaInterpreter* interpreter = new MariaInterpreter();
+		MariaFileManager* fileManager = new MariaFileManager();
+		MariaTaskManager* taskManager = new MariaTaskManager(fileManager->openFile());
 
 		//Test for 'create UniqueTask101'
 		MariaInputObject* input = interpreter->parseInput(inputString[0]);
 
 		Assert::IsTrue(input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING);
 
-		MariaTask *toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
-		if(toAdd != NULL) {
+		MariaTask* toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
+		if (toAdd != NULL) {
 			fileManager->writeFile(taskManager->getAllTasks());
 		}
 		Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 1);

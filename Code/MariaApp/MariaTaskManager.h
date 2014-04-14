@@ -12,7 +12,7 @@ class MariaTaskManager : public MariaUndoObserver {
 public:
 	static const int UNDO_LIMIT = 5;
 
-	MariaTaskManager(vector<MariaTask*> *inputTaskList = NULL);
+	MariaTaskManager(vector<MariaTask*>* inputTaskList = NULL);
 	~MariaTaskManager(void);
 
 	MariaTask* addTask(string name, MariaTime* start = NULL, MariaTime* end = NULL);
@@ -34,20 +34,20 @@ private:
 #ifdef _DEBUG
 public:
 #endif
-	vector<MariaTask*> *taskList;
-	vector<pair<MariaTask*, MariaTask*>*> *undoList;
+	vector<MariaTask*>*taskList;
+	vector<pair<MariaTask*, MariaTask*>*>*undoList;
 
-	vector<MariaTask*> *queryResult;
+	vector<MariaTask*>* queryResult;
 	string previousSearchString;
-	MariaTime *previousStart;
-	MariaTime *previousEnd;
+	MariaTime* previousStart;
+	MariaTime* previousEnd;
 	MariaTask::TaskType previousType;
 
 	void deletePreviousQuery();
 	void storePreviousQuery(string);
 	void storePreviousQuery(MariaTask::TaskType);
-	void storePreviousQuery(MariaTime*, MariaTime*);
-	void storePreviousQuery(MariaTime*, MariaTime*, MariaTask::TaskType);
+	void storePreviousQuery(MariaTime* , MariaTime* );
+	void storePreviousQuery(MariaTime* , MariaTime* , MariaTask::TaskType);
 	
 
 	string lowercaseString(string text);

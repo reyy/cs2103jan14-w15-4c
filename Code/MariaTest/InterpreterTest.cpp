@@ -76,7 +76,7 @@ namespace MariaTest {
 			Assert::AreEqual(expectedStartTime->getDay(), output->getStartTime()->getDay());
 			Assert::AreEqual(expectedStartTime->getDayWeek(), output->getStartTime()->getDayWeek());
 
-			MariaTime* expectedEndTime = new MariaTime(expectedStartTime->getYear(), expectedStartTime->getMonth(), expectedStartTime->getDay()+1);
+			MariaTime* expectedEndTime = new MariaTime(expectedStartTime->getYear(), expectedStartTime->getMonth(), expectedStartTime->getDay() + 1);
 			Assert::AreEqual(expectedEndTime->getYear(), output->getEndTime()->getYear());
 			Assert::AreEqual(expectedEndTime->getMonth(), output->getEndTime()->getMonth());
 			Assert::AreEqual(expectedEndTime->getDay(), output->getEndTime()->getDay());
@@ -222,7 +222,7 @@ namespace MariaTest {
 				Assert::AreEqual("", e.what());
 			}
 
-			MariaTime* expectedTime = new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1);
+			MariaTime* expectedTime = new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay() + 1);
 
 			Assert::IsTrue(output->getCommandType() == MariaInputObject::CommandType::SHOW_DATE);
 			Assert::AreEqual(expectedTime->getYear(), output->getEndTime()->getYear());
@@ -253,7 +253,7 @@ namespace MariaTest {
 			Assert::AreEqual(expectedStartTime->getDay(), output->getStartTime()->getDay());
 			Assert::AreEqual(expectedStartTime->getDayWeek(), output->getStartTime()->getDayWeek());
 
-			MariaTime* expectedEndTime = new MariaTime(expectedStartTime->getYear(), expectedStartTime->getMonth(), expectedStartTime->getDay()+1);
+			MariaTime* expectedEndTime = new MariaTime(expectedStartTime->getYear(), expectedStartTime->getMonth(), expectedStartTime->getDay() + 1);
 			Assert::AreEqual(expectedEndTime->getYear(), output->getEndTime()->getYear());
 			Assert::AreEqual(expectedEndTime->getMonth(), output->getEndTime()->getMonth());
 			Assert::AreEqual(expectedEndTime->getDay(), output->getEndTime()->getDay());

@@ -19,7 +19,7 @@ MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskSta
 	assert(qmainWindow != NULL);
 
 	_qmainWindow = qmainWindow;
-	_taskStartHeight = _qmainWindow->height()*taskStartHeight;
+	_taskStartHeight = _qmainWindow->height() * taskStartHeight;
 	_page = 0;
 	_maxTaskDisplay = maxTaskDisplay;
 	
@@ -36,43 +36,43 @@ MariaUIStateDisplay::~MariaUIStateDisplay() {
 
 //@author A0111784H
 void MariaUIStateDisplay::updateUITaskNumber() {
-	int maxShown = _taskStack.size() - _page*_maxTaskDisplay;
-	if(maxShown > _maxTaskDisplay) {
+	int maxShown = _taskStack.size() - _page * _maxTaskDisplay;
+	if (maxShown > _maxTaskDisplay) {
 		maxShown = _maxTaskDisplay;
 	}
 
-	for( int i = _page*_maxTaskDisplay ; i < _page*_maxTaskDisplay + maxShown ; i++ ) {
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + maxShown; i++) {
 		_taskStack.at(i)->setTitlePretext(std::to_string(i + 1) + ". ");
 	}
 }
 
-MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::DisplayType type) {
+MariaUITask* MariaUIStateDisplay::addUITask(MariaTask* task, MariaUITask::DisplayType type) {
 	assert(task != NULL);
 
-	int currentPosition = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
+	int currentPosition = ((int)_taskStack.size()) - _page * _maxTaskDisplay;
 
-	int range = ((int)_taskStack.size()) - _page*_maxTaskDisplay;
-	if(range > _maxTaskDisplay) {
+	int range = ((int)_taskStack.size()) - _page * _maxTaskDisplay;
+	if (range > _maxTaskDisplay) {
 		range = _maxTaskDisplay;
 	}
 	
 	float compoundPosition = 0.0;
-	for( int i = _page*_maxTaskDisplay ; i < _page*_maxTaskDisplay + range ; i++ ) {
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + range; i++) {
 		compoundPosition += _taskStack.at(i)->getTaskHeight();
 	}
 
 	float yOffset = 0.0;
-	if(currentPosition < 0) {
+	if (currentPosition < 0) {
 		yOffset -= _qmainWindow->height();
 	}
 
-	if(currentPosition >= _maxTaskDisplay) {
+	if (currentPosition >= _maxTaskDisplay) {
 		yOffset += _qmainWindow->height();
 	}
 
-	MariaUITask *temp = new MariaUITask(_qmainWindow, task, type);
+	MariaUITask* temp = new MariaUITask(_qmainWindow, task, type);
 	
-	if(currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
+	if (currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
 		temp->setPosition(QPointF(_qmainWindow->width(), _taskStartHeight + compoundPosition + yOffset));
 		temp->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
 		temp->activate();
@@ -81,7 +81,7 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::Displa
 		temp->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
 	}
 
-	if(task->getType() != MariaTask::FLOATING) {
+	if (task->getType() != MariaTask::FLOATING) {
 		temp->startUpdatingTime();
 	}
 
@@ -93,16 +93,16 @@ MariaUITask* MariaUIStateDisplay::addUITask(MariaTask *task, MariaUITask::Displa
 
 void MariaUIStateDisplay::updateUITaskPosition() {
 	float compoundPosition = 0.0;
-	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
-		int currentPosition = i - _page*_maxTaskDisplay;
-		if(currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
+	for (int i = 0; i < _taskStack.size(); i++) {
+		int currentPosition = i - _page * _maxTaskDisplay;
+		if (currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
 			_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight + compoundPosition));
 			compoundPosition += _taskStack.at(i)->getTaskHeight();
 		} else {
-			if(currentPosition < 0) {
-				_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight - _qmainWindow->height()));
+			if (currentPosition < 0) {
+				_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight -_qmainWindow->height()));
 			}
-			if(currentPosition >= _maxTaskDisplay) {
+			if (currentPosition >= _maxTaskDisplay) {
 				_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight + _qmainWindow->height()));
 			}
 		}
@@ -116,7 +116,7 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
 	MariaUITask* temp = NULL;
 	temp = _taskStack[index];
 	_taskDisposeStack.push_back(temp);
-	temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, temp->getPosition().y()));
+	temp->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, temp->getPosition().y()));
 	temp->stopUpdatingTime();
 	_taskStack.erase(_taskStack.begin() + index);
 
@@ -128,14 +128,14 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
 	assert(task != NULL);
 
 	MariaUITask* temp = NULL;
-	for (int i = 0; i < _taskStack.size(); i++ ) {
+	for (int i = 0; i < _taskStack.size(); i++) {
 		if (_taskStack[i]->getMariaTask() == task) {
 			temp = _taskStack[i];
 			_taskDisposeStack.push_back(temp);
-			temp->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
+			temp->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
 			temp->stopUpdatingTime();
 			_taskStack.erase(_taskStack.begin() + i);
-			setPage(i/_maxTaskDisplay);
+			setPage(i / _maxTaskDisplay);
 			break;
 		}
 	}
@@ -144,8 +144,8 @@ MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
 }
 
 void MariaUIStateDisplay::eraseAllUITask() {
-	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
-		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width()-TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
+	for (int i = 0; i < _taskStack.size(); i++) {
+		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
 		_taskStack.at(i)->stopUpdatingTime();
 	}
 
@@ -158,7 +158,7 @@ void MariaUIStateDisplay::eraseAllUITask() {
 }
 
 void MariaUIStateDisplay::clearUITask() {
-	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
+	for (int i = 0; i < _taskStack.size(); i++) {
 		_taskStack.at(i)->stopUpdatingTime();
 		SAFE_DELETE(_taskStack.at(i));
 	}
@@ -167,7 +167,7 @@ void MariaUIStateDisplay::clearUITask() {
 		_taskStack.pop_back();
 	}
 
-	for( int i = 0 ; i < _taskDisposeStack.size() ; i++ ) {
+	for (int i = 0; i < _taskDisposeStack.size(); i++) {
 		_taskDisposeStack.at(i)->stopUpdatingTime();
 		SAFE_DELETE(_taskDisposeStack.at(i));
 	}
@@ -185,14 +185,14 @@ int MariaUIStateDisplay::getTotalUITask() {
 bool MariaUIStateDisplay::isAllTaskAtLocation() {
 	bool toReturn = true;
 	
-	int maxShown = _taskStack.size() - _page*_maxTaskDisplay;
-	if(maxShown > _maxTaskDisplay) {
+	int maxShown = _taskStack.size() - _page * _maxTaskDisplay;
+	if (maxShown > _maxTaskDisplay) {
 		maxShown = _maxTaskDisplay;
 	}
 
 	//Only task that are visible are checked.
-	for( int i = _page*_maxTaskDisplay ; i < _page*_maxTaskDisplay + maxShown ; i++ ) {
-		if(!_taskStack.at(i)->isAtLocation()) {
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + maxShown; i++) {
+		if (!_taskStack.at(i)->isAtLocation()) {
 			toReturn = false;
 			break;
 		}
@@ -206,7 +206,7 @@ int MariaUIStateDisplay::getMaxTaskDisplay() {
 }
 
 bool MariaUIStateDisplay::setPage(int page) {
-	if(isPageValid(page)) {
+	if (isPageValid(page)) {
 		_page = page;
 		return true;
 	} else {
@@ -215,10 +215,10 @@ bool MariaUIStateDisplay::setPage(int page) {
 }
 
 void MariaUIStateDisplay::setPageEnd() {
-	if(getTotalUITask() == 0) {
+	if (getTotalUITask() == 0) {
 		_page = 0;
 	} else {
-		_page = ((getTotalUITask()-1) / _maxTaskDisplay);
+		_page = ((getTotalUITask() - 1) / _maxTaskDisplay);
 	}
 }
 
@@ -227,7 +227,7 @@ int MariaUIStateDisplay::getPage() {
 }
 
 bool MariaUIStateDisplay::isPageValid(int page) {
-	if(page >= 0 && page <= ceil((getTotalUITask()-1) / _maxTaskDisplay)) {
+	if (page >= 0 && page <= ceil((getTotalUITask() - 1) / _maxTaskDisplay)) {
 		return true;
 	} else {
 		return false;
@@ -236,20 +236,20 @@ bool MariaUIStateDisplay::isPageValid(int page) {
 
 void MariaUIStateDisplay::updatePage() {
 	float compoundPosition = 0.0;
-	for( int i = 0 ; i < _taskStack.size() ; i++ ) {
+	for (int i = 0; i < _taskStack.size(); i++) {
 
-		int currentPosition = i - _page*_maxTaskDisplay;
+		int currentPosition = i - _page * _maxTaskDisplay;
 		float yOffset = 0.0;
 
-		if(currentPosition < 0) {
+		if (currentPosition < 0) {
 			yOffset -= _qmainWindow->height();
 		}
 
-		if(currentPosition >= _maxTaskDisplay) {
+		if (currentPosition >= _maxTaskDisplay) {
 			yOffset += _qmainWindow->height();
 		}
 		
-		if(yOffset == 0.0) {
+		if (yOffset == 0.0) {
 			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
 			_taskStack.at(i)->activate();
 			compoundPosition += _taskStack.at(i)->getTaskHeight();
@@ -265,42 +265,42 @@ void MariaUIStateDisplay::updatePage() {
 
 void MariaUIStateDisplay::updatePageTitleGUI() {
 	_pageText->show();
-	_pageText->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5 - TITLE_WIDTH*0.5, getPosition().y() + _qmainWindow->height() - TITLE_Y_OFFSET - TITLE_HEIGHT, TITLE_WIDTH, TITLE_HEIGHT));
+	_pageText->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() - TITLE_Y_OFFSET - TITLE_HEIGHT, TITLE_WIDTH, TITLE_HEIGHT));
 }
 
 void MariaUIStateDisplay::updateGUI() {
 }
 
 void MariaUIStateDisplay::updateTitleText() {
-	int offsetBeforePage = _page*_maxTaskDisplay;
+	int offsetBeforePage = _page * _maxTaskDisplay;
 	//+1 to find the difference for the next page.
 	int offsetAfterPage = ((int)_taskStack.size() - (_page + 1) * _maxTaskDisplay);
 
 	string toShow;
 	string toShow2;
-	if(offsetBeforePage > 0) {
+	if (offsetBeforePage > 0) {
 		toShow += to_string(offsetBeforePage);
 
 		//Check if there are more than 1 item to include 's' in the string.
-		if(offsetBeforePage > 1) {
+		if (offsetBeforePage > 1) {
 			toShow += MESSAGE_ITEMS_ABOVE;
 		} else {
 			toShow += MESSAGE_ITEM_ABOVE;
 		}
 	}
 
-	if(offsetAfterPage > 0) {
+	if (offsetAfterPage > 0) {
 		toShow2 += to_string(offsetAfterPage);
 
 		//Check if there are more than 1 item to include 's' in the string.
-		if(offsetAfterPage > 1) {
+		if (offsetAfterPage > 1) {
 			toShow2 += MESSAGE_ITEMS_BELOW;
 		} else {
 			toShow2 += MESSAGE_ITEM_BELOW;
 		}
 	}
 
-	if(toShow.length() > 0 && toShow2.length() > 0) {
+	if (toShow.length() > 0 && toShow2.length() > 0) {
 		toShow += "\n";
 	}
 

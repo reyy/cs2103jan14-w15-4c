@@ -40,6 +40,7 @@ public:
 	static const string PREVIEW_DEADLINE_ITEM_TRIM;
 	
 	static const string PREVIEW_FLOATING_SUGGESTION_DEFAULT;
+	static const string PREVIEW_FLOATING_SUGGESTION_NO_DATE;
 	static const string PREVIEW_FREE_DAY;
 	static const string PREVIEW_FREE_DAY_TODAY;
 	
@@ -52,7 +53,7 @@ public:
 	static const float BODY_XOFFSET;
 	static const float DIVIDER_HEIGHT;
 
-	MariaUIPreview(QMainWindow *qmainWindow);
+	MariaUIPreview(QMainWindow* qmainWindow);
 	~MariaUIPreview();
 
 	string generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine);
@@ -63,17 +64,17 @@ public:
 	void updateText();
 
 private:
-	QMainWindow *_qmainWindow;
+	QMainWindow* _qmainWindow;
 
-	QLabel *_textToday;
-	QLabel *_textTodayBody;
-	QLabel *_lineToday;
-	QLabel *_textTomorrow;
-	QLabel *_textTomorrowBody;
-	QLabel *_lineTomorrow;
-	QLabel *_textCalendar;
-	QLabel *_textCalendarBody;
-	QLabel *_lineCalendar;
+	QLabel* _textToday;
+	QLabel* _textTodayBody;
+	QLabel* _lineToday;
+	QLabel* _textTomorrow;
+	QLabel* _textTomorrowBody;
+	QLabel* _lineTomorrow;
+	QLabel* _textCalendar;
+	QLabel* _textCalendarBody;
+	QLabel* _lineCalendar;
 
 	string _generatedTodayText;
 	string _generatedTomorrowText;

@@ -126,31 +126,31 @@ string MariaTime::getTimeFromNow() {
 	time ( &currentTime );
 	int difference = (int)difftime(timeStamp, currentTime);
 
-	if(difference < 0) {
+	if (difference < 0) {
 		return STRING_EMPTY;
-	}else if(difference > NUM_SECS_PER_MONTH) {
+	}else if (difference > NUM_SECS_PER_MONTH) {
 		int value = difference / NUM_SECS_PER_MONTH;
 		return formatPlural(value, STRING_MONTH);
 
-	}else if(difference > NUM_SECS_PER_WEEK) {
+	}else if (difference > NUM_SECS_PER_WEEK) {
 		int value = difference / NUM_SECS_PER_WEEK;
 		return formatPlural(value, STRING_WEEK);
 
-	}else if(difference > NUM_SECS_PER_DAY) {
+	}else if (difference > NUM_SECS_PER_DAY) {
 		int value = difference / NUM_SECS_PER_DAY;
 		return formatPlural(value, STRING_DAY);
 
 	} else {
 		string returnString;
-		if((difference % NUM_SEC) > 0) {
+		if ((difference % NUM_SEC) > 0) {
 			returnString += to_string(difference % NUM_SEC) + STRING_SEC;
 		}
 		difference /= NUM_SEC;
-		if((difference % NUM_MIN) > 0) {
+		if ((difference % NUM_MIN) > 0) {
 			returnString = to_string(difference % NUM_MIN) + STRING_MIN + returnString;
 		}
 		difference /= NUM_MIN;
-		if((difference % NUM_HRS) > 0) {
+		if ((difference % NUM_HRS) > 0) {
 			returnString = to_string(difference % NUM_HRS) + STRING_HOUR + returnString;
 		}
 		return returnString;
@@ -165,14 +165,14 @@ MariaTime MariaTime::getCurrentTime() {
 	return toReturn;
 }
 
-string MariaTime::convertToTimeString(MariaTime *time) {
+string MariaTime::convertToTimeString(MariaTime* time) {
 	string returnHour;
 	string returnMin;
 
-		if(time->getHour() == 0) {
+		if (time->getHour() == 0) {
 			returnHour = to_string(time->getHour() + AM_PM_OFFSET);
 			returnMin = TIME_AM;
-		} else if(time->getHour() <= AM_PM_OFFSET){
+		} else if (time->getHour() <= AM_PM_OFFSET){
 			returnHour = to_string(time->getHour());
 			returnMin = TIME_AM;
 		} else {
@@ -181,44 +181,44 @@ string MariaTime::convertToTimeString(MariaTime *time) {
 		}
 		returnMin = to_string(time->getMin()) + returnMin;
 
-		if(time->getMin() < DOUBLE_DIGIT_LIMIT) {
+		if (time->getMin() < DOUBLE_DIGIT_LIMIT) {
 				returnMin = STRING_ZERO_PAD + returnMin;
 		}
 
 		return returnHour + TIME_SEPARATOR + returnMin;
 }
 
-string MariaTime::convertToDateString(MariaTime *time) {
+string MariaTime::convertToDateString(MariaTime* time) {
 	string toReturn;
-	toReturn+=to_string(time->getDay()) + DATE_SEPARATOR;
-	toReturn+=MONTHS[time->getMonth() - MONTH_OFFSET] + DATE_SEPARATOR;
-	toReturn+=to_string(time->getYear());
+	toReturn += to_string(time->getDay()) + DATE_SEPARATOR;
+	toReturn += MONTHS[time->getMonth() - MONTH_OFFSET] + DATE_SEPARATOR;
+	toReturn += to_string(time->getYear());
 	return toReturn;
 }
 
-string MariaTime::convertToMonthString(MariaTime *time) {
+string MariaTime::convertToMonthString(MariaTime* time) {
 	string toReturn;
 	toReturn += MONTHS[time->getMonth() - MONTH_OFFSET] + DATE_SEPARATOR;
 	toReturn += to_string(time->getYear());
 	return toReturn;
 }
 
-int MariaTime::timeDifference(MariaTime *end, MariaTime *start) {
+int MariaTime::timeDifference(MariaTime* end, MariaTime* start) {
 	return (int)difftime(end->get(), start->get());
 }
 
 int MariaTime::compareTo(MariaTime other) {
 	double difference = difftime(get(), other.get());
-	if( difference > 0 ){
+	if (difference > 0){
 		return 1;
-	}else if( difference < 0 ){
+	}else if (difference < 0){
 		return -1;
 	}
 	return 0;
 }
 
 string MariaTime::formatPlural(int value, string text) {
-	if(value > 1) {
+	if (value > 1) {
 		return to_string(value) + text + STRING_PLURAL;
 	} else {
 		return to_string(value) + text;

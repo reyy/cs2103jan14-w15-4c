@@ -34,13 +34,13 @@ public:
 	static const int AMOUNT_OF_HELP_IMAGE = 6;
 	static const int IMAGE_INDEX_HELP = 12;
 
-	MariaUI(MariaLogic *mariaLogic, QWidget *parent = 0);
+	MariaUI(MariaLogic *mariaLogic, QWidget * parent = 0);
 	~MariaUI(void);
 	
 	void forceLogicCall();
 	void setBackgroundColor(int r, int g, int b);
 	static QPixmap* getImageHandler(int index);
-	MariaUICommandBar* getCommandBar();
+	MariaUICommandBar * getCommandBar();
 
 signals:	
 	void triggerShowHideEvent();
@@ -49,8 +49,8 @@ public slots:
 	void quitAction();
 
 protected:
-	bool eventFilter(QObject* obj, QEvent *event);
-	void keyReleaseEvent(QKeyEvent* event);
+	bool eventFilter(QObject * obj, QEvent * event);
+	void keyReleaseEvent(QKeyEvent * event);
 
 protected slots:
 	void updateBackgroundColor();
@@ -63,15 +63,15 @@ private:
 	static const float CLOSE_BUTTON_X_OFFSET;
 	static const float CLOSE_BUTTON_Y_OFFSET;
 
-	MariaLogic *_mariaLogic;
-	MariaUICommandBar* _commandBar;
+	MariaLogic * _mariaLogic;
+	MariaUICommandBar * _commandBar;
 
-	QToolButton *_btClose;
-	QTimer *_bkgColorUpdateTimer;
+	QToolButton * _btClose;
+	QTimer* _bkgColorUpdateTimer;
 	QColor _bkgColor;
 	QColor _targetBkgColor;
-	QSystemTrayIcon *_trayIcon;
-	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_IMAGES];
+	QSystemTrayIcon * _trayIcon;
+	static QPixmap* _taskTypeIconHandler[AMOUNT_OF_IMAGES];
 
 	void initWindow();
 	void initButton();

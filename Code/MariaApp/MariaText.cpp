@@ -45,7 +45,7 @@ string MariaText::format(string formatString, ...) {
 	char buffer[BUFFER_SIZE];
 	va_list args;
 	va_start (args, formatString);
-	vsprintf (buffer,formatString.c_str(), args);
+	vsprintf (buffer, formatString.c_str(), args);
 	va_end (args);
 	return string(buffer);
 }

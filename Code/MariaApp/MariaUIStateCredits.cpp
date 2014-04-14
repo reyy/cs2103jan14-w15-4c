@@ -80,7 +80,7 @@ bool MariaUIStateCredits::timerBeginState() {
 bool MariaUIStateCredits::timerActiveState() {
 	animateLogo();
 
-	if(_doneAnimating) {
+	if (_doneAnimating) {
 		return false;
 	} else {
 		return true;
@@ -94,7 +94,7 @@ bool MariaUIStateCredits::timerEndState() {
 }
 
 void MariaUIStateCredits::animateLogo() {
-	if(_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
+	if (_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
 		_logoImageIndex++;
 	} else {
 		_logoImageIndex = 0;
@@ -103,7 +103,7 @@ void MariaUIStateCredits::animateLogo() {
 }
 
 void MariaUIStateCredits::updateGUIPosition() {
-	_displayText->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-DISPLAY_TEXT_WIDTH*0.5, getPosition().y() + _qmainWindow->height() * TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
-	_displayTextBody->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-DISPLAY_TEXT_WIDTH*0.5, getPosition().y() + _qmainWindow->height() * TEXTBODY_STAGE_Y_SCALE, DISPLAYBODY_TEXT_WIDTH, DISPLAYBODY_TEXT_HEIGHT));
-	_logo->setGeometry(QRect(getPosition().x() + _qmainWindow->width()*0.5-MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width()*0.5, getPosition().y() + _qmainWindow->height()*LOGO_STAGE_Y_SCALE, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+	_displayText->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
+	_displayTextBody->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TEXTBODY_STAGE_Y_SCALE, DISPLAYBODY_TEXT_WIDTH, DISPLAYBODY_TEXT_HEIGHT));
+	_logo->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, getPosition().y() + _qmainWindow->height() * LOGO_STAGE_Y_SCALE, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
 }

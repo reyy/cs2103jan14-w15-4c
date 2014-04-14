@@ -68,10 +68,10 @@ public:
 	int compareTo(MariaTime other);
 
 	static MariaTime getCurrentTime();
-	static string convertToTimeString(MariaTime *time);
-	static string convertToDateString(MariaTime *time);
-	static string convertToMonthString(MariaTime *time);
-	static int timeDifference(MariaTime *end, MariaTime *start);
+	static string convertToTimeString(MariaTime* time);
+	static string convertToDateString(MariaTime* time);
+	static string convertToMonthString(MariaTime* time);
+	static int timeDifference(MariaTime* end, MariaTime* start);
 
 private:
 	time_t timeStamp;

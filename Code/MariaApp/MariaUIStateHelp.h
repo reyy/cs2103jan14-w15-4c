@@ -21,8 +21,8 @@ private:
 	static const int HELP_IMAGE_WIDTH = 480;
 	static const int HELP_IMAGE_HEIGHT = 640;
 
-	QMainWindow *_qmainWindow;
-	QLabel *_helpImage;
+	QMainWindow* _qmainWindow;
+	QLabel* _helpImage;
 	int _helpIndex;
 	bool _doneViewing;
 
