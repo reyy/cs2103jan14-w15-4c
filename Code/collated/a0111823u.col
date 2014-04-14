@@ -3,20 +3,798 @@
 
 
 	/**
-	 * origin: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaTaskManager.cpp
+	 * origin: .\MariaApp\\MariaFileManager.cpp
+	 */
+
+#include "MariaFileManager.h"
+
+const string MariaFileManager::INPUT_FILE = "DEFAULT.SAV";
+
+const string MariaFileManager::TASK_OPEN_FIELD = "[Task]";
+const string MariaFileManager::TASK_TITLE_FIELD = "\t[Title]";
+const string MariaFileManager::TASK_DESC_FIELD = "\t[Desc]";
+const string MariaFileManager::TASK_STARTTIME_FIELD = "\t[Start]";
+const string MariaFileManager::TASK_ENDTIME_FIELD = "\t[End]";
+const string MariaFileManager::TASK_CREATED_FIELD = "\t[Created]";
+const string MariaFileManager::TASK_ISDONE_FIELD = "\t[Done]";
+const string MariaFileManager::TASK_CLOSE_FIELD = "[End Task]";
+
+const string MariaFileManager::TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
+const string MariaFileManager::TASK_COMPLETED = "Done";
+const string MariaFileManager::TASK_NOT_COMPLETED = "Not Done";
+
+MariaFileManager::MariaFileManager(void) {
+}
+
+MariaFileManager::~MariaFileManager(void) {
+}
+
+// This method is called to open the user input file when the program
+// is first run. It parses and stores previously saved user data.
+vector<MariaTask*>* MariaFileManager::openFile() {
+	ifstream fileReader(INPUT_FILE);
+	if (!fileExists()) {
+		return createNewFile();
+	} else if (fileReader.is_open()) {
+		return readFile(&fileReader);
+	} else {
+		throw exception("File Exists but cannot be opened.");
+	}
+}
+
+vector<MariaTask*>* MariaFileManager::createNewFile() {
+	ofstream fileWriter(INPUT_FILE);
+	fileWriter.close();
+
+	return new vector<MariaTask*>();
+}
+
+// This method overwrites the user input file 
+// with the current data from messageList.
+bool MariaFileManager::writeFile(vector<MariaTask*> taskList) {
+	ofstream fileWriter(INPUT_FILE);
+	if (!fileWriter.is_open()) {
+		return false;
+	}
+
+	for (MariaTask* task : taskList) {
+		fileWriter << taskToString(task);
+	}
+	fileWriter.close();
+
+	return true;
+}
+
+
+// This method reads and stores data from an input file.
+// Requires an already open ifstream to pull data from.
+vector<MariaTask*>* MariaFileManager::readFile(ifstream *fileReader) {
+	vector<MariaTask*>* taskList = new vector<MariaTask*>();
+
+	while(true) {
+		string lineRead;
+		string inputText[ATTRIBUTES_PER_TASK] = {""};
+
+		for (int i = 0; i< ATTRIBUTES_PER_TASK; i++) {
+			if (getline (*fileReader, lineRead)) {
+				if (lineRead == TASK_CLOSE_FIELD) {
+					break;
+				}
+				inputText[i] = lineRead;
+			} else {
+				fileReader->close();
+				return taskList;
+			}
+		}
+		taskList->push_back(stringToTask(inputText));
+	}
+}
+
+bool MariaFileManager::fileExists() {
+ struct stat fileInfo;
+	return stat(INPUT_FILE.c_str(), &fileInfo) == 0;
+}
+
+MariaTask* MariaFileManager::stringToTask(string inputText[]) {
+	MariaTask* newTask = new MariaTask();
+	for (int i = 0; i < ATTRIBUTES_PER_TASK; i++) {
+		string field = getFirstWord(inputText[i]);
+		string value = removeFirstWord(inputText[i], field);
+
+		if (field == TASK_TITLE_FIELD) {
+			newTask->setTitle(value);
+		} else if (field == TASK_DESC_FIELD) {
+			newTask->setDescription(value);
+		} else if (field == TASK_STARTTIME_FIELD) {
+			newTask->setStart(stringToTime(value));
+		} else if (field == TASK_ENDTIME_FIELD) {
+			newTask->setEnd(stringToTime(value));
+		} else if (field == TASK_CREATED_FIELD) {
+			newTask->setCreated(stringToTime(value));
+		} else if (field == TASK_ISDONE_FIELD) {
+			newTask->setIsDone(stringToBool(value));
+		}
+		
+	}
+	newTask->refreshTaskType();
+	return newTask;
+}
+
+MariaTime* MariaFileManager::stringToTime(string inputText) {
+	if (inputText == "") {
+		return NULL;
+	} else {
+		return new MariaTime(inputText);
+	}
+}
+
+bool MariaFileManager::stringToBool(string inputText) {
+	if (inputText == TASK_COMPLETED) {
+		return true;
+	} else if (inputText == TASK_NOT_COMPLETED) {
+		return false;
+	} else {
+		throw exception("Corrupted File!");
+	}
+}
+
+string MariaFileManager::taskToString(MariaTask* task) {
+	
+	string returnString = TASK_OPEN_FIELD 		 + NEW_LINE + 
+							TASK_TITLE_FIELD	 + task->getTitle()					 + NEW_LINE + 
+							TASK_DESC_FIELD		 + task->getDescription()			 + NEW_LINE + 
+							TASK_STARTTIME_FIELD + timeToString(task->getStart())	 + NEW_LINE + 
+							TASK_ENDTIME_FIELD	 + timeToString(task->getEnd())		 + NEW_LINE + 
+							TASK_CREATED_FIELD	 + timeToString(task->getCreated())	 + NEW_LINE + 
+							TASK_ISDONE_FIELD	 + boolToString(task->getIsDone())	 + NEW_LINE + 
+							TASK_CLOSE_FIELD + NEW_LINE;
+
+	return returnString;
+}
+
+string MariaFileManager::timeToString(MariaTime* inputTime) {
+	if (inputTime == NULL) {
+		return ("");
+	} else {
+		return inputTime->get(TIME_FORMAT);
+	}
+}
+
+string MariaFileManager::boolToString(bool input) {
+	if (input) {
+		return TASK_COMPLETED;
+	} else {
+		return TASK_NOT_COMPLETED;
+	}
+}
+
+// This method returns the first word from input string
+string MariaFileManager::getFirstWord(string inputText) {
+	for (int i = 0; i<inputText.length(); i++) {
+		if (inputText[i] == ']') {
+			return inputText.substr(0, i + 1);
+		}
+	}
+	return inputText;
+}
+
+// This method returns the input string without its first word 
+string MariaFileManager::removeFirstWord(string inputText, string firstWord) {
+	if (inputText.length() <= firstWord.length()) {
+		return ("");
+	}
+	return inputText.substr(firstWord.length());
+}
+	// End of segment: .\MariaApp\\MariaFileManager.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaFileManager.h
+	 */
+
+#include <fstream>
+#include <sys/stat.h>
+#include <vector>
+#include "MariaTask.h"
+
+#pragma once
+class MariaFileManager
+{
+public:
+	static const string INPUT_FILE;
+	static const int ATTRIBUTES_PER_TASK = 8;
+
+	static const string TASK_OPEN_FIELD;
+	static const string TASK_TITLE_FIELD;
+	static const string TASK_DESC_FIELD;
+	static const string TASK_STARTTIME_FIELD;
+	static const string TASK_ENDTIME_FIELD;
+	static const string TASK_CREATED_FIELD;
+	static const string TASK_ISDONE_FIELD;
+	static const string TASK_CLOSE_FIELD;
+
+	static const char NEW_LINE = '\n';
+	static const string TIME_FORMAT;
+	static const string TASK_COMPLETED;
+	static const string TASK_NOT_COMPLETED;
+
+	MariaFileManager(void);
+	~MariaFileManager(void);
+	vector<MariaTask*>* openFile();
+	bool writeFile(vector<MariaTask*>);
+
+private:
+	vector<MariaTask*>* readFile(ifstream *fileReader);
+	vector<MariaTask*>* createNewFile();
+	bool fileExists();
+
+	MariaTask* stringToTask(string inputText[]);
+	MariaTime* stringToTime(string inputText);
+	bool	   stringToBool(string inputText);
+	
+	string taskToString(MariaTask* task);
+	string timeToString(MariaTime* inputTime);
+	string boolToString(bool input);
+
+	string getFirstWord(string inputText);
+	string removeFirstWord(string inputText, string firstWord);
+};
+
+
+	// End of segment: .\MariaApp\\MariaFileManager.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+MariaLogic::MariaLogic(int argc, char *argv[]) : QApplication(argc, argv) {
+	initWindowIcon();
+	initShowHideWrapper();
+	initComponents();
+	initStartingState();
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::initWindowIcon() {
+	QApplication::setWindowIcon(QIcon(QString::fromStdString("Resources/marialogo32x32.png")));
+}
+
+void MariaLogic::initComponents() {
+	initTaskManager();
+
+	mariaInterpreter = new MariaInterpreter();
+	mariaFileManager = new MariaFileManager();
+	
+	mariaUI = new MariaUI(this);
+	mariaStateManager = new MariaStateManager();
+}
+
+void MariaLogic::initTaskManager() {
+	for (int i = 0; i < 3; i++) {
+		try {
+			mariaTaskManager = new MariaTaskManager(mariaFileManager->openFile());
+			break;
+		} catch(exception e) {
+			MessageBox(NULL, L"MARIA is unable to start because its save file is currently being used by another program or user.", L"Error!", MB_OK | MB_ICONERROR);
+			quit();
+		}
+	}
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::initShowHideWrapper() {
+	_beginthread(&MariaLogic::doShowHideWrapper, 0, this);
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandAddFloatingTask(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	MariaTask* toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, NULL);
+	string taskTitle = input->getTitle();
+
+	if (toAdd != NULL) {
+		addTaskToUI(toAdd, state);
+		saveToFile();
+		return MariaText::format(MariaText::TASK_ADDED_SUCCESS, taskTitle.c_str());
+	} else {
+		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
+	}
+}
+
+string MariaLogic::runCommandAddDeadlineTask(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	MariaTask* toAdd = mariaTaskManager->addTask(input->getTitle(), NULL, input->getEndTime());
+	string taskTitle = input->getTitle();
+
+	if (toAdd != NULL) {
+		addTaskToUI(toAdd, state);
+		saveToFile();
+		return MariaText::format(MariaText::TASK_ADDED_SUCCESS, taskTitle.c_str());
+	} else {
+		return MariaText::format(MariaText::TASK_ADDED_ERROR, taskTitle.c_str());
+	}
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandShowAll(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks(true);
+
+	mariaStateManager->queueState(StateType::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, "All Tasks", listOfTasks));
+	mariaStateManager->transitState();
+	
+	return MariaText::SHOW_ALL;
+}
+
+string MariaLogic::runCommandSearch(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), true);
+	mariaStateManager->queueState(StateType::SHOW, new MariaUIStateShow((QMainWindow*)mariaUI, input->getTitle(), listOfTasks));
+	mariaStateManager->transitState();
+
+	return MariaText::format(MariaText::SEARCH_RESULT, input->getTitle().c_str());
+}
+
+string MariaLogic::runCommandDeleteTask(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToDelete = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+
+		if (numberToDelete > 0 && numberToDelete <= tempObj->getTotalUITask()) {
+			MariaUITask* toDeleteTask = tempObj->eraseUITask(numberToDelete - 1);
+			mariaTaskManager->archiveTask(toDeleteTask->getMariaTask());
+			saveToFile();
+
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();
+			return MariaText::TASK_RESOLVED_CONFLICT;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				mariaTaskManager->archiveTask(listOfTasks[0]);
+				saveToFile();
+				if (mariaTaskManager->compareToPreviousQuery()) {
+					((MariaUIStateHome*)state)->eraseUITask(listOfTasks[0]);
+				}
+				return MariaText::format(MariaText::TASK_DELETED, input->getTitle().c_str());
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+
+	return MariaText::EMPTY_STRING;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandUndo(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	StateType currentState = mariaStateManager->getCurrentState();
+	if (currentState != StateType::HOME && currentState != StateType::SHOW) {
+		return MariaText::UNDO_ERROR;
+	}
+
+	MariaStateObject* currentObj = mariaStateManager->getCurrentStateObject();
+	MariaTask* changed = mariaTaskManager->undoLast();
+
+	if (changed) {
+		saveToFile();
+
+		int taskCountDifference = mariaTaskManager->compareToPreviousQuery();
+		if (taskCountDifference < 0) {
+			((MariaUIStateHome*)currentObj)->eraseUITask(changed);
+		} else if (taskCountDifference > 0) {
+			addTaskToUI(changed, state);
+		} 
+		mariaTaskManager->compareToPreviousQuery();
+		return MariaText::UNDO_SUCCESS;
+	}
+	return MariaText::UNDO_EMPTY;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::saveToFile() {
+	vector<MariaTask*> taskList = mariaTaskManager->getAllTasks();
+	mariaFileManager->writeFile(taskList);
+}
+
+void MariaLogic::addTaskToUI(MariaTask* toAdd, MariaStateObject* state) {
+	if (!mariaTaskManager->compareToPreviousQuery()) {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks(true);
+		MariaUIStateShow* nextState = new MariaUIStateShow((QMainWindow*)mariaUI, "All Tasks", listOfTasks);
+
+		int pageNum = getPageNumOfTask(toAdd, listOfTasks, nextState->getMaxTaskDisplay());
+		nextState->setPage(pageNum);
+		mariaStateManager->queueState(StateType::SHOW, nextState);
+		mariaStateManager->transitState();
+
+	} else if (mariaStateManager->getCurrentState() == StateType::HOME) {
+		((MariaUIStateHome*)state)->addUITask(toAdd, MariaUITask::DisplayType::NORMAL);
+		((MariaUIStateHome*)state)->setPageEnd();
+
+	} else if (mariaStateManager->getCurrentState() == StateType::SHOW) {
+		((MariaUIStateShow* )state)->addUITask(toAdd, MariaUITask::DisplayType::DETAILED);
+		((MariaUIStateShow* )state)->setPageEnd();
+	}
+}
+
+int MariaLogic::getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks, int maxTask) {
+	for (int i = 0; i<listOfTasks.size(); i++) {
+		if (listOfTasks[i] == task) {
+			return i / maxTask;
+		}
+	}
+	return listOfTasks.size() / maxTask;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaTask.cpp
+	 */
+
+#include "MariaTask.h"
+
+MariaTask::MariaTask(string title, MariaTime* start, MariaTime* end) {
+	this->title = title;
+	this->start = start;
+	this->end = end;
+	this->isDone = false;
+
+	this->created = new MariaTime(MariaTime::getCurrentTime());
+	
+	refreshTaskType();
+}
+
+MariaTask::MariaTask(string title, string description, MariaTime* start, MariaTime* end, bool isDone) {
+	this->title = title;
+	this->description = description;
+	this->start = start;
+	this->end = end;
+	this->isDone = isDone;
+
+	this->created = new MariaTime(MariaTime::getCurrentTime());
+	
+	refreshTaskType();
+}
+
+MariaTask::~MariaTask(void) {
+	delete start;
+	delete end;
+}
+
+MariaTask::TaskType MariaTask::getType() {
+	return type;
+}
+
+string MariaTask::getTitle() {
+	return title;
+}
+
+string MariaTask::getDescription() {
+	return description;
+}
+
+MariaTime* MariaTask::getStart() {
+	return start;
+}
+
+MariaTime* MariaTask::getEnd() {
+	return end;
+}
+
+MariaTime* MariaTask::getCreated() {
+	return created;
+}
+
+bool MariaTask::getIsDone() {
+	return isDone;
+}
+
+double MariaTask::getDuration() {
+	return difftime(end->get(), start->get());
+}
+
+MariaTask* MariaTask::getClone() {
+	MariaTime* clonedStart = NULL;
+	MariaTime* clonedEnd = NULL;
+
+	if (start != NULL) {
+		clonedStart = new MariaTime(start->get());
+	}
+	if (end != NULL) {
+		clonedEnd = new MariaTime(end->get());
+	}
+
+	MariaTask* clonedTask = new MariaTask(title, description, clonedStart, clonedEnd, isDone);
+	clonedTask->setCreated(new MariaTime(created->get()));
+	return clonedTask;
+}
+
+string MariaTask::getTimeFromNow() {
+	if (type == DEADLINE) {
+		return getEnd()->getTimeFromNow();
+	}else if (type == TIMED) {
+		return getStart()->getTimeFromNow();
+	}
+	return "";
+}
+
+void MariaTask::setTitle(string title) {
+	if (MariaTask::observer != NULL) {
+		MariaTask::observer->notifyAction(this);
+	}
+	this->title = title;
+}
+
+void MariaTask::setDescription(string description) {
+	if (MariaTask::observer != NULL) {
+		MariaTask::observer->notifyAction(this);
+	}
+	this->description = description;
+}
+
+void MariaTask::setStart(MariaTime* start) {
+	if (MariaTask::observer != NULL) {
+		MariaTask::observer->notifyAction(this);
+	}
+	delete this->start;
+	this->start = start;
+	refreshTaskType();
+}
+
+void MariaTask::setEnd(MariaTime* end) {
+	if (MariaTask::observer != NULL) {
+		MariaTask::observer->notifyAction(this);
+	}
+	delete this->end;
+	this->end = end;
+	refreshTaskType();
+}
+
+void MariaTask::setCreated(MariaTime* created) {
+	delete this->created;
+	this->created = created;
+}
+
+void MariaTask::setIsDone(bool isDone) {
+	if (MariaTask::observer != NULL) {
+		MariaTask::observer->notifyAction(this);
+	}
+	this->isDone = isDone;
+}
+
+void MariaTask::setAll(MariaTask* other) {
+	title = other->getTitle();
+	description = other->getDescription();
+	isDone = (other->getIsDone());
+
+	delete start;
+	if (other->getStart() != NULL) {
+		start = new MariaTime(other->getStart()->get());
+	} else {
+		start = NULL;
+	}
+	
+	delete end;
+	if (other->getEnd() != NULL) {
+		end = new MariaTime(other->getEnd()->get());
+	} else {
+		end = NULL;
+	}
+	refreshTaskType();
+}
+
+void MariaTask::refreshTaskType() {
+	if (start == NULL && end == NULL) {
+		type = TaskType::FLOATING;
+	}else if (start == NULL) {
+		type = TaskType::DEADLINE;
+	} else {
+		type = TaskType::TIMED;
+	}
+}
+
+bool MariaTask::operator<(MariaTask rhs) { 
+	
+	if (type == rhs.getType()) {
+		if (type == MariaTask::TIMED) {
+			return start->get() < rhs.getStart()->get();
+		}else if (type == MariaTask::DEADLINE) {
+			return end->get() < rhs.getEnd()->get();
+		}else{
+			return title < rhs.getTitle(); 
+		}
+	}else{
+		return type < getType();
+	}
+	
+}
+
+void MariaTask::initObserver(MariaUndoObserver* observer) {
+	MariaTask::observer = observer;
+}
+
+MariaUndoObserver * MariaTask::observer = NULL;
+
+	// End of segment: .\MariaApp\\MariaTask.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaTask.h
+	 */
+
+#pragma once
+
+#include <functional>
+#include <string>
+#include "MariaTime.h"
+#include "MariaUndoObserver.h"
+
+using namespace std;
+
+class MariaTask : public MariaTaskInterface {
+public:
+	typedef enum {
+		FLOATING, 
+		DEADLINE, 
+		TIMED, 
+		INVALID
+	} TaskType;
+	
+	MariaTask(string title = "", MariaTime* start = NULL, MariaTime* end = NULL);
+	MariaTask(string title, string description, MariaTime* start = NULL, MariaTime* end = NULL, bool isDone = false);
+	~MariaTask();
+	
+	
+	TaskType	getType();
+	string		getTitle();
+	string		getDescription();
+	string		getTimeFromNow();
+	MariaTime* 	getStart();
+	MariaTime* 	getEnd();
+	MariaTime* 	getCreated();
+	double		getDuration();
+	MariaTask* 	getClone();
+	bool		getIsDone();
+	
+	void setTitle(string);
+	void setDescription(string);
+	void setStart(MariaTime*);
+	void setEnd(MariaTime*);
+	void setCreated(MariaTime*);
+	void setIsDone(bool);
+	void setAll(MariaTask*);
+
+	void refreshTaskType();
+
+	bool operator<(MariaTask rhs);
+
+	static void initObserver(MariaUndoObserver * );
+	
+
+private:
+	TaskType	type;
+	string		title;
+	string		description;
+	MariaTime* 	start;
+	MariaTime* 	end;
+	MariaTime* 	created;
+	bool		isDone;
+
+	static MariaUndoObserver* observer;
+};
+
+	// End of segment: .\MariaApp\\MariaTask.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaTaskManager.cpp
 	 */
 
 #include "MariaTaskManager.h"
 #include <assert.h>
 
-MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
+MariaTaskManager::MariaTaskManager(vector<MariaTask*>* inputTaskList) {
 	taskList = inputTaskList;
-	if(taskList == NULL) {
+	if (taskList == NULL) {
 		taskList = new vector<MariaTask*>();
 	}
 	sortTasks();
 
-	undoList = new vector<pair<MariaTask*,MariaTask*>*>();
+	undoList = new vector<pair<MariaTask*, MariaTask*>*>();
 	MariaTask::initObserver(this);
 
 	previousStart = NULL;
@@ -25,19 +803,19 @@ MariaTaskManager::MariaTaskManager(vector<MariaTask*> *inputTaskList) {
 }
 
 MariaTaskManager::~MariaTaskManager(void) {
-	for(MariaTask* t: (*this->taskList)) {
+	for (MariaTask* t: (*this->taskList)) {
 		delete t;
 	}
 	delete taskList;
 
-	for(pair<MariaTask*,MariaTask*>* t: (*this->undoList)) {
+	for (pair<MariaTask*, MariaTask*>* t: (*this->undoList)) {
 		delete t;
 	}
 	delete undoList;
 }
 
 MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* end) {
-	MariaTask *tempTask = new MariaTask(name, start, end);
+	MariaTask* tempTask = new MariaTask(name, start, end);
 	tempTask->initObserver(this);
 	taskList->push_back(tempTask);
 
@@ -48,19 +826,19 @@ MariaTask* MariaTaskManager::addTask(string name, MariaTime* start, MariaTime* e
 	return tempTask;
 }
 
-vector<MariaTask*> MariaTaskManager::findTask(std::string searchString, bool addToHistory) {
+vector<MariaTask*> MariaTaskManager::findTask(string searchString, bool addToHistory) {
 	vector<MariaTask*> returnList;
 	searchString = lowercaseString(searchString);
 
-	for(MariaTask* temp : *taskList) {
-		if(lowercaseString(temp->getTitle()).find(searchString) != string::npos) {
+	for (MariaTask* temp : *taskList) {
+		if (lowercaseString(temp->getTitle()).find(searchString) != string::npos) {
 			returnList.push_back(temp);
 		}
 	}
 
-	if(addToHistory) {
+	if (addToHistory) {
 		storePreviousQuery(searchString);
-		if(queryResult != NULL) {
+		if (queryResult != NULL) {
 			delete queryResult;
 		}
 		queryResult = new vector<MariaTask*> (returnList);
@@ -72,19 +850,19 @@ vector<MariaTask*> MariaTaskManager::findTask(std::string searchString, bool add
 vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, bool addToHistory) {
 	vector<MariaTask*> returnList;
 
-	for(MariaTask* temp : *taskList) {
+	for (MariaTask* temp : *taskList) {
 		if (temp->getEnd() == NULL) {
 			continue;
 		}
 
-		if(temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
+		if (temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
 			returnList.push_back(temp);
 		}
 	}
 
-	if(addToHistory) {
+	if (addToHistory) {
 		storePreviousQuery(start, end);
-		if(queryResult != NULL) {
+		if (queryResult != NULL) {
 			delete queryResult;
 		}
 		queryResult = new vector<MariaTask*> (returnList);
@@ -96,16 +874,16 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type, bool addToHistory) {
 	vector<MariaTask*> returnList;
 
-	for(MariaTask* temp : *taskList) {
-		if(temp->getType() == type) {
+	for (MariaTask* temp : *taskList) {
+		if (temp->getType() == type) {
 			switch(type) {
 			case MariaTask::TaskType::DEADLINE:
-				if(temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
+				if (temp->getEnd()->get() >= start->get() && temp->getEnd()->get() <= end->get()) {
 					returnList.push_back(temp);
 				}
 				break;
 			case MariaTask::TaskType::TIMED:
-				if(temp->getStart()->get() >= start->get() && temp->getStart()->get() <= end->get()) {
+				if (temp->getStart()->get() >= start->get() && temp->getStart()->get() <= end->get()) {
 					returnList.push_back(temp);
 				}
 				break;
@@ -113,9 +891,9 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 		}
 	}
 
-	if(addToHistory) {
+	if (addToHistory) {
 		storePreviousQuery(start, end, type);
-		if(queryResult != NULL) {
+		if (queryResult != NULL) {
 			delete queryResult;
 		}
 		queryResult = new vector<MariaTask*> (returnList);
@@ -125,18 +903,18 @@ vector<MariaTask*> MariaTaskManager::findTask(MariaTime* start, MariaTime* end, 
 }
 
 vector<MariaTask*> MariaTaskManager::findTask(MariaTask::TaskType type, bool addToHistory) {
-	assert(taskList!=NULL);
+	assert(taskList != NULL);
 	vector<MariaTask*> returnList;
 
-	for(MariaTask *temp : *taskList) {
-		if(temp->getType() == type) {
+	for (MariaTask* temp : *taskList) {
+		if (temp->getType() == type) {
 			returnList.push_back(temp);
 		}
 	}
 
-	if(addToHistory) {
+	if (addToHistory) {
 		storePreviousQuery(type);
-		if(queryResult != NULL) {
+		if (queryResult != NULL) {
 			delete queryResult;
 		}
 		queryResult = new vector<MariaTask*> (returnList);
@@ -150,27 +928,37 @@ vector<MariaTask*> MariaTaskManager::getWeeklyTask() {
 	MariaTime* startTime = &MariaTime::getCurrentTime();
 	startTime->setHour(0);
 	startTime->setMin(0);
+
 	MariaTime* endTime =  &MariaTime::getCurrentTime();
-	endTime->setDay(startTime->getDay()+7);
+	endTime->setDay(startTime->getDay() + MariaTime::NUM_DAYS);
 	endTime->setHour(23);
 	endTime->setMin(59);
-	return findTask(startTime,endTime,true);
+
+	return findTask(startTime, endTime, true);
 }
 
-vector<MariaTask*> MariaTaskManager::getAllTasks() {
-	assert(taskList!=NULL);
+vector<MariaTask*> MariaTaskManager::getAllTasks(bool addToHistory) {
+	assert(taskList != NULL);
+
+	if (addToHistory) {
+		storePreviousQuery("");
+		if (queryResult != NULL) {
+			delete queryResult;
+		}
+		queryResult = new vector<MariaTask*> (*taskList);
+	}
 
 	return *taskList;
 }
 
 bool MariaTaskManager::archiveTask(MariaTask* task) {
-	assert(task!=NULL);
+	assert(task != NULL);
 
 	this->notifyAction(task);
 
 	auto it = std::find(taskList->begin(), taskList->end(), task);
 
-	if(it != taskList->end()) {
+	if (it != taskList->end()) {
 		delete (*it);
 		taskList->erase(it);
 		return true;
@@ -181,16 +969,18 @@ bool MariaTaskManager::archiveTask(MariaTask* task) {
 }
 
 int MariaTaskManager::compareToPreviousQuery() {
-	if(queryResult == NULL) {
+	if (queryResult == NULL) {
 		return false;
 	}
 	vector<MariaTask*> previousQueryResult = vector<MariaTask*>(*queryResult);
 
-	if(previousSearchString != "") {
+	if (previousSearchString != "") {
 		findTask(previousSearchString);
-	} else if(previousStart == NULL && previousEnd == NULL) {
+	} else if (previousStart == NULL && previousEnd == NULL && previousType == MariaTask::TaskType::INVALID) {
+		getAllTasks(true);
+	} else if (previousStart == NULL && previousEnd == NULL) {
 		findTask(previousType);
-	} else if(previousType != MariaTask::TaskType::INVALID) {
+	} else if (previousType != MariaTask::TaskType::INVALID) {
 		findTask(previousStart, previousEnd, previousType);
 	} else {
 		findTask(previousStart, previousEnd);
@@ -201,11 +991,11 @@ int MariaTaskManager::compareToPreviousQuery() {
 
 void MariaTaskManager::deletePreviousQuery() {
 	previousSearchString = "";
-	if(previousStart != NULL) {
+	if (previousStart != NULL) {
 		delete previousStart;
 	}
 	previousStart = NULL;
-	if(previousEnd != NULL) {
+	if (previousEnd != NULL) {
 		delete previousEnd;
 	}
 	previousEnd = NULL;
@@ -222,17 +1012,17 @@ void MariaTaskManager::storePreviousQuery(MariaTask::TaskType previousType) {
 	this->previousType = previousType;
 }
 
-void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd){
-	MariaTime * tempStart = new MariaTime(previousStart->get());
-	MariaTime * tempEnd = new MariaTime(previousEnd->get());
+void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd) {
+	MariaTime* tempStart = new MariaTime(previousStart->get());
+	MariaTime* tempEnd = new MariaTime(previousEnd->get());
 	deletePreviousQuery();
 	this->previousStart = tempStart;
 	this->previousEnd = tempEnd;
 }
 
 void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* previousEnd, MariaTask::TaskType previousType) {
-	MariaTime * tempStart = new MariaTime(previousStart->get());
-	MariaTime * tempEnd = new MariaTime(previousEnd->get());
+	MariaTime* tempStart = new MariaTime(previousStart->get());
+	MariaTime* tempEnd = new MariaTime(previousEnd->get());
 	deletePreviousQuery();
 	this->previousStart = tempStart;
 	this->previousEnd = tempEnd;
@@ -243,7 +1033,7 @@ void MariaTaskManager::storePreviousQuery(MariaTime* previousStart, MariaTime* p
 string MariaTaskManager::lowercaseString(string text) {
 	string toReturn = "";
 
-	for (int i = 0; i < text.size(); i++ ) {
+	for (int i = 0; i < text.size(); i++) {
 		toReturn += tolower(text[i]);
 	}
 
@@ -269,7 +1059,7 @@ bool MariaTaskManager::compareTasks(MariaTask* t1, MariaTask* t2) {
 }
 
 MariaTask* MariaTaskManager::undoLast() {
-	if(undoList->empty()) {
+	if (undoList->empty()) {
 		return NULL;
 	}
 	MariaTask* toReturn = NULL;
@@ -277,31 +1067,21 @@ MariaTask* MariaTaskManager::undoLast() {
 	MariaTask* oldTask = undoList->back()->second;
 	auto it = std::find(taskList->begin(), taskList->end(), taskPointer);
 
-	if(it != taskList->end()) {
+	if (it != taskList->end()) {
 		toReturn = (undoList->back())->first;
-		if(oldTask == NULL) { 
+		if (oldTask == NULL) { 
 			//last action = addTask
 			delete taskPointer;
 			taskList->erase(it);
 		} else { 
 			//last action = editTask
-			/*delete taskPointer; //delete current task
-			taskList->erase(it);
-			for(pair<MariaTask*,MariaTask*> *p : *undoList) {
-			if(p->first == taskPointer) {
-			p->first = oldTask;
-			}
-			}
-			taskList->push_back(oldTask);
-			sortTasks();*/
 			taskPointer->setAll(oldTask);
 			delete oldTask;
-			//(undoList->back())->first = oldTask; //set pointer in taskList to old task
 		}
 	} else {
 		//last action = deleteTask
-		for(pair<MariaTask*,MariaTask*> *p : *undoList) {
-			if(p->first == taskPointer) {
+		for (pair<MariaTask*, MariaTask*>*p : * undoList) {
+			if (p->first == taskPointer) {
 				p->first = oldTask;
 			}
 		}
@@ -316,20 +1096,19 @@ MariaTask* MariaTaskManager::undoLast() {
 
 void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 
-	MariaTask *oldTask = NULL;
-	MariaTask *taskPointer = NULL;
+	MariaTask* oldTask = NULL;
+	MariaTask* taskPointer = NULL;
 
-	for(int i = 0; i<taskList->size(); i++) {
-		if(((MariaTask*)task) == (*taskList)[i]){
+	for (int i = 0; i<taskList->size(); i++) {
+		if (((MariaTask*)task) == (*taskList)[i]) {
 			taskPointer = (*taskList)[i];
 			break;
 		}
 	}
-	//taskPointer = (MariaTask*)task;
 
 	assert(taskPointer != NULL);
 
-	if(!isAddTask) {
+	if (!isAddTask) {
 		oldTask = ((MariaTask*)task)->getClone();
 	} 
 
@@ -340,14 +1119,14 @@ void MariaTaskManager::notifyAction(MariaTaskInterface* task, bool isAddTask) {
 	undoList->push_back(new pair<MariaTask*, MariaTask*>(taskPointer, oldTask));
 }
 
-	// End of segment: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaTaskManager.cpp
+	// End of segment: .\MariaApp\\MariaTaskManager.cpp
 
 
 
 
 
 	/**
-	 * origin: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaTaskManager.h
+	 * origin: .\MariaApp\\MariaTaskManager.h
 	 */
 
 #pragma once
@@ -363,7 +1142,7 @@ class MariaTaskManager : public MariaUndoObserver {
 public:
 	static const int UNDO_LIMIT = 5;
 
-	MariaTaskManager(vector<MariaTask*> *inputTaskList = NULL);
+	MariaTaskManager(vector<MariaTask*>* inputTaskList = NULL);
 	~MariaTaskManager(void);
 
 	MariaTask* addTask(string name, MariaTime* start = NULL, MariaTime* end = NULL);
@@ -372,13 +1151,12 @@ public:
 	vector<MariaTask*> findTask(MariaTime* start, MariaTime* end, MariaTask::TaskType type, bool addToHistory = true);
 	vector<MariaTask*> findTask(MariaTask::TaskType type, bool addToHistory = true);
 	vector<MariaTask*> getWeeklyTask();
-	vector<MariaTask*> getAllTasks();
+	vector<MariaTask*> getAllTasks(bool addToHistory = false);
 
 	int compareToPreviousQuery();
 	MariaTask* undoLast();
 
-	bool archiveTask(MariaTask*); //Note: For now, this deletes tasks!
-	bool deleteArchive();
+	bool archiveTask(MariaTask*);
 
 	void notifyAction(MariaTaskInterface* task, bool isAddTask = false);
 
@@ -386,20 +1164,20 @@ private:
 #ifdef _DEBUG
 public:
 #endif
-	vector<MariaTask*> *taskList;
-	vector<pair<MariaTask*, MariaTask*>*> *undoList;
+	vector<MariaTask*>*taskList;
+	vector<pair<MariaTask*, MariaTask*>*>*undoList;
 
-	vector<MariaTask*> *queryResult;
+	vector<MariaTask*>* queryResult;
 	string previousSearchString;
-	MariaTime *previousStart;
-	MariaTime *previousEnd;
+	MariaTime* previousStart;
+	MariaTime* previousEnd;
 	MariaTask::TaskType previousType;
 
 	void deletePreviousQuery();
 	void storePreviousQuery(string);
 	void storePreviousQuery(MariaTask::TaskType);
-	void storePreviousQuery(MariaTime*, MariaTime*);
-	void storePreviousQuery(MariaTime*, MariaTime*, MariaTask::TaskType);
+	void storePreviousQuery(MariaTime* , MariaTime* );
+	void storePreviousQuery(MariaTime* , MariaTime* , MariaTask::TaskType);
 	
 
 	string lowercaseString(string text);
@@ -407,7 +1185,550 @@ public:
 	static bool compareTasks(MariaTask* d1, MariaTask* d2);
 };
 
-	// End of segment: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaTaskManager.h
+	// End of segment: .\MariaApp\\MariaTaskManager.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaTime.cpp
+	 */
+
+#include "MariaTime.h"
+
+const string MariaTime::TIME_SEPARATOR = ":";
+const string MariaTime::TIME_AM = " AM";
+const string MariaTime::TIME_PM = " PM";
+const string MariaTime::DATE_SEPARATOR = " ";
+const string MariaTime::DATE_TIME_FORMAT = "%d-%d-%d %d:%d:%d";
+
+const string MariaTime::STRING_MONTH = " month";
+const string MariaTime::STRING_WEEK = " week";
+const string MariaTime::STRING_DAY = " day";
+const string MariaTime::STRING_HOUR = " hr ";
+const string MariaTime::STRING_MIN = " min ";
+const string MariaTime::STRING_SEC = " sec";
+const string MariaTime::STRING_PLURAL = " s";
+const string MariaTime::STRING_EMPTY = "";
+const string MariaTime::STRING_ZERO_PAD = "0";
+
+const char * const MariaTime::DAYS[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+const char * const MariaTime::MONTHS[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November" , "December"};
+
+MariaTime::MariaTime(int year , int month , int day , int hour , int min , int sec ) {
+	timeStruct.tm_year = year - YEAR_OFFSET;
+	timeStruct.tm_mon = month - MONTH_OFFSET;
+	timeStruct.tm_mday = day;
+	timeStruct.tm_hour = hour;
+	timeStruct.tm_min = min;
+	timeStruct.tm_sec = sec;
+
+	timeStamp = mktime(&timeStruct);
+}
+
+MariaTime::MariaTime(time_t unixTime) {
+	timeStamp = unixTime;
+	time(&unixTime);
+	timeStruct	 = *(localtime(&unixTime));
+}
+
+MariaTime::MariaTime(string value) {
+	int year;
+	int month;
+	sscanf (value.c_str(), DATE_TIME_FORMAT.c_str(), &year, &month, &timeStruct.tm_mday, &timeStruct.tm_hour, &timeStruct.tm_min, &timeStruct.tm_sec);
+	timeStruct.tm_year = year - YEAR_OFFSET;
+	timeStruct.tm_mon = month - MONTH_OFFSET;
+	timeStamp = mktime(&timeStruct);
+
+}
+
+string MariaTime::get(string format) {
+	char buff[BUFFER_SIZE];
+	strftime(buff, BUFFER_SIZE, format.c_str() , localtime(&timeStamp));
+	return buff;
+}
+
+void MariaTime::set(time_t unixTime) {
+	timeStamp = unixTime;
+	time(&unixTime);
+	timeStruct	 = *(localtime(&unixTime));
+}
+
+time_t MariaTime::get() {
+	return timeStamp;
+}
+
+int MariaTime::getYear() {
+	return timeStruct.tm_year + YEAR_OFFSET;
+}
+
+int MariaTime::getMonth() {
+	return timeStruct.tm_mon + MONTH_OFFSET;
+}
+
+int MariaTime::getDay() {
+	return timeStruct.tm_mday;
+}
+
+int MariaTime::getHour() {
+	return timeStruct.tm_hour;
+}
+
+int MariaTime::getMin() {
+	return timeStruct.tm_min;
+}
+
+int MariaTime::getSec() {
+	return timeStruct.tm_sec;
+}
+
+int MariaTime::getDayWeek() {
+	return timeStruct.tm_wday;
+}
+
+void MariaTime::setYear(int year) {
+	timeStruct.tm_year = year - YEAR_OFFSET;
+	timeStamp = mktime(&timeStruct);
+}
+
+void MariaTime::setMonth(int month) {
+	timeStruct.tm_mon = month - MONTH_OFFSET;
+	timeStamp = mktime(&timeStruct);
+}
+
+void MariaTime::setDay(int day) {
+	timeStruct.tm_mday = day;
+	timeStamp = mktime(&timeStruct);
+}
+
+void MariaTime::setHour(int hour) {
+	timeStruct.tm_hour = hour;
+	timeStamp = mktime(&timeStruct);
+}
+
+void MariaTime::setMin(int min) {
+	timeStruct.tm_min = min;
+	timeStamp = mktime(&timeStruct);
+}
+
+void MariaTime::setSec(int sec) {
+	timeStruct.tm_sec = sec;
+	timeStamp = mktime(&timeStruct);
+}
+
+string MariaTime::getTimeFromNow() {
+	time_t currentTime;
+	time ( &currentTime );
+	int difference = (int)difftime(timeStamp, currentTime);
+
+	if (difference < 0) {
+		return STRING_EMPTY;
+	}else if (difference > NUM_SECS_PER_MONTH) {
+		int value = difference / NUM_SECS_PER_MONTH;
+		return formatPlural(value, STRING_MONTH);
+
+	}else if (difference > NUM_SECS_PER_WEEK) {
+		int value = difference / NUM_SECS_PER_WEEK;
+		return formatPlural(value, STRING_WEEK);
+
+	}else if (difference > NUM_SECS_PER_DAY) {
+		int value = difference / NUM_SECS_PER_DAY;
+		return formatPlural(value, STRING_DAY);
+
+	} else {
+		string returnString;
+		if ((difference % NUM_SEC) > 0) {
+			returnString += to_string(difference % NUM_SEC) + STRING_SEC;
+		}
+		difference /= NUM_SEC;
+		if ((difference % NUM_MIN) > 0) {
+			returnString = to_string(difference % NUM_MIN) + STRING_MIN + returnString;
+		}
+		difference /= NUM_MIN;
+		if ((difference % NUM_HRS) > 0) {
+			returnString = to_string(difference % NUM_HRS) + STRING_HOUR + returnString;
+		}
+		return returnString;
+	}
+
+}
+
+MariaTime MariaTime::getCurrentTime() {
+	time_t rawtime;
+	time ( &rawtime );
+	MariaTime toReturn(rawtime);
+	return toReturn;
+}
+
+string MariaTime::convertToTimeString(MariaTime* time) {
+	string returnHour;
+	string returnMin;
+
+		if (time->getHour() == 0) {
+			returnHour = to_string(time->getHour() + AM_PM_OFFSET);
+			returnMin = TIME_AM;
+		} else if (time->getHour() <= AM_PM_OFFSET){
+			returnHour = to_string(time->getHour());
+			returnMin = TIME_AM;
+		} else {
+			returnHour = to_string(time->getHour() - AM_PM_OFFSET);
+			returnMin = TIME_PM;
+		}
+		returnMin = to_string(time->getMin()) + returnMin;
+
+		if (time->getMin() < DOUBLE_DIGIT_LIMIT) {
+				returnMin = STRING_ZERO_PAD + returnMin;
+		}
+
+		return returnHour + TIME_SEPARATOR + returnMin;
+}
+
+string MariaTime::convertToDateString(MariaTime* time) {
+	string toReturn;
+	toReturn += to_string(time->getDay()) + DATE_SEPARATOR;
+	toReturn += MONTHS[time->getMonth() - MONTH_OFFSET] + DATE_SEPARATOR;
+	toReturn += to_string(time->getYear());
+	return toReturn;
+}
+
+string MariaTime::convertToMonthString(MariaTime* time) {
+	string toReturn;
+	toReturn += MONTHS[time->getMonth() - MONTH_OFFSET] + DATE_SEPARATOR;
+	toReturn += to_string(time->getYear());
+	return toReturn;
+}
+
+int MariaTime::timeDifference(MariaTime* end, MariaTime* start) {
+	return (int)difftime(end->get(), start->get());
+}
+
+int MariaTime::compareTo(MariaTime other) {
+	double difference = difftime(get(), other.get());
+	if (difference > 0){
+		return 1;
+	}else if (difference < 0){
+		return -1;
+	}
+	return 0;
+}
+
+string MariaTime::formatPlural(int value, string text) {
+	if (value > 1) {
+		return to_string(value) + text + STRING_PLURAL;
+	} else {
+		return to_string(value) + text;
+	}
+}
+	// End of segment: .\MariaApp\\MariaTime.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaTime.h
+	 */
+
+#pragma once
+#include <time.h>
+#include <string>
+using namespace std;
+
+class MariaTime {
+public:
+	static const string TIME_AM;
+	static const string TIME_PM;	
+	static const string TIME_SEPARATOR;
+	static const string DATE_SEPARATOR;
+	static const string DATE_TIME_FORMAT;
+
+	static const string STRING_MONTH;
+	static const string STRING_WEEK;
+	static const string STRING_DAY;
+	static const string STRING_HOUR;
+	static const string STRING_MIN;
+	static const string STRING_SEC;
+	static const string STRING_PLURAL;
+	static const string STRING_EMPTY;
+	static const string STRING_ZERO_PAD;
+
+	static const int YEAR_OFFSET = 1900;
+	static const int MONTH_OFFSET = 1;
+	static const int AM_PM_OFFSET = 12;
+	static const int DOUBLE_DIGIT_LIMIT = 10;
+	static const int BUFFER_SIZE = 20;
+
+	static const int NUM_SEC = 60;
+	static const int NUM_MIN = 60;
+	static const int NUM_HRS = 24;
+	static const int NUM_DAYS = 7;
+	static const int NUM_DAYS_PER_MONTH = 30;
+	static const int NUM_SECS_PER_MONTH = NUM_SEC * NUM_MIN * NUM_HRS * NUM_DAYS_PER_MONTH;
+	static const int NUM_SECS_PER_WEEK = NUM_SEC * NUM_MIN * NUM_HRS * NUM_DAYS;
+	static const int NUM_SECS_PER_DAY = NUM_SEC * NUM_MIN * NUM_HRS;
+	
+	static const char * const DAYS[];
+	static const char * const MONTHS[];
+
+	MariaTime(int year = 1901, int month = 1, int day = 1, int hour = 0, int min = 0, int sec = 0);
+	MariaTime(time_t unixTime);
+	MariaTime(string value);
+	
+	string getTimeFromNow();
+	string get(string format);
+	time_t get();
+
+	void set(time_t unixTime);
+
+	int getYear();
+	int getMonth();
+	int getDay();
+	int getHour();
+	int getMin();
+	int getSec();
+	int getDayWeek();
+
+	void setYear(int);
+	void setMonth(int);
+	void setDay(int);
+	void setHour(int);
+	void setMin(int);
+	void setSec(int);
+
+	int compareTo(MariaTime other);
+
+	static MariaTime getCurrentTime();
+	static string convertToTimeString(MariaTime* time);
+	static string convertToDateString(MariaTime* time);
+	static string convertToMonthString(MariaTime* time);
+	static int timeDifference(MariaTime* end, MariaTime* start);
+
+private:
+	time_t timeStamp;
+	struct tm timeStruct;
+
+	string formatPlural(int value, string text);
+};
+
+
+	// End of segment: .\MariaApp\\MariaTime.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaTest\IntegratedTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace MariaTest {
+	TEST_CLASS(IntegratedTest) {
+	public:
+	//Integrated Test Case that simulates adding and removing a task
+		TEST_METHOD(MSSTest_AddRemoveTask) {
+			string inputString = "create UniqueTask101";
+
+			MariaInterpreter* interpreter = new MariaInterpreter();
+			MariaFileManager* fileManager = new MariaFileManager();
+			MariaTaskManager* taskManager = new MariaTaskManager(fileManager->openFile());
+
+			MariaInputObject* input = interpreter->parseInput(inputString);
+
+			if (input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING) {
+				MariaTask* toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
+				if (toAdd != NULL) {
+					fileManager->writeFile(taskManager->getAllTasks());
+				}
+
+				Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 1);
+
+
+				taskManager->archiveTask(taskManager->findTask("UniqueTask101")[0]);
+				fileManager->writeFile(taskManager->getAllTasks());
+
+				Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 0);
+
+				SAFE_DELETE(input);
+				SAFE_DELETE(fileManager);
+				SAFE_DELETE(taskManager);
+
+				//Reload the managers to check if task is still there
+				interpreter = new MariaInterpreter();
+				fileManager = new MariaFileManager();
+				taskManager = new MariaTaskManager(fileManager->openFile());
+
+				Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 0);
+
+				SAFE_DELETE(fileManager);
+				SAFE_DELETE(taskManager);
+
+			} else {
+				Assert::IsTrue(false);
+			}
+		}
+
+		//Integrated Test Case that simulates adding, editing and removing a task
+		TEST_METHOD(MSSTest_AddEditRemoveTask) {
+			string inputString[4] = {"create UniqueTask101", 
+									"edit UniqueTask101 change title UnqiueTask202", 
+									"delete UnqiueTask101", 
+									"delete UnqiueTask202"};
+
+			MariaInterpreter* interpreter = new MariaInterpreter();
+			MariaFileManager* fileManager = new MariaFileManager();
+			MariaTaskManager* taskManager = new MariaTaskManager(fileManager->openFile());
+
+			//Test for 'create UniqueTask101'
+			MariaInputObject* input = interpreter->parseInput(inputString[0]);
+
+			Assert::IsTrue(input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING);
+
+			MariaTask* toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
+			if (toAdd != NULL) {
+				fileManager->writeFile(taskManager->getAllTasks());
+			}
+			Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 1);
+			SAFE_DELETE(input);
+
+			//edit UniqueTask101 change title UnqiueTask202'
+			input = interpreter->parseInput(inputString[1]);
+			taskManager->findTask("UniqueTask101")[0]->setTitle("UniqueTask202");
+			fileManager->writeFile(taskManager->getAllTasks());
+
+			Assert::IsTrue(taskManager->findTask("UniqueTask202").size() == 1);
+			SAFE_DELETE(input);
+
+			//delete UnqiueTask101	
+			input = interpreter->parseInput(inputString[2]);
+			Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 0);
+
+			//delete UnqiueTask202
+			input = interpreter->parseInput(inputString[3]);
+			taskManager->archiveTask(taskManager->findTask("UniqueTask202")[0]);
+			fileManager->writeFile(taskManager->getAllTasks());
+
+			Assert::IsTrue(taskManager->findTask("").size() == 0);
+			SAFE_DELETE(input);
+
+			SAFE_DELETE(fileManager);
+			SAFE_DELETE(taskManager);
+		}
+
+	// End of segment: .\MariaTest\IntegratedTest.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaTest\TaskTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace MariaTest {
+	TEST_CLASS(TaskTest) {
+	public:
+		TEST_METHOD(Task_DeleteTask) {
+			MariaTaskManager* program = new MariaTaskManager();
+			
+			MariaTask* temp = program->addTask("new task");
+			MariaTask* temp2 = new MariaTask();
+			
+			Assert::IsFalse(program->taskList->empty());
+			//Assert::IsFalse(program->archiveTask(temp2));
+			Assert::IsTrue(program->archiveTask(temp));
+			Assert::IsTrue(program->taskList->empty());
+
+			delete temp2;
+			delete program;
+		}
+
+		TEST_METHOD(Task_Sort) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("bbb");
+			program->addTask("aaa");
+			program->addTask("1", NULL, &MariaTime::getCurrentTime());
+			program->addTask("ccc");
+			program->addTask("123");
+			program->sortTasks();
+			Assert::AreEqual((*program->taskList)[4]->getTitle(), (string)"1");
+			delete program;
+		}
+
+		//Test case for undoing an 'edit task'
+		TEST_METHOD(Task_UndoOnce) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+			(*program->taskList)[0]->setTitle("New Title");
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title", (*program->taskList)[0]->getTitle());
+			delete program;
+		}
+
+		//Test case for undoing multiple 'edit task's
+		TEST_METHOD(Task_UndoMultiple) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+
+			(*program->taskList)[0]->setTitle("New Title 1");
+
+			(*program->taskList)[0]->setTitle("New Title 2");
+
+			program->undoLast();
+			Assert::AreEqual((string)"New Title 1", (*program->taskList)[0]->getTitle());
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title", (*program->taskList)[0]->getTitle());
+			delete program;
+		}
+
+		//Test case for undoing a 'delete task'
+		TEST_METHOD(Task_UndoDelete) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+			MariaTask* temp = program->findTask("Original Title")[0];
+
+			temp->setTitle("New Title 1");
+			program->archiveTask((*program->taskList)[0]);
+
+			program->undoLast();
+			Assert::AreEqual((string)"New Title 1", (*program->taskList)[0]->getTitle());
+			program->undoLast();
+			Assert::AreEqual((string)"Original Title", (*program->taskList)[0]->getTitle());
+			delete program;
+		}
+
+		//test case for undoing an 'add task'
+		TEST_METHOD(Task_UndoAdd) {
+			MariaTaskManager* program = new MariaTaskManager();
+			program->addTask("Original Title");
+			MariaTask* temp = program->findTask("Original Title")[0];
+			
+			Assert::AreEqual((string)"Original Title", (*program->taskList)[0]->getTitle());
+			program->undoLast();
+			Assert::IsTrue(program->taskList->empty());
+			delete program;
+		}
+
+		//Empty boundary test case for undo
+		TEST_METHOD(Task_UndoNothing) {
+			MariaTaskManager* program = new MariaTaskManager();
+			Assert::IsFalse(program->undoLast());
+			delete program;
+		}
+
+	};
+}
+	// End of segment: .\MariaTest\TaskTest.cpp
 
 
 

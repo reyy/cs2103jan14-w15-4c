@@ -1,0 +1,593 @@
+//@author: generated
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::doShowHide() {
+	RegisterHotKey(NULL, 1, MOD_CONTROL | MOD_NOREPEAT, VK_SPACE);
+	MSG msg;
+	while(GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		if (msg.message == WM_HOTKEY) {
+			emit mariaUI->triggerShowHideEvent();
+		}
+	}
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandDeleteAll(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->getAllTasks();
+		for (int i = 0; i < listOfTasks.size(); i++) {
+			mariaTaskManager->archiveTask(listOfTasks[i]);
+		}
+		saveToFile();
+
+		((MariaUIStateHome*)state)->eraseAllUITask();
+		return ("All tasks have been deleted.");
+	}
+
+	return ("");
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void __cdecl MariaLogic::doShowHideWrapper(void *mariaLogic) {
+	static_cast<MariaLogic*>(mariaLogic)->doShowHide();
+}
+
+int main(int argc, char *argv[]) {
+	// Enable memory leak dumping.
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtDumpMemoryLeaks();
+#endif
+	MariaLogic *mariaLogic = new MariaLogic(argc, argv);
+
+	int returnCode = QApplication::exec();
+	SAFE_DELETE(mariaLogic);
+
+	return returnCode;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUI.cpp
+	 */
+
+void MariaUI::showHideEvent() {
+	if (isVisible()) {
+		setWindowState(Qt::WindowState::WindowMinimized);
+		_trayIcon->show();
+		_trayIcon->showMessage("MARIA is still running!", "Press Ctrl + Space to show MARIA\nType \'exit\' to quit the program.");
+		hide();
+	} else {
+		setWindowState(Qt::WindowState::WindowActive);
+		_trayIcon->hide();
+		show();
+	}
+}
+
+void MariaUI::initWindow() {
+	QFont newFont("Century Gothic");
+	newFont.setStyleStrategy(QFont::PreferAntialias);
+	QApplication::setFont(newFont);
+
+	if (objectName().isEmpty()) {
+		setObjectName(QStringLiteral("MariaUI"));
+	}
+	setWindowFlags( Qt::FramelessWindowHint );
+	setWindowTitle(QApplication::translate("MariaUI", "MARIA", 0));
+
+	resize(WINDOW_DEFAULT_SIZE_X, WINDOW_DEFAULT_SIZE_Y);
+}
+
+void MariaUI::initButton() {
+	QPixmap imageHandleCloseButton("./Resources/ui_bt_close.png");
+	_btClose = new QToolButton(this);
+	_btClose->setAutoFillBackground(true);;
+	_btClose->setIcon(QIcon(imageHandleCloseButton));
+	_btClose->setIconSize(QSize(imageHandleCloseButton.width(), imageHandleCloseButton.height()));
+	_btClose->setFixedSize(QSize(imageHandleCloseButton.width(), imageHandleCloseButton.height()));
+	_btClose->setToolTip("Close Program");
+	_btClose->setStyleSheet("border:0px;");
+	_btClose->setGeometry(QRect(width() - imageHandleCloseButton.width() + CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
+
+	connect(_btClose, SIGNAL(clicked()), this , SLOT(quitAction()));
+}
+
+	// End of segment: .\MariaApp\\MariaUI.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUI.cpp
+	 */
+
+void MariaUI::initTrayIcon() {
+	_trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
+	_trayIcon->setToolTip("MARIA - Press Ctrl + Space to unhide");
+
+	QObject::connect(this, SIGNAL(triggerShowHideEvent()), this, SLOT(showHideEvent()));
+}
+
+void MariaUI::loadImages() {	
+	_taskTypeIconHandler[0] = new QPixmap("./Resources/ui_task_type_floating.png");
+	_taskTypeIconHandler[1] = new QPixmap("./Resources/ui_task_type_deadline.png");
+	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
+	_taskTypeIconHandler[3] = new QPixmap("./Resources/ui_completed.png");
+	_taskTypeIconHandler[4] = new QPixmap("./Resources/ui_not_completed.png");
+	_taskTypeIconHandler[5] = new QPixmap("./Resources/ui_maria_logo_1.png");
+	_taskTypeIconHandler[6] = new QPixmap("./Resources/ui_maria_logo_2.png");
+	_taskTypeIconHandler[7] = new QPixmap("./Resources/ui_maria_logo_3.png");
+	_taskTypeIconHandler[8] = new QPixmap("./Resources/ui_maria_logo_4.png");
+	_taskTypeIconHandler[9] = new QPixmap("./Resources/ui_maria_logo_5.png");
+	_taskTypeIconHandler[10] = new QPixmap("./Resources/ui_maria_logo_6.png");
+	_taskTypeIconHandler[11] = new QPixmap("./Resources/ui_loadingdots.png");
+	_taskTypeIconHandler[12] = new QPixmap("./Resources/help_0.png");
+	_taskTypeIconHandler[13] = new QPixmap("./Resources/help_1.png");
+	_taskTypeIconHandler[14] = new QPixmap("./Resources/help_2.png");
+	_taskTypeIconHandler[15] = new QPixmap("./Resources/help_3.png");
+	_taskTypeIconHandler[16] = new QPixmap("./Resources/help_4.png");
+	_taskTypeIconHandler[17] = new QPixmap("./Resources/help_5.png");
+}
+
+void MariaUI::unloadImages() {
+	for (int i = 0; i < AMOUNT_OF_IMAGES; i++) {
+		SAFE_DELETE(_taskTypeIconHandler[i]);
+	}
+}
+
+	// End of segment: .\MariaApp\\MariaUI.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIClock.cpp
+	 */
+
+MariaUIClock::MariaUIClock(QMainWindow* qmainWindow) {
+	assert(qmainWindow != NULL);
+	
+	_qmainWindow = qmainWindow;
+
+	_currentTime = new QLabel(_qmainWindow);
+	_currentTime->setAlignment(Qt::AlignRight);
+	_currentTime->setStyleSheet("color:#ffffff; font-size:40px;");
+	_currentTime->hide();
+	_currentDate = new QLabel(_qmainWindow);
+	_currentDate->setAlignment(Qt::AlignLeft);
+	_currentDate->setStyleSheet("color:#ffffff; font-size:15px; font-weight:bold;");
+	_currentDate->hide();
+	_currentDay = new QLabel(_qmainWindow);
+	_currentDay->setAlignment(Qt::AlignLeft);
+	_currentDay->setStyleSheet("color:#ffffff; font-size:15px; font-weight:bold;");
+	_currentDay->hide();
+	_line = new QLabel(_qmainWindow);
+	_line->setPixmap(QPixmap("./Resources/ui_clock_divider.png"));
+	_line->hide();
+
+	_clockTimer = new QTimer(this);
+	connect(_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
+}
+
+	// End of segment: .\MariaApp\\MariaUIClock.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIPreview.cpp
+	 */
+
+MariaUIPreview::MariaUIPreview(QMainWindow* qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow=qmainWindow;
+
+	_textToday = new QLabel(_qmainWindow);
+	_textToday->setStyleSheet("color:#ffffff; font-size:10px;");
+	_textToday->setText("Today");
+	_textToday->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textToday->show();
+
+	_textTodayBody = new QLabel(_qmainWindow);
+	_textTodayBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
+	_textTodayBody->setAlignment(Qt::AlignTop);
+	_textTodayBody->setWordWrap(true);
+	_textTodayBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textTodayBody->show();
+
+	_lineToday = new QLabel(_qmainWindow);
+	_lineToday->setPixmap(QPixmap("./Resources/ui_divider.png"));
+	_lineToday->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_lineToday->show();
+
+	_textTomorrow = new QLabel(_qmainWindow);
+	_textTomorrow->setStyleSheet("color:#ffffff; font-size:10px;");
+	_textTomorrow->setText("Tomorrow");
+	_textTomorrow->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textTomorrow->show();
+
+	_textTomorrowBody = new QLabel(_qmainWindow);
+	_textTomorrowBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
+	_textTomorrowBody->setAlignment(Qt::AlignTop);
+	_textTomorrowBody->setWordWrap(true);
+	_textTomorrowBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textTomorrowBody->show();
+
+	_lineTomorrow = new QLabel(_qmainWindow);
+	_lineTomorrow->setPixmap(QPixmap("./Resources/ui_divider.png"));
+	_lineTomorrow->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_lineTomorrow->show();
+
+	_textCalendar = new QLabel(_qmainWindow);
+	_textCalendar->setStyleSheet("color:#ffffff; font-size:10px;");
+	_textCalendar->setText("Outlook for the Week");
+	_textCalendar->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textCalendar->show();
+
+	_textCalendarBody = new QLabel(_qmainWindow);
+	_textCalendarBody->setStyleSheet("color:#ffffff; font-size:" + QString::number(FONT_SIZE) + "px;");
+	_textCalendarBody->setAlignment(Qt::AlignTop);
+	_textCalendarBody->setWordWrap(true);
+	_textCalendarBody->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_textCalendarBody->show();
+
+	_lineCalendar = new QLabel(_qmainWindow);
+	_lineCalendar->setPixmap(QPixmap("./Resources/ui_divider.png"));
+	_lineCalendar->setGeometry(QRect(-_qmainWindow->width(), -_qmainWindow->height(), 0.0, 0.0));
+	_lineCalendar->show();
+
+	_generatedTodayText = "";
+	_generatedTomorrowText = "";
+	_generatedSuggestionText = "";
+}
+
+	// End of segment: .\MariaApp\\MariaUIPreview.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateCredits.cpp
+	 */
+
+void MariaUIStateCredits::initBeginState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
+
+	_displayText->setStyleSheet("color:#ffffff;font-size:" + QString::number(FONT_SIZE) + "px;font-weight:bold;");
+	_displayText->setAlignment(Qt::AlignCenter);
+	_displayText->setGeometry(QRect(_qmainWindow->width(), _qmainWindow->height(), 0.0, 0.0));
+	_displayText->setText(QString::fromStdString(CREDITS_STRING));
+	_displayText->show();
+
+	_displayTextBody->setStyleSheet("color:#ffffff;font-size:" + QString::number(FONT_SIZE_BODY) + "px;");
+	_displayTextBody->setAlignment(Qt::AlignCenter);
+	_displayTextBody->setGeometry(QRect(_qmainWindow->width(), _qmainWindow->height(), 0.0, 0.0));
+	_displayTextBody->setText(QString::fromStdString(CREDITS_STRING_BODY));
+	_displayTextBody->show();
+
+	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON));
+	_logo->setAlignment(Qt::AlignCenter);
+	_logo->setGeometry(QRect(_qmainWindow->width(), _qmainWindow->height(), 0.0, 0.0));
+	_logo->show();
+}
+
+	// End of segment: .\MariaApp\\MariaUIStateCredits.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateDisplay.cpp
+	 */
+
+MariaUIStateDisplay::MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow = qmainWindow;
+	_taskStartHeight = _qmainWindow->height() * taskStartHeight;
+	_page = 0;
+	_maxTaskDisplay = maxTaskDisplay;
+	
+	_pageText = new QLabel(_qmainWindow);
+	_pageText->setStyleSheet("color:rgba(255, 255, 255, 200); font-size:" + QString::number(FONT_SIZE) + "px;");
+	_pageText->setAlignment(Qt::AlignCenter);
+	_pageText->hide();
+}
+
+MariaUIStateDisplay::~MariaUIStateDisplay() {
+	clearUITask();
+	SAFE_DELETE(_pageText);
+}
+
+	// End of segment: .\MariaApp\\MariaUIStateDisplay.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateShow.cpp
+	 */
+
+const float MariaUIStateShow::TASKBAR_STARTHEIGHT_SCALE = 0.1;
+const float MariaUIStateShow::TASK_STARTHEIGHT_SCALE = 0.23;
+const float MariaUIStateShow::TITLE_WIDTH = 420.0;
+const float MariaUIStateShow::TITLE_HEIGHT = 50.0;
+const float MariaUIStateShow::TITLE_HEIGHT_SCALE = 0.15;
+
+MariaUIStateShow::MariaUIStateShow(QMainWindow* qmainWindow, string title, vector<MariaTask*> listOfTasks) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
+	assert(qmainWindow != NULL);
+	
+	_listOfTasks = listOfTasks;
+
+	_titleLabel = new QLabel(_qmainWindow);
+	_titleLabel->setStyleSheet("color:#ffffff; font-size:22px; font-weight:bold;");
+	_titleLabel->setAlignment(Qt::AlignCenter);
+	_titleLabel->setText(QString::fromStdString(title));
+	_titleLabel->hide();
+}
+
+MariaUIStateShow::~MariaUIStateShow() {
+	clearUITask();
+	SAFE_DELETE(_titleLabel);
+}
+
+	// End of segment: .\MariaApp\\MariaUIStateShow.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateType.h
+	 */
+
+#pragma once
+
+typedef enum {
+	BLANK, 
+	HOME, 
+	SHOW, 
+	HELP, 
+	CONFLICT, 
+	LOADING, 
+	CREDITS, 
+	QUIT
+} StateType;
+	// End of segment: .\MariaApp\\MariaUIStateType.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStatus.cpp
+	 */
+
+void MariaUIStatus::loadImages() {
+	_imageHandle[IMAGE_INDEX_OK] = new QPixmap("./Resources/ui_status_recognise.png");
+	_imageHandle[IMAGE_INDEX_UNKNOWN] = new QPixmap("./Resources/ui_status_unknown.png");
+	_imageHandle[IMAGE_INDEX_WAIT_0] = new QPixmap("./Resources/ui_status_wait_0.png");
+	_imageHandle[IMAGE_INDEX_WAIT_1] = new QPixmap("./Resources/ui_status_wait_1.png");
+	_imageHandle[IMAGE_INDEX_WAIT_2] = new QPixmap("./Resources/ui_status_wait_2.png");
+	_imageHandle[IMAGE_INDEX_WAIT_3] = new QPixmap("./Resources/ui_status_wait_3.png");
+}
+
+	// End of segment: .\MariaApp\\MariaUIStatus.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITask.cpp
+	 */
+
+bool MariaUITask::updatePosition() {
+	if (_active) {
+		if (abs(_position.x() - _destination.x())>VALUE_THRESHOLD || 
+			abs(_position.y() - _destination.y())>VALUE_THRESHOLD) {
+				_position.setX(_position.x() + (_destination.x() - _position.x()) * FLOW_FACTOR);
+				_position.setY(_position.y() + (_destination.y() - _position.y()) * FLOW_FACTOR);
+				switch(_currentDisplayType) {
+				case NORMAL:
+					if (_taskType == MariaTask::FLOATING) {
+						_displayTitle->setGeometry(_position.x(), _position.y(), _qmainWindow->width(), TASK_HEIGHT_FLOATING);
+					} else {
+						_displayTitle->setGeometry(_position.x(), _position.y(), _qmainWindow->width(), TASK_HEIGHT);
+					}
+					_timeText->setGeometry(_position.x() + TIMESTAMP_X_OFFSET, _position.y() + TASK_HEIGHT - TIME_Y_OFFSET - FONT_SIZE_TIME, _qmainWindow->width(), TASK_HEIGHT);
+					break;
+				case EXPANDED:
+					_displayTitle->setGeometry(_position.x(), _position.y(), _qmainWindow->width(), TASK_HEIGHT_EXPANDED);
+					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET + TASK_WIDTH_SHORTEN , TASK_HEIGHT_EXPANDED - DESCRIPTION_Y_OFFSET * 2);
+					_startEndText->setGeometry(_position.x() + _qmainWindow->width() - TEXTBOX_X_OFFSET - START_END_TIME_WIDTH - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), _position.y() + DESCRIPTION_Y_OFFSET * 0.5, START_END_TIME_WIDTH, TASK_HEIGHT_EXPANDED - DESCRIPTION_Y_OFFSET);
+					_completed->setGeometry(_position.x() + _qmainWindow->width() - TEXTBOX_X_OFFSET - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(),  _position.y() + DESCRIPTION_Y_OFFSET * 0.5, (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->height());
+					break;
+				case DETAILED:
+					_displayTitle->setGeometry(_position.x(), _position.y(), _qmainWindow->width(), TASK_HEIGHT_DETAILED);
+					_desciptionText->setGeometry(_position.x() + TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET, _position.y() + DESCRIPTION_Y_OFFSET, TEXTBOX_X_OFFSET + DESCRIPTION_X_OFFSET + TASK_WIDTH_SHORTEN , TASK_HEIGHT_DETAILED - DESCRIPTION_Y_OFFSET * 2);
+					_startEndText->setGeometry(_position.x() + _qmainWindow->width() - TEXTBOX_X_OFFSET - START_END_TIME_WIDTH - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), _position.y() + DESCRIPTION_Y_OFFSET * 0.5, START_END_TIME_WIDTH, TASK_HEIGHT_DETAILED - DESCRIPTION_Y_OFFSET);
+					_completed->setGeometry(_position.x() + _qmainWindow->width() - TEXTBOX_X_OFFSET - (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(),  _position.y() + DESCRIPTION_Y_OFFSET * 0.5, (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->width(), (MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED))->height());
+					break;
+				}
+				_typeOfTask->setGeometry(_position.x() + TEXTBOX_X_OFFSET + BULLET_X_OFFSET, _position.y() + BULLET_Y_OFFSET, (MariaUI::getImageHandler(_taskType))->width(), (MariaUI::getImageHandler(_taskType))->height());
+				return true;
+		} else {
+			if (_updatePositionTimer->isActive()) {
+				_updatePositionTimer->stop();
+			}
+			_atLocation = true;
+			//Check if it has the chance of deactivating itself.
+			if (_position.y() < 0.0 || _position.y() > _qmainWindow->height()) {
+				deactivate();
+			}
+			return false;
+		}
+	}
+
+	return false;
+}
+
+	// End of segment: .\MariaApp\\MariaUITask.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITask.cpp
+	 */
+
+void MariaUITask::setDisplayTitle() {
+
+	_displayTitle = new QLabel(_qmainWindow);
+	_displayTitle->setAlignment(Qt::AlignLeft);
+	_displayTitle->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_displayTitle->hide();
+
+	switch(_currentDisplayType) {
+
+	case EXPANDED:
+		_displayTitle->setStyleSheet("color:#000000; padding-left: " + QString::number(BULLET_SPACE + TEXTBOX_X_OFFSET) + "px; background-color:rgba(255, 255, 255, 255);border: 1px solid rgba(200, 200, 200, 255);font-size:" + QString::number(FONT_SIZE_TITLE) + "px;");
+		break;
+	case DETAILED:
+		_displayTitle->setStyleSheet("color:#000000; padding-left: " + QString::number(BULLET_SPACE + TEXTBOX_X_OFFSET) + "px; background-color:rgba(255, 255, 255, 255);border: 1px solid rgba(200, 200, 200, 255);font-size:" + QString::number(FONT_SIZE_TITLE_DETAILED) + "px;");
+		break;
+	case NORMAL:
+	default:
+		_displayTitle->setStyleSheet("color:#000000; padding-left: " + QString::number(BULLET_SPACE + TEXTBOX_X_OFFSET) + "px; background-color:rgba(255, 255, 255, 255);border: 1px solid rgba(200, 200, 200, 255);font-size:" + QString::number(FONT_SIZE_TITLE) + "px;");
+		break;
+	}
+
+	_typeOfTask = new QLabel(_qmainWindow);
+	_typeOfTask->setPixmap(*(MariaUI::getImageHandler(_taskType)));
+	_typeOfTask->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_typeOfTask->hide();
+}
+
+void MariaUITask::setTimeTitle() {
+	_timeText = new QLabel(_qmainWindow);
+	_timeText->setAlignment(Qt::AlignRight);
+	_timeText->setStyleSheet("color:#000000;font-size:" + QString::number(FONT_SIZE_TIME) + "px; padding-right: " + QString::number(TEXTBOX_X_OFFSET) + "px;");
+	_timeText->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_timeText->hide();
+}
+
+void MariaUITask::setDescription() {
+	_desciptionText = new QLabel(_qmainWindow);
+	_desciptionText->setStyleSheet("color:#000000;font-size:" + QString::number(FONT_SIZE_DESCRIPTION) + "px; padding-right: " + QString::number(TEXTBOX_X_OFFSET) + "px;");
+	_desciptionText->setAlignment(Qt::AlignLeft);
+	_desciptionText->setWordWrap(true);
+	_desciptionText->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_desciptionText->hide();
+}
+
+void MariaUITask::setTimeAndIcon() {
+	_startEndText = new QLabel(_qmainWindow);
+	_startEndText->setStyleSheet("color:#000000;font-size:" + QString::number(FONT_SIZE_DESCRIPTION) + "px;");
+	_startEndText->setAlignment(Qt::AlignRight);
+	_startEndText->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_startEndText->hide();
+
+	_completed = new QLabel(_qmainWindow);
+	_completed->setAlignment(Qt::AlignCenter);
+	_completed->setStyleSheet("color:#000000;font-size:" + QString::number(FONT_SIZE_DESCRIPTION) + "px;");
+	_completed->setGeometry(-_qmainWindow->width(), 0, 0, 0);
+	_completed->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED));
+	_completed->hide();
+}
+	// End of segment: .\MariaApp\\MariaUITask.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITextbox.cpp
+	 */
+
+const float MariaUITextbox::FONT_SIZE_TYPED_TEXT = 14.0;
+const float MariaUITextbox::FONT_SIZE_QUESTION_TEXT = 16.0;
+
+MariaUITextbox::MariaUITextbox(QMainWindow* qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow = qmainWindow;
+
+	_inputBox = new QLineEdit(_qmainWindow);
+	_inputBox->setStyleSheet("background-color: #ffffff;border:0px;border-radius: 5px;color:#000000;font-size:" + QString::number(FONT_SIZE_TYPED_TEXT) + "px;");
+	_inputBox->installEventFilter(_qmainWindow);
+
+	_suggestText = new QLabel(_qmainWindow);
+	_suggestText->setStyleSheet("background-color: rgba(0, 0, 0, 0);border:0px;color:#555555;font-size:" + QString::number(FONT_SIZE_TYPED_TEXT) + "px;");
+
+	_questionText = new QLabel(_qmainWindow);
+	_questionText->setStyleSheet("background-color: rgba(0, 0, 0, 0);border:0px;color:#ffffff;font-weight:bold;font-size:" + QString::number(FONT_SIZE_QUESTION_TEXT) + "px;");
+	_questionText->setAlignment(Qt::AlignBottom|Qt::AlignLeft);
+	_questionText->setWordWrap(true);
+
+	_updateSuggestTextTimer = new QTimer(_qmainWindow);
+	connect(_updateSuggestTextTimer, SIGNAL(timeout()), this, SLOT(updateSuggestText()));
+	updateSuggestText();
+	_updateSuggestTextTimer->start(SUGGEST_TEXT_UPDATE_TIME);
+}
+
+MariaUITextbox::~MariaUITextbox() {
+	if (_updateSuggestTextTimer->isActive()) {
+		_updateSuggestTextTimer->stop();
+	}
+
+	SAFE_DELETE(_updateSuggestTextTimer);
+	SAFE_DELETE(_suggestText);
+	SAFE_DELETE(_inputBox);
+	SAFE_DELETE(_questionText);
+}
+
+	// End of segment: .\MariaApp\\MariaUITextbox.cpp
+
+
+
+
+

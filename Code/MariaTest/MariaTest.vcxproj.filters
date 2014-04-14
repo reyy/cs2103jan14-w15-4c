@@ -32,9 +32,6 @@
     <ClCompile Include="TaskTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileManagerTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IntegratedTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
