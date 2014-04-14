@@ -49,6 +49,8 @@ private:
 	void parseEditEndTime(string input, MariaInputObject* inputObject);
 	void parseEditDescription(string input, MariaInputObject* inputObject);
 	void parseShow(string input, MariaInputObject* inputObject, StateType currentState);
+	void parseShowDateFormat(string input, MariaInputObject* inputObject);
+	void parseShowDateRange(string input, MariaInputObject* inputObject);
 	void parseSearch(string input, MariaInputObject* inputObject, StateType currentState);
 	void parseDelete(string input, MariaInputObject* inputObject, StateType currentState);
 	void parseMarkDone(string input, MariaInputObject* inputObject, StateType currentState);

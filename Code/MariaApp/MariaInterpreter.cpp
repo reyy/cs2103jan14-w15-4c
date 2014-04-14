@@ -38,36 +38,36 @@ MariaInterpreter::MariaInterpreter(map<string, MariaInputObject::CommandType>* i
 	commandKeywordList = inputCommandList;
 	if (commandKeywordList == NULL) {
 		commandKeywordList = new map<string, MariaInputObject::CommandType>();
-	}
 
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("add", MariaInputObject::CommandType::ADD));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("create", MariaInputObject::CommandType::ADD));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("edit", MariaInputObject::CommandType::EDIT));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("update", MariaInputObject::CommandType::EDIT));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("show", MariaInputObject::CommandType::SHOW));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("view", MariaInputObject::CommandType::SHOW));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("search", MariaInputObject::CommandType::SEARCH));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("find", MariaInputObject::CommandType::SEARCH));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("complete", MariaInputObject::CommandType::MARK_DONE));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("done", MariaInputObject::CommandType::MARK_DONE));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("incomplete", MariaInputObject::CommandType::MARK_UNDONE));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("uncomplete", MariaInputObject::CommandType::MARK_UNDONE));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("undone", MariaInputObject::CommandType::MARK_UNDONE));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("delete", MariaInputObject::CommandType::DELETE_TASK));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("remove", MariaInputObject::CommandType::DELETE_TASK));
-	//commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("clear", MariaInputObject::CommandType::DELETE_ALL));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("undo", MariaInputObject::CommandType::UNDO));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("back", MariaInputObject::CommandType::GO_HOME));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("home", MariaInputObject::CommandType::GO_HOME));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("help", MariaInputObject::CommandType::GO_HELP));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("credits", MariaInputObject::CommandType::GO_CREDITS));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("credit", MariaInputObject::CommandType::GO_CREDITS));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("up", MariaInputObject::CommandType::PAGE_UP));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("down", MariaInputObject::CommandType::PAGE_DOWN));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("left", MariaInputObject::CommandType::PAGE_LEFT));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("right", MariaInputObject::CommandType::PAGE_RIGHT));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("exit", MariaInputObject::CommandType::EXIT));
-	commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("quit", MariaInputObject::CommandType::EXIT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("add", MariaInputObject::CommandType::ADD));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("create", MariaInputObject::CommandType::ADD));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("edit", MariaInputObject::CommandType::EDIT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("update", MariaInputObject::CommandType::EDIT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("show", MariaInputObject::CommandType::SHOW));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("view", MariaInputObject::CommandType::SHOW));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("search", MariaInputObject::CommandType::SEARCH));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("find", MariaInputObject::CommandType::SEARCH));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("complete", MariaInputObject::CommandType::MARK_DONE));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("done", MariaInputObject::CommandType::MARK_DONE));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("incomplete", MariaInputObject::CommandType::MARK_UNDONE));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("uncomplete", MariaInputObject::CommandType::MARK_UNDONE));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("undone", MariaInputObject::CommandType::MARK_UNDONE));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("delete", MariaInputObject::CommandType::DELETE_TASK));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("remove", MariaInputObject::CommandType::DELETE_TASK));
+		//commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("clear", MariaInputObject::CommandType::DELETE_ALL));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("undo", MariaInputObject::CommandType::UNDO));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("back", MariaInputObject::CommandType::GO_HOME));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("home", MariaInputObject::CommandType::GO_HOME));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("help", MariaInputObject::CommandType::GO_HELP));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("credits", MariaInputObject::CommandType::GO_CREDITS));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("credit", MariaInputObject::CommandType::GO_CREDITS));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("up", MariaInputObject::CommandType::PAGE_UP));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("down", MariaInputObject::CommandType::PAGE_DOWN));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("left", MariaInputObject::CommandType::PAGE_LEFT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("right", MariaInputObject::CommandType::PAGE_RIGHT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("exit", MariaInputObject::CommandType::EXIT));
+		commandKeywordList->insert(pair<string, MariaInputObject::CommandType>("quit", MariaInputObject::CommandType::EXIT));
+	}
 }
 
 MariaInterpreter::~MariaInterpreter(void) {
@@ -462,6 +462,7 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, St
 	int dummyVar = 0;
 
 	if (input.size() == 0) {
+		// If the command is merely "show", we shall assume it to be "show today"
 		inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime()));
 	} else if (isStringEqual(input, MODIFIER_ALL_TASKS)) {
@@ -473,105 +474,11 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, St
 		inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
 		inputObject->setEndTime(new MariaTime(MariaTime::getCurrentTime().getYear(), MariaTime::getCurrentTime().getMonth(), MariaTime::getCurrentTime().getDay()+1));
 	} else if (hasDate(input)) {
-		// Need to check if there are 1 or more dates.
+		// Need to check if it is a SHOW_DATE_RANGE command
 		if (hasDateTime(extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_START, dummyVar)) && hasDateTime(extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_END, dummyVar))) {
-			// End time
-			int delimiterPos = 0;
-			string dateTimeString = extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_END, delimiterPos);
-
-			input = input.substr(0, delimiterPos);
-
-			if (dateTimeString.size() == 0) {
-				SAFE_DELETE(inputObject);
-				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
-			}
-
-			dateTimeString = trimWhiteSpace(dateTimeString);
-			vector<string> tokenizedDateTime = tokenizeString(dateTimeString);
-			removeTokens(tokenizedDateTime, 0, 1);
-
-			MariaTime* endTime;
-
-			try {
-				endTime = parseDateTimeString(tokenizedDateTime);
-			} catch (exception& e) {
-				SAFE_DELETE(inputObject);
-				throw;
-			}
-
-			inputObject->setEndTime(endTime);
-
-			// Start time
-			delimiterPos = 0;
-			dateTimeString = extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_START, delimiterPos);
-
-			input = input.substr(0, delimiterPos);
-
-			if (dateTimeString.size() == 0) {
-				SAFE_DELETE(inputObject);
-				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
-			}
-
-			dateTimeString = trimWhiteSpace(dateTimeString);
-			tokenizedDateTime = tokenizeString(dateTimeString);
-			removeTokens(tokenizedDateTime, 0, 1);
-
-			MariaTime* startTime;
-
-			try {
-				startTime = parseDateTimeString(tokenizedDateTime);
-			} catch (exception& e) {
-				SAFE_DELETE(inputObject);
-				throw;
-			}
-
-			inputObject->setStartTime(startTime);
-			inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE_RANGE);
-
-			while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
-				MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
-
-				inputObject->setEndTime(newEndTime);
-			}
+			parseShowDateRange(input, inputObject);
 		} else if (isStringEqual(input, EXPRESSION_DATE_FORMAT)) {
-			int seperatorPos = 0;
-			char seperatorArray[2] = { '/', '-' };
-
-			for (int j = 0; j < 2; j++) {
-				seperatorPos = input.find(seperatorArray[j]);
-
-				if (seperatorPos != string::npos) {
-					vector<string> workingList = tokenizeString(input, seperatorArray[j]);
-
-					if (workingList.size() != 3) {
-						SAFE_DELETE(inputObject);
-						throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
-					}
-
-					int day = atoi(workingList[0].c_str());
-					int month = atoi(workingList[1].c_str());
-					int year = atoi(workingList[2].c_str());
-
-					if (day <= 0) {
-						day = 1;
-					} else if (day >= 32) {
-						day = 31;
-					}
-
-					if (month <= 0) {
-						month = 1;
-					} else if (month >= 13) {
-						month = 12;
-					}
-
-					if (year < 100) {
-						year += 2000;
-					}
-
-					break;
-				}
-			}
-			inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
+			
 		} else if (isStringContain(input, EXPRESSION_MONTHS_OF_YEAR)) {
 			int year = MariaTime::getCurrentTime().getYear();
 			int month;
@@ -612,18 +519,13 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, St
 				inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
 			}
 
-			// Check to see if the month is past today's date.
-			// If it is, advance by one year.
-			if (month < MariaTime::getCurrentTime().getMonth()) {
-				year++;
-			}
 			inputObject->setEndTime(new MariaTime(year, month, day));
 		} else if (isStringEqual(input, EXPRESSION_DAYS_OF_WEEK)) {
 			int year = MariaTime::getCurrentTime().getYear();
 			int month = MariaTime::getCurrentTime().getMonth();
 			int day = MariaTime::getCurrentTime().getDay();
 
-			// do that minus magic thingy
+			// Check if the day is not in the past.
 			int currentDayOfWeek = MariaTime::getCurrentTime().getDayWeek();
 			int inputDayOfWeek = getDayOfWeek(input);
 			int differenceInDays = inputDayOfWeek - currentDayOfWeek;
@@ -634,14 +536,114 @@ void MariaInterpreter::parseShow(string input, MariaInputObject* inputObject, St
 				day += differenceInDays;
 			}
 
-			// Also check if the preceding token is "next".
-			// If it is, add a week to this day.
 			inputObject->setEndTime(new MariaTime(year, month, day));
 			inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
 		}
 	} else {
 		SAFE_DELETE(inputObject);
 		throw exception(MESSAGE_INVALID_COMMAND.c_str());
+	}
+}
+
+void MariaInterpreter::parseShowDateFormat(string input, MariaInputObject* inputObject) {
+	int seperatorPos = 0;
+	const char seperatorArray[2] = { '/', '-' };
+
+	for (int j = 0; j < 2; j++) {
+		seperatorPos = input.find(seperatorArray[j]);
+
+		if (seperatorPos != string::npos) {
+			vector<string> workingList = tokenizeString(input, seperatorArray[j]);
+
+			if (workingList.size() != 3) {
+				SAFE_DELETE(inputObject);
+				throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+			}
+
+			int day = atoi(workingList[0].c_str());
+			int month = atoi(workingList[1].c_str());
+			int year = atoi(workingList[2].c_str());
+
+			if (day <= 0) {
+				day = 1;
+			} else if (day >= 32) {
+				day = 31;
+			}
+
+			if (month <= 0) {
+				month = 1;
+			} else if (month >= 13) {
+				month = 12;
+			}
+
+			if (year < 100) {
+				year += 2000;
+			}
+
+			break;
+		}
+	}
+	inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE);
+}
+
+void MariaInterpreter::parseShowDateRange(string input, MariaInputObject* inputObject) {
+	// End time
+	int delimiterPos = 0;
+	string dateTimeString = extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_END, delimiterPos);
+
+	input = input.substr(0, delimiterPos);
+
+	if (dateTimeString.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	dateTimeString = trimWhiteSpace(dateTimeString);
+	vector<string> tokenizedDateTime = tokenizeString(dateTimeString);
+	removeTokens(tokenizedDateTime, 0, 1);
+
+	MariaTime* endTime;
+
+	try {
+		endTime = parseDateTimeString(tokenizedDateTime);
+	} catch (exception& e) {
+		SAFE_DELETE(inputObject);
+		throw;
+	}
+
+	inputObject->setEndTime(endTime);
+
+	// Start time
+	delimiterPos = 0;
+	dateTimeString = extractFromBackOfString(input, DELIMITER_SHOW_DATE_RANGE_START, delimiterPos);
+
+	input = input.substr(0, delimiterPos);
+
+	if (dateTimeString.size() == 0) {
+		SAFE_DELETE(inputObject);
+		throw exception(MESSAGE_INVALID_DATE_TIME.c_str());
+	}
+
+	dateTimeString = trimWhiteSpace(dateTimeString);
+	tokenizedDateTime = tokenizeString(dateTimeString);
+	removeTokens(tokenizedDateTime, 0, 1);
+
+	MariaTime* startTime;
+
+	try {
+		startTime = parseDateTimeString(tokenizedDateTime);
+	} catch (exception& e) {
+		SAFE_DELETE(inputObject);
+		throw;
+	}
+
+	inputObject->setStartTime(startTime);
+	inputObject->setCommandType(MariaInputObject::CommandType::SHOW_DATE_RANGE);
+
+	while (inputObject->getStartTime()->compareTo(*inputObject->getEndTime()) > 0) {
+		MariaTime* newEndTime = new MariaTime(inputObject->getEndTime()->getYear(), inputObject->getEndTime()->getMonth(), inputObject->getEndTime()->getDay()+7, inputObject->getEndTime()->getHour(), inputObject->getEndTime()->getMin());
+
+		inputObject->setEndTime(newEndTime);
 	}
 }
 
