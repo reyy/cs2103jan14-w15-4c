@@ -1,3 +1,4 @@
+//@author A0111823U
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
@@ -19,13 +20,6 @@ namespace MariaTest {
 
 			delete temp2;
 			delete program;
-		}
-
-		TEST_METHOD(Task_GetAllTask) {
-			MariaTaskManager* program = new MariaTaskManager();
-			//program->taskList = NULL;
-			program->getAllTasks();
-			Assert::IsTrue(true);
 		}
 
 		TEST_METHOD(Task_Sort) {

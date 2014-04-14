@@ -159,6 +159,7 @@ void MariaUI::updateBackgroundColor() {
 	this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
 }
 
+//@author generated
 void MariaUI::showHideEvent() {
 	if(isVisible()) {
 		setWindowState(Qt::WindowState::WindowMinimized);
