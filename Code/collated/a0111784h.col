@@ -3,78 +3,782 @@
 
 
 	/**
-	 * origin: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaUI.cpp
+	 * origin: .\MariaApp\\MariaLogic.cpp
 	 */
 
+MariaLogic::~MariaLogic(void) {
+	SAFE_DELETE(mariaFileManager);
+	SAFE_DELETE(mariaTaskManager);
+	SAFE_DELETE(mariaInterpreter);
+	SAFE_DELETE(mariaStateManager);
+	SAFE_DELETE(mariaUI);
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::generateTextforUI() {
+	if (mariaStateManager->getCurrentState() == StateType::HOME) {
+		MariaUIPreview* preview = ((MariaUIStateHome*)mariaStateManager->getCurrentStateObject())->getUIPreview();
+
+		MariaTime now=MariaTime::getCurrentTime();
+		MariaTime startOfDay(now.getYear(), now.getMonth(), now.getDay(), 0, 0);
+		MariaTime endOfDay(now.getYear(), now.getMonth(), now.getDay(), 23, 59);
+		MariaTime endOfTomorrow(now.getYear(), now.getMonth(), now.getDay() + 1, 23, 59);
+		MariaTime startOfTomorrow(now.getYear(), now.getMonth(), now.getDay() + 1, 0, 0);
+
+		//Generate Task for UIPreview.
+		vector<MariaTask*> taskListNow = mariaTaskManager->findTask(&now, &endOfDay, MariaTask::TaskType::TIMED, false);
+		vector<MariaTask*> taskListAll = mariaTaskManager->findTask(&startOfDay, &endOfDay, MariaTask::TaskType::TIMED, false);
+		vector<MariaTask*> taskListDeadLine = mariaTaskManager->findTask(&now, &endOfDay, MariaTask::TaskType::DEADLINE, false);
+		vector<MariaTask*> taskListTomorrow = mariaTaskManager->findTask(&startOfTomorrow, &endOfTomorrow, MariaTask::TaskType::TIMED, false);
+		vector<MariaTask*> taskListTomorrowDeadLine = mariaTaskManager->findTask(&startOfTomorrow, &endOfTomorrow, MariaTask::TaskType::DEADLINE, false);
+		vector<MariaTask*> taskListSuggest = mariaTaskManager->findTask(MariaTask::TaskType::FLOATING, false);
+
+		//Nearest free day in a week. Day starts from 0. -1 denotes no free day.
+		int freeDay = - 1;
+		for (int i = 0; i < 7; i++) {	
+			MariaTime startOfFreeDay(now.getYear(), now.getMonth(), now.getDay() + i, 0, 0);
+			MariaTime endOfFreeDay(now.getYear(), now.getMonth(), now.getDay() + i, 23, 59);
+			vector<MariaTask*> freeDayList = mariaTaskManager->findTask(&startOfFreeDay, &endOfFreeDay, false);
+			if (freeDayList.size() == 0) {
+				freeDay = (now.getDay() + i) % 7;
+				break;
+			}
+		}
+
+		preview->generateTodayText(taskListNow, taskListAll, taskListDeadLine);
+		preview->generateTomorrowText(taskListTomorrow, taskListTomorrowDeadLine);
+		preview->generateSuggestionText(freeDay, taskListSuggest);
+		preview->updateText();
+	}
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+void MariaLogic::initStartingState() {
+	MariaUIStateLoading* temp = new MariaUIStateLoading((QMainWindow*)mariaUI);
+	mariaStateManager->queueState(StateType::LOADING, temp);
+	temp->setDisplayText(MariaText::LOADING);
+	temp->setLoadingDone();
+	
+	mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandEditStartTime(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToEdit = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
+			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit - 1);
+			// Check to see if the task even has an start time to begin with.
+			if (toEditTask->getMariaTask()->getStart() == NULL) {
+				throw MariaText::TASK_UPDATE_TYPE_ERROR;
+			}
+			// Check to see if the new time is past the end time.
+			if (toEditTask->getMariaTask()->getEnd()->compareTo(*input->getEditTime()) < 0) {
+				throw MariaText::TASK_UPDATE_START_TIME_ERROR;
+			}
+
+			toEditTask->getMariaTask()->setStart(input->getEditTime());
+			saveToFile();
+
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATED_TIME;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				// Check to see if the task even has an start time to begin with.
+				if (listOfTasks[0]->getStart() == NULL) {
+					throw MariaText::TASK_UPDATE_TYPE_ERROR;
+				}
+				// Check to see if the new time is past the end time.
+				if (listOfTasks[0]->getEnd()->compareTo(*input->getEditTime()) < 0) {
+					throw MariaText::TASK_UPDATE_START_TIME_ERROR;
+				}
+
+				listOfTasks[0]->setStart(input->getEditTime());
+				saveToFile();
+				return MariaText::TASK_UPDATED_TIME;
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+	
+	return MariaText::EMPTY_STRING;
+}
+
+string MariaLogic::runCommandEditEndTime(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToEdit = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
+			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit - 1);
+			// Check to see if the task even has an end time to begin with.
+			if (toEditTask->getMariaTask()->getEnd() == NULL) {
+				throw MariaText::TASK_UPDATE_TYPE_ERROR;
+			}
+			// Check to see if the new time is before the start time.
+			if (toEditTask->getMariaTask()->getStart() != NULL && toEditTask->getMariaTask()->getStart()->compareTo(*input->getEditTime()) > 0) {
+				throw MariaText::TASK_UPDATE_END_TIME_ERROR;
+			}
+			toEditTask->getMariaTask()->setEnd(input->getEditTime());
+			saveToFile();
+					
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATED_TIME;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				// Check to see if the task even has an end time to begin with.
+				if (listOfTasks[0]->getEnd() == NULL) {
+					throw MariaText::TASK_UPDATE_TYPE_ERROR;
+				}
+				// Check to see if the new time is before the start time.
+				if (listOfTasks[0]->getStart() != NULL && listOfTasks[0]->getStart()->compareTo(*input->getEditTime()) > 0) {
+					throw MariaText::TASK_UPDATE_END_TIME_ERROR;
+				}
+				listOfTasks[0]->setEnd(input->getEditTime());
+				saveToFile();
+				return MariaText::TASK_UPDATED_TIME;
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+	
+	return MariaText::EMPTY_STRING;
+}
+
+string MariaLogic::runCommandEditDescription(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	//Jay: Pending splitting up of conflict and non conflict.
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToEdit = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+		if (numberToEdit > 0 && numberToEdit <= tempObj->getTotalUITask()) {
+			//TO DO, transit to edit state.
+			MariaUITask* toEditTask = tempObj->eraseUITask(numberToEdit - 1);
+			toEditTask->getMariaTask()->setDescription(input->getEditField());
+			saveToFile();
+					
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();					
+			return MariaText::TASK_UPDATED_DESCRIPTION;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle(), false);
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				listOfTasks[0]->setDescription(input->getEditField());
+				saveToFile();
+				return MariaText::TASK_UPDATED_DESCRIPTION;
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+	
+	return MariaText::EMPTY_STRING;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandMarkDone(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToMark = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+
+		if (numberToMark > 0 && numberToMark <= tempObj->getTotalUITask()) {
+			MariaUITask* toMarkTask = tempObj->eraseUITask(numberToMark - 1);
+			toMarkTask->getMariaTask()->setIsDone(true);
+			saveToFile();
+
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();
+			return MariaText::TASK_RESOLVED_CONFLICT;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				listOfTasks[0]->setIsDone(true);
+				saveToFile();
+				return MariaText::format(MariaText::TASK_MARK_COMPLETE, input->getTitle().c_str());
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+
+	return MariaText::EMPTY_STRING;
+}
+
+string MariaLogic::runCommandMarkUndone(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	if (mariaStateManager->getCurrentState() == StateType::CONFLICT) {
+		int numberToMark = input->getOptionID();
+		MariaUIStateConflict* tempObj = (MariaUIStateConflict*)state;
+
+		if (numberToMark > 0 && numberToMark <= tempObj->getTotalUITask()) {
+			MariaUITask* toMarkTask = tempObj->eraseUITask(numberToMark - 1);
+			toMarkTask->getMariaTask()->setIsDone(false);
+			saveToFile();
+
+			mariaStateManager->queueState(StateType::HOME, new MariaUIStateHome((QMainWindow*)mariaUI, mariaTaskManager->getWeeklyTask()));
+			mariaStateManager->transitState();
+			return MariaText::TASK_RESOLVED_CONFLICT;
+		}
+	} else {
+		vector<MariaTask*> listOfTasks = mariaTaskManager->findTask(input->getTitle());
+
+		if (listOfTasks.size() == 1) {
+			if (mariaStateManager->getCurrentState() == StateType::HOME || mariaStateManager->getCurrentState() == StateType::SHOW) {
+				listOfTasks[0]->setIsDone(false);
+				saveToFile();
+				return MariaText::format(MariaText::TASK_UNMARK_COMPLETE, input->getTitle().c_str());
+			}
+		} else if (listOfTasks.size() == 0) {
+			return MariaText::TASK_NOT_FOUND;
+		} else {
+			mariaStateManager->queueState(StateType::CONFLICT, new MariaUIStateConflict((QMainWindow*)mariaUI, listOfTasks));
+			mariaStateManager->transitState();
+			return MariaText::TASK_UPDATE_CONFLICT;
+		}
+	}
+
+	return MariaText::EMPTY_STRING;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaLogic.cpp
+	 */
+
+string MariaLogic::runCommandPageLeft(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	MariaUIStateHelp* tempObj = dynamic_cast<MariaUIStateHelp*>(state);
+
+	switch (mariaStateManager->getCurrentState()) {
+	case StateType::HELP:
+		if (tempObj != NULL) {
+			tempObj->setHelpIndex(tempObj->getHelpIndex() - 1);
+		}
+		break;
+
+	default:
+		SAFE_DELETE(input);
+		throw MariaText::IGNORE_EXCEPTION;
+		break;
+	}
+
+	return MariaText::EMPTY_STRING;
+}
+
+string MariaLogic::runCommandPageRight(MariaInputObject* input, MariaStateObject* state) {
+	assert(input != NULL);
+	assert(state != NULL);
+
+	MariaUIStateHelp* tempObj = dynamic_cast<MariaUIStateHelp*>(state);
+
+	switch (mariaStateManager->getCurrentState()) {
+	case StateType::HELP:
+		if (tempObj != NULL) {
+			tempObj->setHelpIndex(tempObj->getHelpIndex() + 1);
+		}
+		break;
+
+	default:
+		SAFE_DELETE(input);
+		throw MariaText::IGNORE_EXCEPTION;
+		break;
+	}
+
+	return MariaText::EMPTY_STRING;
+}
+
+	// End of segment: .\MariaApp\\MariaLogic.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaStateManager.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaStateManager.h"
+
+MariaStateManager::MariaStateManager() {
+	_currentState = BLANK;
+	_currentTransition = BEGIN;
+	_currentStateObject = NULL;
+	_transitCalled = false;
+
+	_stateBeginTimer = new QTimer(this);
+	connect(_stateBeginTimer, SIGNAL(timeout()), this, SLOT(timerBeginState()));
+
+	_stateActiveTimer = new QTimer(this);
+	connect(_stateActiveTimer, SIGNAL(timeout()), this, SLOT(timerActiveState()));
+
+	_stateEndTimer = new QTimer(this);
+	connect(_stateEndTimer, SIGNAL(timeout()), this, SLOT(timerEndState()));
+}
+
+MariaStateManager::~MariaStateManager() {
+	SAFE_DELETE(_stateBeginTimer);
+	SAFE_DELETE(_stateActiveTimer);
+	SAFE_DELETE(_stateEndTimer);
+}
+
+void MariaStateManager::queueState(StateType type, MariaStateObject* stateObject) {
+	assert(type != NULL);
+	assert(stateObject != NULL);
+	
+	_stateQueue.push(type);
+	_stateQueueObject.push(stateObject);
+
+	if (getCurrentState() == BLANK) {
+		initBeginState();
+	}
+}
+
+void MariaStateManager::transitState() {
+	if (_currentTransition == ACTIVE) {
+		if (_stateActiveTimer->isActive()) {
+			_transitCalled = true;
+		} else {
+			initEndState();
+		}
+	} else {
+		_transitCalled = true;
+	}
+}
+
+StateType MariaStateManager::getCurrentState() {
+	return _currentState;
+}
+
+MariaStateManager::StateTransition MariaStateManager::getTransition() {
+	return _currentTransition;
+}
+
+void MariaStateManager::clearQueuedState() {
+	while(!_stateQueue.empty()) {
+		_stateQueue.pop();
+		_stateQueueObject.pop();
+	}
+}
+
+MariaStateObject* MariaStateManager::getCurrentStateObject() {
+	return _currentStateObject;
+}
+
+bool MariaStateManager::runActiveUpdate() {
+	if (!_stateActiveTimer->isActive()) {
+		_stateActiveTimer->start(STATE_UPDATE_FREQUENCY);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaStateManager::initBeginState() {
+	if (_stateQueue.size() > 0) {
+		_currentTransition = BEGIN;
+		_currentState = _stateQueue.front();
+		_stateQueue.pop();
+		_currentStateObject = _stateQueueObject.front();
+		_stateQueueObject.pop();
+		_currentStateObject->initBeginState();
+		_currentStateObject->setStartDestination();
+
+		_transitCalled = false;
+
+		_stateBeginTimer->start(STATE_UPDATE_FREQUENCY);
+	} else {
+		_currentState = BLANK;
+	}
+}
+
+void MariaStateManager::initActiveState() {
+	_currentTransition = ACTIVE;
+	_currentStateObject->initActiveState();
+	_stateActiveTimer->start(STATE_UPDATE_FREQUENCY);
+}
+
+void MariaStateManager::initEndState() {
+	_currentTransition = END;
+	_currentStateObject->initEndState();
+	_currentStateObject->setEndDestination();
+	_stateEndTimer->start(STATE_UPDATE_FREQUENCY);
+}
+
+void MariaStateManager::timerBeginState() {
+	if (!_currentStateObject->timerBeginState() && !_currentStateObject->updatePosition()) {
+		_stateBeginTimer->stop();
+		initActiveState();
+		_currentStateObject->timerBeginState();
+	}
+}
+
+void MariaStateManager::timerActiveState() {
+	if (!_currentStateObject->timerActiveState()) {
+		_stateActiveTimer->stop();
+
+		if (_transitCalled || _currentStateObject->_transitionAuto) {
+			initEndState();
+		}
+	}
+}
+
+void MariaStateManager::timerEndState() {
+	if (!_currentStateObject->timerEndState() && !_currentStateObject->updatePosition()) {
+		_stateEndTimer->stop();
+
+		if (_stateActiveTimer->isActive()) {
+			_stateActiveTimer->stop();
+		}
+		if (_stateActiveTimer->isActive()) {
+			_stateActiveTimer->stop();
+		}
+		if (_stateActiveTimer->isActive()) {
+			_stateActiveTimer->stop();
+		}
+
+		SAFE_DELETE(_currentStateObject);
+
+		initBeginState();
+	}
+}
+	// End of segment: .\MariaApp\\MariaStateManager.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaStateManager.h
+	 */
+
+#pragma once
+
+#include <queue>
+#include <QtCore/QTimer>
+#include <QtWidgets/QMainWindow>
+#include "MariaStateObject.h"
+#include "MariaUIStateType.h"
+
+class MariaStateManager : public QWidget {
+	 Q_OBJECT
+
+public:
+	typedef enum {
+		BEGIN, 
+		ACTIVE, 
+		END
+	} StateTransition;
+
+	MariaStateManager();
+	~MariaStateManager();
+	
+	void queueState(StateType type, MariaStateObject* stateObject);
+	void transitState();
+	StateType getCurrentState();
+	StateTransition getTransition();
+	void clearQueuedState();
+	MariaStateObject* getCurrentStateObject();
+	bool runActiveUpdate();
+
+private:
+	static const int STATE_UPDATE_FREQUENCY = 1;
+	StateType _currentState;
+	StateTransition _currentTransition;
+	MariaStateObject* _currentStateObject;
+	std::queue<StateType> _stateQueue;
+	std::queue<MariaStateObject*> _stateQueueObject;
+
+	bool _transitCalled;
+
+	QTimer* _stateBeginTimer;
+	QTimer* _stateActiveTimer;
+	QTimer* _stateEndTimer;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+
+private slots:
+	void timerBeginState();
+	void timerActiveState();
+	void timerEndState();
+};
+
+
+	// End of segment: .\MariaApp\\MariaStateManager.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUI.cpp
+	 */
+
+#include <assert.h>
 #include <QKeyEvent>
+#include "MariaMacros.h"
 #include "MariaUI.h"
 #include "MariaLogic.h"
 
+const float MariaUI::WINDOW_DEFAULT_COLOR_R = 186;
+const float MariaUI::WINDOW_DEFAULT_COLOR_G = 199;
+const float MariaUI::WINDOW_DEFAULT_COLOR_B = 22;
 const float MariaUI::FLOW_FACTOR = 0.1;
 const float MariaUI::VALUE_THRESHOLD = 1.0;
 const float MariaUI::CLOSE_BUTTON_X_OFFSET = 0.0;
 const float MariaUI::CLOSE_BUTTON_Y_OFFSET = 0.0;
-const float MariaUI::WINDOW_DEFAULT_COLOR_R = 186;
-const float MariaUI::WINDOW_DEFAULT_COLOR_G = 199;
-const float MariaUI::WINDOW_DEFAULT_COLOR_B = 22;
 
-QPixmap *MariaUI::_taskTypeIconHandler[AMOUNT_OF_IMAGES]={};
+QPixmap* MariaUI::_taskTypeIconHandler[AMOUNT_OF_IMAGES]={};
 
-MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget *parent) : QMainWindow(parent) {
+MariaUI::MariaUI(MariaLogic *mariaLogic, QWidget * parent) : QMainWindow(parent) {
+	assert(mariaLogic != NULL);
+
 	_mariaLogic = mariaLogic;
 
 	initWindow();
-	initButtons();
+	initButton();
 	initBackgroundColor(WINDOW_DEFAULT_COLOR_R, WINDOW_DEFAULT_COLOR_G, WINDOW_DEFAULT_COLOR_B);
-	_commandBar = new MariaUICommandBar(this);
-	_commandBar->getTextbox()->setFocus();
-	show();
-
-	trayIcon = new QSystemTrayIcon(QIcon(QString::fromStdString("Resources/marialogo16x16.png")));
-	trayIcon->setToolTip("M.A.R.I.A.");
-
+	initCommandBar();
+	initTrayIcon();
 	loadImages();
-
-	QObject::connect(this, SIGNAL(triggerShowHideEvent()), this, SLOT(showHideEvent()));
+	show();
 }
 
 MariaUI::~MariaUI() {
 	unloadImages();
-	delete trayIcon;
-	delete _btClose;	
-	delete _commandBar;
-	delete _bkgColorUpdateTimer;
+	SAFE_DELETE(_trayIcon);
+	SAFE_DELETE(_btClose);	
+	SAFE_DELETE(_commandBar);
+	SAFE_DELETE(_bkgColorUpdateTimer);
 }
 
-void MariaUI::initWindow() {
-	_expandView = false;
+void MariaUI::forceLogicCall() {
+	//Overwrite for UI classes to initiate a call to logic instead of through keyboards.
+	_mariaLogic->generateTextforUI();
+}
 
-	QFont newFont("Century Gothic");
-	newFont.setStyleStrategy(QFont::PreferAntialias);
-	QApplication::setFont(newFont);
+void MariaUI::setBackgroundColor(int r, int g, int b) {
+	_targetBkgColor.setRed(r);
+	_targetBkgColor.setGreen(g);
+	_targetBkgColor.setBlue(b);
 
-	if (objectName().isEmpty()) {
-		setObjectName(QStringLiteral("MariaUI"));
+	if (!_bkgColorUpdateTimer->isActive()) {
+		_bkgColorUpdateTimer->start(BACKGROUND_UPDATE_FREQUENCY);
 	}
-	setWindowFlags( Qt::FramelessWindowHint );
-	setWindowTitle(QApplication::translate("MariaUI", "M.A.R.I.A", 0));
-
-	resize(WINDOW_DEFAULT_SIZE_X, WINDOW_DEFAULT_SIZE_Y);
 }
 
-void MariaUI::initButtons() {
-	QPixmap imageHandleCloseButton("./Resources/ui_bt_close.png");
-	_btClose = new QToolButton(this);
-	_btClose->setAutoFillBackground(true);;
-	_btClose->setIcon(QIcon(imageHandleCloseButton));
-	_btClose->setIconSize(QSize(imageHandleCloseButton.width(), imageHandleCloseButton.height()));
-	_btClose->setFixedSize(QSize(imageHandleCloseButton.width(), imageHandleCloseButton.height()));
-	_btClose->setToolTip("Close Program");
-	_btClose->setStyleSheet("border:0px;");
-	_btClose->setGeometry(QRect(width()-imageHandleCloseButton.width() + CLOSE_BUTTON_X_OFFSET, CLOSE_BUTTON_Y_OFFSET, imageHandleCloseButton.width(), imageHandleCloseButton.height()));	
-
-	connect(_btClose, SIGNAL(clicked()), this , SLOT(quitAction()));
+QPixmap* MariaUI::getImageHandler(int index) {
+	return _taskTypeIconHandler[index];
 }
+
+MariaUICommandBar * MariaUI::getCommandBar() {
+	return _commandBar;
+}
+
+void MariaUI::quitAction() {
+	_mariaLogic->terminateProgram();
+}
+
+bool MariaUI::eventFilter(QObject * obj, QEvent * event) {
+	if (obj == _commandBar->getTextbox()->getInputBoxReference()) {
+		if (event->type() == QEvent::KeyPress) {
+			QKeyEvent * keyPressed = static_cast<QKeyEvent*>(event);
+			if (keyPressed->key() == Qt::Key_Backspace) {
+				//Checks the length of the input BEFORE backspace is pressed.
+				// - 1 is used to check what happens AFTER if its pressed.
+				if (_commandBar->getTextbox()->getUserInput().length() - 1 == 0) {
+					_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+				}
+			} else {
+				_commandBar->getTextbox()->setSuggestText("");
+			}
+		}
+	}
+	return QMainWindow::eventFilter(obj, event);
+}
+
+void MariaUI::keyReleaseEvent(QKeyEvent * event) {
+	int keyPressed = event->key();
+	string result;
+	switch(event->key()) {
+	case Qt::Key_Z:
+		if (event->modifiers().testFlag(Qt::ControlModifier)) {
+			result = _mariaLogic->processCommand("undo");
+		}
+		break;
+	case Qt::Key_Return:
+	case Qt::Key_Enter:
+		try {
+			result = _mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
+		} catch (exception& e) {
+			_commandBar->getTextbox()->setQuestionText(e.what());
+			_commandBar->getStatus()->setStatus(MariaUIStatus::UNKNOWN);
+		}
+		break;
+	case Qt::Key_Up:
+		result = _mariaLogic->processCommand("up");
+		break;
+	case Qt::Key_Down:
+		result = _mariaLogic->processCommand("down");
+		break;
+	case Qt::Key_Left:
+		try {
+			result = _mariaLogic->processCommand("left");
+		} catch (exception& e) {
+			return;
+		}
+		break;
+	case Qt::Key_Right:
+		try {
+			result = _mariaLogic->processCommand("right");
+		} catch (exception& e) {
+			return;
+		}
+		break;
+	case Qt::Key_Escape:
+		result = _mariaLogic->processCommand("home");
+		_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+		break;
+	default:
+		if (_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
+			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
+		} else {
+			if (_commandBar->getTextbox()->getUserInput().length() > 0) {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
+			} else {
+				_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
+			}
+		}
+		event->ignore();
+		break;
+	}
+
+	if (result.length() > 0) {
+		_commandBar->getTextbox()->setQuestionText(result);
+	}
+}
+
+void MariaUI::updateBackgroundColor() {
+	if (abs(_bkgColor.red() - _targetBkgColor.red()) > VALUE_THRESHOLD || 
+		abs(_bkgColor.green() - _targetBkgColor.green()) > VALUE_THRESHOLD || 
+		abs(_bkgColor.blue() - _targetBkgColor.blue())>VALUE_THRESHOLD) {
+			_bkgColor.setRed(_bkgColor.red() + (_targetBkgColor.red() - _bkgColor.red()) * FLOW_FACTOR);
+			_bkgColor.setGreen(_bkgColor.green() + (_targetBkgColor.green() - _bkgColor.green()) * FLOW_FACTOR);
+			_bkgColor.setBlue(_bkgColor.blue() + (_targetBkgColor.blue() - _bkgColor.blue()) * FLOW_FACTOR);
+	} else {
+		if (_bkgColorUpdateTimer->isActive()) {
+			_bkgColorUpdateTimer->stop();
+		}
+	}
+	QString backgroundcolor = QString::number(_bkgColor.red()) + ", " + QString::number(_bkgColor.green()) + ", " + QString::number(_bkgColor.blue());
+	this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
+}
+
+	// End of segment: .\MariaApp\\MariaUI.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUI.cpp
+	 */
 
 void MariaUI::initBackgroundColor(int r, int g, int b) {
 	_bkgColor.setRed(r);
@@ -89,245 +793,2831 @@ void MariaUI::initBackgroundColor(int r, int g, int b) {
 	updateBackgroundColor();
 }
 
-void MariaUI::loadImages() {	
-	_taskTypeIconHandler[0] = new QPixmap("./Resources/ui_task_type_floating.png");
-	_taskTypeIconHandler[1] = new QPixmap("./Resources/ui_task_type_deadline.png");
-	_taskTypeIconHandler[2] = new QPixmap("./Resources/ui_task_type_timed.png");
-	_taskTypeIconHandler[3] = new QPixmap("./Resources/ui_completed.png");
-	_taskTypeIconHandler[4] = new QPixmap("./Resources/ui_not_completed.png");
-	_taskTypeIconHandler[5] = new QPixmap("./Resources/ui_maria_logo_1.png");
-	_taskTypeIconHandler[6] = new QPixmap("./Resources/ui_maria_logo_2.png");
-	_taskTypeIconHandler[7] = new QPixmap("./Resources/ui_maria_logo_3.png");
-	_taskTypeIconHandler[8] = new QPixmap("./Resources/ui_maria_logo_4.png");
-	_taskTypeIconHandler[9] = new QPixmap("./Resources/ui_maria_logo_5.png");
-	_taskTypeIconHandler[10] = new QPixmap("./Resources/ui_maria_logo_6.png");
-	_taskTypeIconHandler[11] = new QPixmap("./Resources/ui_loadingdots.png");
+void MariaUI::initCommandBar() {
+	_commandBar = new MariaUICommandBar(this);
+	_commandBar->getTextbox()->setFocus();
+	_commandBar->getTextbox()->setQuestionText(MariaText::HOME);
 }
 
-void MariaUI::unloadImages() {
-	for(int i = 0 ; i < AMOUNT_OF_IMAGES ; i++ ) {
-		delete _taskTypeIconHandler[i];
-	}
-}
-
-void MariaUI::quitAction() {
-	_mariaLogic->terminateProgram();
-}
-
-void MariaUI::updateBackgroundColor() {
-
-	if(abs(_bkgColor.red()-_targetBkgColor.red())>VALUE_THRESHOLD ||
-		abs(_bkgColor.green()-_targetBkgColor.green())>VALUE_THRESHOLD ||
-		abs(_bkgColor.blue()-_targetBkgColor.blue())>VALUE_THRESHOLD) {
-			_bkgColor.setRed(_bkgColor.red() + (_targetBkgColor.red()-_bkgColor.red())*FLOW_FACTOR);
-			_bkgColor.setGreen(_bkgColor.green() + (_targetBkgColor.green()-_bkgColor.green())*FLOW_FACTOR);
-			_bkgColor.setBlue(_bkgColor.blue() + (_targetBkgColor.blue()-_bkgColor.blue())*FLOW_FACTOR);
-	} else {
-		if(_bkgColorUpdateTimer->isActive()) {
-			_bkgColorUpdateTimer->stop();
-		}
-	}
-	QString backgroundcolor = QString::number(_bkgColor.red()) + ", " + QString::number(_bkgColor.green()) + ", " + QString::number(_bkgColor.blue());
-	this->setStyleSheet("QMainWindow {background-color: rgb(" + backgroundcolor + ");min-width:400px;min-height:120px;}");
-}
-
-void MariaUI::showHideEvent() {
-	if(isVisible()) {
-		setWindowState(Qt::WindowState::WindowMinimized);
-		trayIcon->show();
-		trayIcon->showMessage("M.A.R.I.A. is still running!", "Press Ctrl + Space to show M.A.R.I.A.\nType \'exit\' to quit the program.");
-		hide();
-	} else {
-		setWindowState(Qt::WindowState::WindowActive);
-		trayIcon->hide();
-		show();
-	}
-}
-
-void MariaUI::resizeEvent(QResizeEvent* event) {
-	QWidget::resizeEvent(event);
-}
-
-bool MariaUI::eventFilter(QObject* obj, QEvent *event) {
-	if (obj == _commandBar->getTextbox()->getInputBoxReference()) {
-		if (event->type() == QEvent::KeyPress) {
-			QKeyEvent* keyPressed = static_cast<QKeyEvent*>(event);
-			if(keyPressed->key() == Qt::Key_Backspace) {
-				//-1 is required because is checks the length BEFORE backspace is applied to QLineEdit.
-				if(_commandBar->getTextbox()->getUserInput().length()-1 == 0) {
-					_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
-				}
-			} else {
-				_commandBar->getTextbox()->setSuggestText("");
-			}
-		}
-	}
-	return QMainWindow::eventFilter(obj, event);
-}
-
-void MariaUI::keyReleaseEvent(QKeyEvent* event) {
-	int keyPressed = event->key();
-	if(event->key() == Qt::Key_Z && event->modifiers().testFlag(Qt::ControlModifier)) {
-		if(_mariaLogic->processUndo()) {
-			getCommandBar()->getTextbox()->setQuestionText("Undo was successful");
-		} else {
-			getCommandBar()->getTextbox()->setQuestionText("Nothing to Undo.");
-		}
-	} else if(keyPressed == Qt::Key_Return || keyPressed == Qt::Key_Enter) {
-		_mariaLogic->processCommand(_commandBar->getTextbox()->getUserInput());
-	} else if(keyPressed == Qt::Key_Up) {
-		_mariaLogic->processCommand("up");
-	} else if(keyPressed == Qt::Key_Down) {
-		_mariaLogic->processCommand("down");
-	} else {
-		if(_mariaLogic->checkValidCommand(_commandBar->getTextbox()->getUserInput())) {
-			_commandBar->getStatus()->setStatus(MariaUIStatus::OK);
-		} else {
-			if(_commandBar->getTextbox()->getUserInput().length() > 0) {
-				_commandBar->getStatus()->setStatus(MariaUIStatus::WAIT);
-			} else {
-				_commandBar->getStatus()->setStatus(MariaUIStatus::NONE);
-			}
-
-		}
-		event->ignore();
-	}
-}
-
-void MariaUI::forceLogicCall() {
-	//Overwrite for UI classes to initiate a call to logic instead of through keyboards.
-	_mariaLogic->generateTextforUI();
-}
-
-void MariaUI::setExpand(bool value) {
-	_expandView = value;
-
-	if(_expandView) {
-		resize(WINDOW_DEFAULT_EXPAND_SIZE_X, WINDOW_DEFAULT_EXPAND_SIZE_Y);
-	} else {
-		resize(WINDOW_DEFAULT_SIZE_X, WINDOW_DEFAULT_SIZE_Y);
-	}
-}
-
-bool MariaUI::getExpand() {
-	return _expandView;
-}
-
-void MariaUI::setBackgroundColor(int r, int g, int b) {
-	_targetBkgColor.setRed(r);
-	_targetBkgColor.setGreen(g);
-	_targetBkgColor.setBlue(b);
-
-	if(!_bkgColorUpdateTimer->isActive()) {
-		_bkgColorUpdateTimer->start(50);
-	}
-}
-
-QPixmap* MariaUI::getImageHandler(int index) {
-	return _taskTypeIconHandler[index];
-}
-
-MariaUICommandBar * MariaUI::getCommandBar() {
-	return _commandBar;
-}
-
-	// End of segment: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaUI.cpp
+	// End of segment: .\MariaApp\\MariaUI.cpp
 
 
 
 
 
 	/**
-	 * origin: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaUI.h
+	 * origin: .\MariaApp\\MariaUI.h
 	 */
 
 #pragma once
 
-#include <QtWidgets/QMainWindow>
-#include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
-#include <QtCore/QTimer>
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/qsystemtrayicon.h>
+#include <QtWidgets/qshortcut.h>
+#include <QtCore/QVariant>
+#include <QtCore/QTimer>
 #include "MariaUICommandBar.h"
 #include "MariaUITextbox.h"
-#include <QtWidgets/qshortcut.h>
 
 class MariaLogic;
 class MariaUI : QMainWindow {
 	 Q_OBJECT
 
 public:
-	static const int AMOUNT_OF_IMAGES = 12;
+	static const int WINDOW_DEFAULT_SIZE_X = 480;
+	static const int WINDOW_DEFAULT_SIZE_Y = 640;
+	static const float WINDOW_DEFAULT_COLOR_R;
+	static const float WINDOW_DEFAULT_COLOR_G;
+	static const float WINDOW_DEFAULT_COLOR_B;
+
+	static const int AMOUNT_OF_IMAGES = 18;
 	static const int IMAGE_INDEX_COMPLETED = 3;
 	static const int IMAGE_INDEX_NOT_COMPLETED = 4;
 	static const int IMAGE_INDEX_ICON = 5;
 	static const int AMOUNT_OF_ICON = 6;
 	static const int IMAGE_INDEX_DOTS = 11;
+	static const int AMOUNT_OF_HELP_IMAGE = 6;
+	static const int IMAGE_INDEX_HELP = 12;
 
-	static const float FLOW_FACTOR;
-	static const float VALUE_THRESHOLD;
-	static const int WINDOW_DEFAULT_SIZE_X = 480;
-	static const int WINDOW_DEFAULT_SIZE_Y = 640;
-	static const int WINDOW_DEFAULT_EXPAND_SIZE_X = 480;
-	static const int WINDOW_DEFAULT_EXPAND_SIZE_Y = 600;
-	static const float CLOSE_BUTTON_X_OFFSET;
-	static const float CLOSE_BUTTON_Y_OFFSET;
-	static const float WINDOW_DEFAULT_COLOR_R;
-	static const float WINDOW_DEFAULT_COLOR_G;
-	static const float WINDOW_DEFAULT_COLOR_B;
-
-private:
-	MariaLogic *_mariaLogic;
+	MariaUI(MariaLogic *mariaLogic, QWidget * parent = 0);
+	~MariaUI(void);
 	
-	MariaUICommandBar* _commandBar;
+	void forceLogicCall();
+	void setBackgroundColor(int r, int g, int b);
+	static QPixmap* getImageHandler(int index);
+	MariaUICommandBar * getCommandBar();
 
-	QToolButton *_btClose;
-	bool _expandView;
-	QTimer *_bkgColorUpdateTimer;
-	QColor _bkgColor;
-	QColor _targetBkgColor;
-	QSystemTrayIcon *trayIcon;
-	static QPixmap *_taskTypeIconHandler[AMOUNT_OF_IMAGES];
-
-	//Load images used in application.
-	void initWindow();
-	void initButtons();
-	void initBackgroundColor(int r, int g, int b);
-	static void loadImages();
-	static void unloadImages();
+signals:	
+	void triggerShowHideEvent();
 
 public slots:
 	void quitAction();
+
+protected:
+	bool eventFilter(QObject * obj, QEvent * event);
+	void keyReleaseEvent(QKeyEvent * event);
 
 protected slots:
 	void updateBackgroundColor();
 	void showHideEvent();
 
-protected:
-	void resizeEvent(QResizeEvent *event);
-	bool eventFilter(QObject* obj, QEvent *event);
-	void keyReleaseEvent(QKeyEvent* event);
+private:
+	static const int BACKGROUND_UPDATE_FREQUENCY = 50;
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const float CLOSE_BUTTON_X_OFFSET;
+	static const float CLOSE_BUTTON_Y_OFFSET;
+
+	MariaLogic * _mariaLogic;
+	MariaUICommandBar * _commandBar;
+
+	QToolButton * _btClose;
+	QTimer* _bkgColorUpdateTimer;
+	QColor _bkgColor;
+	QColor _targetBkgColor;
+	QSystemTrayIcon * _trayIcon;
+	static QPixmap* _taskTypeIconHandler[AMOUNT_OF_IMAGES];
+
+	void initWindow();
+	void initButton();
+	void initCommandBar();
+	void initTrayIcon();
+	void initBackgroundColor(int r, int g, int b);
+	static void loadImages();
+	static void unloadImages();
+};
+	// End of segment: .\MariaApp\\MariaUI.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIClock.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIClock.h"
+#include "MariaTime.h"
+
+const float MariaUIClock::START_HEIGHT_SCALE = 0.14;
+const float MariaUIClock::TIME_WIDTH = 200;
+const float MariaUIClock::TIME_HEIGHT = 60;
+const float MariaUIClock::TIME_X_OFFSET = - 15;
+const float MariaUIClock::TIME_Y_OFFSET = 0;
+const float MariaUIClock::DATE_WIDTH = 200;
+const float MariaUIClock::DATE_HEIGHT = 30;
+const float MariaUIClock::DATE_X_OFFSET = 15;
+const float MariaUIClock::DATE_Y_OFFSET = 26;
+const float MariaUIClock::DAY_WIDTH = 200;
+const float MariaUIClock::DAY_HEIGHT = 30;
+const float MariaUIClock::DAY_X_OFFSET = 15;
+const float MariaUIClock::DAY_Y_OFFSET = 8;
+const float MariaUIClock::LINE_WIDTH = 15;
+const float MariaUIClock::LINE_HEIGHT = 42;
+const float MariaUIClock::LINE_X_OFFSET = - 5;
+const float MariaUIClock::LINE_Y_OFFSET = 5;
+
+	// End of segment: .\MariaApp\\MariaUIClock.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIClock.cpp
+	 */
+
+MariaUIClock::~MariaUIClock(void) {
+	if (_clockTimer->isActive()) {
+		_clockTimer->stop();
+	}
+	
+	SAFE_DELETE(_clockTimer);
+	SAFE_DELETE(_line);
+	SAFE_DELETE(_currentDay);
+	SAFE_DELETE(_currentDate);
+	SAFE_DELETE(_currentTime);
+}
+
+void MariaUIClock::startUpdating() {
+	if (!_clockTimer->isActive()) {
+		_clockTimer->start(CLOCK_UPDATE_FREQUENCY);
+		_currentTime->show();
+		_currentDate->show();
+		_currentDay->show();
+		_line->show();
+		updateClock();
+	}
+}
+
+void MariaUIClock::updateGUI(QPointF statePosition) {
+	_currentTime->setGeometry(QRect(statePosition.x() + _qmainWindow->width() * 0.5 - TIME_WIDTH + TIME_X_OFFSET, 
+		statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE + TIME_Y_OFFSET, TIME_WIDTH, TIME_HEIGHT));
+	_currentDate->setGeometry(QRect(statePosition.x() + _qmainWindow->width() * 0.5 + DATE_X_OFFSET, 
+		statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE + DATE_Y_OFFSET, DATE_WIDTH, DATE_HEIGHT));
+	_currentDay->setGeometry(QRect(statePosition.x() + _qmainWindow->width() * 0.5 + DAY_X_OFFSET, 
+		statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE + DAY_Y_OFFSET, DAY_WIDTH, DAY_HEIGHT));
+	_line->setGeometry(QRect(statePosition.x() + _qmainWindow->width() * 0.5 + LINE_X_OFFSET, 
+		statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE + LINE_Y_OFFSET, LINE_WIDTH, LINE_HEIGHT));
+}
+
+void MariaUIClock::updateClock() {
+	MariaTime currentTime = MariaTime::getCurrentTime();
+	QString tempString;
+
+	//Set Time and Date
+	if (currentTime.getHour() % 12 == 0) {
+		tempString = QString::number(12);
+	} else {
+		tempString = QString::number(currentTime.getHour() % 12);
+	}
+
+	if (currentTime.getMin() < 10) {
+		tempString += ":0" + QString::number(currentTime.getMin());
+	} else {
+		tempString += ":" + QString::number(currentTime.getMin());
+	}
+
+	if (currentTime.getHour() < 12) {
+		tempString += "AM";
+	} else {
+		tempString += "PM";
+	}
+
+	_currentTime->setText(tempString);
+	_currentDate->setText(QString::number(currentTime.getDay()) + " " + QString(MariaTime::MONTHS[currentTime.getMonth() - 1]) + " " + QString::number(currentTime.getYear()));
+	_currentDay->setText(QString(MariaTime::DAYS[(currentTime.getDayWeek() + DAYS_OFFSET ) % DAYS_IN_WEEK]));
+}
+	// End of segment: .\MariaApp\\MariaUIClock.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIClock.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QAction>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+
+class MariaUIClock : QWidget {
+	Q_OBJECT
 
 public:
-	MariaUI(MariaLogic *mariaLogic, QWidget *parent = 0);
-	~MariaUI(void);
-	
-	void forceLogicCall();
-	void setExpand(bool value);
-	bool getExpand();
-	void setBackgroundColor(int r, int g, int b);
-	static QPixmap* getImageHandler(int index);
-	MariaUICommandBar* getCommandBar();
+	MariaUIClock(QMainWindow* qmainWindow);
+	~MariaUIClock();
 
-signals:	
-	void triggerShowHideEvent();
+	void startUpdating();
+	void updateGUI(QPointF statePosition);
+
+protected slots:
+	void updateClock();
+
+private:
+	static const int CLOCK_UPDATE_FREQUENCY = 1000;
+	static const int DAYS_OFFSET = 6;
+	static const int DAYS_IN_WEEK = 7;
+	static const float START_HEIGHT_SCALE;
+	static const float TIME_WIDTH;
+	static const float TIME_HEIGHT;
+	static const float TIME_X_OFFSET;
+	static const float TIME_Y_OFFSET;
+	static const float DATE_WIDTH;
+	static const float DATE_HEIGHT;
+	static const float DATE_X_OFFSET;
+	static const float DATE_Y_OFFSET;
+	static const float DAY_WIDTH;
+	static const float DAY_HEIGHT;
+	static const float DAY_X_OFFSET;
+	static const float DAY_Y_OFFSET;
+	static const float LINE_WIDTH;
+	static const float LINE_HEIGHT;
+	static const float LINE_X_OFFSET;
+	static const float LINE_Y_OFFSET;
+
+	QMainWindow* _qmainWindow;
+	
+	QLabel* _currentTime;
+	QLabel* _currentDate;
+	QLabel* _currentDay;
+	QTimer* _clockTimer;
+	QLabel* _line;
 };
-	// End of segment: C:\Users\Melvyn\Documents\Visual Studio 2012\Projects\Maria\Code\MariaApp\MariaUI.h
+
+	// End of segment: .\MariaApp\\MariaUIClock.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUICommandBar.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUICommandBar.h"
+
+const float MariaUICommandBar::DEFAULT_X_POSITION = 0.0;
+const float MariaUICommandBar::DEFAULT_Y_POSITION = - 200.0;
+const float MariaUICommandBar::FLOW_FACTOR = 0.05;
+const float MariaUICommandBar::VALUE_THRESHOLD = 5.0;
+
+MariaUICommandBar::MariaUICommandBar(QMainWindow* qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow = qmainWindow;
+
+	_yPosition = DEFAULT_Y_POSITION;
+	_yDestination = DEFAULT_Y_POSITION;
+
+	_textbox = new MariaUITextbox(_qmainWindow);
+	_status = new MariaUIStatus(_qmainWindow);
+
+	_updateGUITimer = new QTimer(_qmainWindow);
+	connect(_updateGUITimer, SIGNAL(timeout()), this, SLOT(updateGUI()));
+	updateGUI();
+}
+
+MariaUICommandBar::~MariaUICommandBar() {
+	SAFE_DELETE(_updateGUITimer);
+	SAFE_DELETE(_status);
+	SAFE_DELETE(_textbox);
+}
+
+float MariaUICommandBar::getPosition() {
+	return _yPosition;
+}
+
+void MariaUICommandBar::setDestination(float yPosition) {
+	_yDestination = yPosition;
+	if (!_updateGUITimer->isActive()) {
+		_updateGUITimer->start(GUI_UPDATE_FREQUENCY);
+	}
+}
+
+MariaUITextbox* MariaUICommandBar::getTextbox() {
+	return _textbox;
+}
+
+MariaUIStatus* MariaUICommandBar::getStatus() {
+	return _status;
+}
+
+void MariaUICommandBar::updateGUI() {
+	if (abs(_yPosition - _yDestination)>VALUE_THRESHOLD) {
+		_yPosition += (_yDestination - _yPosition) * FLOW_FACTOR;
+	} else {
+		_updateGUITimer->stop();
+	}
+
+	_textbox->updateGUI(QPointF(DEFAULT_X_POSITION, _yPosition));
+	_status->updateGUI(QPointF(DEFAULT_X_POSITION, _yPosition));
+}
+	// End of segment: .\MariaApp\\MariaUICommandBar.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUICommandBar.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+#include "MariaUITextbox.h"
+#include "MariaUIStatus.h"
+
+class MariaUICommandBar : public QWidget {
+	Q_OBJECT
+
+public:
+	static const int GUI_UPDATE_FREQUENCY = 1;
+	static const float DEFAULT_X_POSITION;
+	static const float DEFAULT_Y_POSITION;
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+
+	MariaUICommandBar(QMainWindow* qmainWindow);
+	~MariaUICommandBar();
+
+	float getPosition();
+	void setDestination(float yPosition);
+
+	MariaUITextbox* getTextbox();
+	MariaUIStatus* getStatus();
+
+protected slots:
+	void updateGUI();
+
+private:
+	QMainWindow* _qmainWindow;
+	MariaUITextbox* _textbox;
+	MariaUIStatus* _status;
+
+	QTimer* _updateGUITimer;
+
+	float _yPosition;
+	float _yDestination;
+};
+
+
+	// End of segment: .\MariaApp\\MariaUICommandBar.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIPreview.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIPreview.h"
+
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NONE = "There are no scheduled events today.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_AT = "The first thing on your calendar today is '%s', at %s.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME = "The first thing on your calendar today is '%s', in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_AT = "'%s' is next up on your calendar, at %s.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME = "'%s' is next up on your calendar, in %s minutes.\n";
+
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_NONE = "You have no events scheduled for tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW = "There is one event scheduled for %s tomorrow.\n";
+const string MariaUIPreview::PREVIEW_EVENT_TOMORROW_MULTIPLE = "There are %i events scheduled and the first one starts at %s\ntomorrow.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW = "One task is due by %s tomorrow.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_TOMORROW_MUTIPLE = "%i tasks are due tomorrow.\n";
+
+const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_AT = "One task is due today.\nIt is '%s' and is due by %s.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_REMAINING_TIME = "One task is due today It is '%s' and is due in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_TODAY_MUTIPLE = "%i tasks are due today.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_AT = "'%s' is due by %s.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_REMAINING_TIME = "'%s' is due in %s minutes.\n";
+const string MariaUIPreview::PREVIEW_DEADLINE_ITEM_TRIM = "Here are some of the tasks:\n";
+
+const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_DEFAULT = "'%s' was created since %s, was it done yet?\n";
+const string MariaUIPreview::PREVIEW_FLOATING_SUGGESTION_NO_DATE = "'%s' was created for some time, was it done yet?\n";
+const string MariaUIPreview::PREVIEW_FREE_DAY = "You are free on %s.\n";
+const string MariaUIPreview::PREVIEW_FREE_DAY_TODAY = "You are free today.\n";
+
+const float MariaUIPreview::START_HEIGHT_SCALE = 0.22;
+const float MariaUIPreview::CALENDAR_HEIGHT_SCALE = 0.52;
+const float MariaUIPreview::MESSAGE_HEIGHT = 220.0;
+const float MariaUIPreview::SPACING_HEIGHT = 20.0;
+const float MariaUIPreview::TITLE_SEPARATE_HEIGHT = 12.0;
+const float MariaUIPreview::TITLE_AREA_HEIGHT = 128.0;
+const float MariaUIPreview::BODY_XOFFSET = 10.0;
+const float MariaUIPreview::DIVIDER_HEIGHT = 4.0;
+
+	// End of segment: .\MariaApp\\MariaUIPreview.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIPreview.cpp
+	 */
+
+MariaUIPreview::~MariaUIPreview() {
+	SAFE_DELETE(_lineCalendar);
+	SAFE_DELETE(_textCalendarBody);
+	SAFE_DELETE(_textCalendar);
+	SAFE_DELETE(_lineTomorrow);
+	SAFE_DELETE(_textTomorrowBody);
+	SAFE_DELETE(_textTomorrow);
+	SAFE_DELETE(_lineToday);
+	SAFE_DELETE(_textTodayBody);
+	SAFE_DELETE(_textToday);
+}
+
+int MariaUIPreview::endLineCount(string text) {
+	int occurrences = 0;
+	string::size_type start = 0;
+	string toFind = "\n";
+
+	while ((start = text.find(toFind, start)) != string::npos) {
+		++occurrences;
+		start += toFind.length();
+	}
+	return occurrences;
+}
+
+string MariaUIPreview::generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine) {
+	string toReturn;
+	char buffer[STRING_BUFFER_SIZE];
+
+	//Today's Task.
+	if (taskListNow.size() > 0) {
+		int withinTheHour = MariaTime::timeDifference(taskListNow.at(0)->getStart(), &MariaTime::getCurrentTime());
+		string toShow = taskListNow.at(0)->getTitle();
+		if (toShow.length() > MAX_CHAR_LENGTH) {
+			toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
+		}
+
+		if (taskListAll.size() - taskListNow.size() == 0) {
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
+				} else {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_FIRST_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
+				}
+				toReturn += buffer;
+			}
+		} else {
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
+				} else {
+					sprintf_s(buffer, PREVIEW_EVENT_TODAY_NEXT_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListNow.at(0)->getStart()).c_str());
+				}
+				toReturn += buffer;
+			}
+		}
+	} else {
+		sprintf_s(buffer, PREVIEW_EVENT_TODAY_NONE.c_str());
+		toReturn += buffer;
+	}
+
+	//Today's Deadline.
+	if (taskListDeadLine.size() > 0) {
+		if (taskListDeadLine.size() == 1) {
+			int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(0)->getEnd(), &MariaTime::getCurrentTime());
+			string toShow = taskListDeadLine.at(0)->getTitle();
+			if (toShow.length() > MAX_CHAR_LENGTH) {
+				toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
+			}
+
+			if (withinTheHour >= 0 ) {//Check if event has passed.
+				if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
+				} else {
+					sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(0)->getEnd()).c_str());
+				}
+				toReturn += buffer;
+			}
+		} else {
+			sprintf_s(buffer, PREVIEW_DEADLINE_TODAY_MUTIPLE.c_str(), taskListDeadLine.size());
+			toReturn += buffer;
+
+			int maxTask = taskListDeadLine.size();
+			if (maxTask > MAX_TASK_SHOWN) {
+				maxTask = MAX_TASK_SHOWN;
+				toReturn += PREVIEW_DEADLINE_ITEM_TRIM;
+			}
+			for (int i = 0; i < maxTask; i++){
+				int withinTheHour = MariaTime::timeDifference(taskListDeadLine.at(i)->getEnd(), &MariaTime::getCurrentTime());
+				string toShow = taskListDeadLine.at(i)->getTitle();
+				if (toShow.length() > MAX_CHAR_LENGTH) {
+					toShow = toShow.substr(0, MAX_CHAR_LENGTH) + "...";
+				}
+
+				if (withinTheHour >= 0 ) {//Check if event has passed.
+					if (withinTheHour < MINUTES_IN_HOURS * MINUTES_IN_HOURS && withinTheHour > 1) {
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_REMAINING_TIME.c_str(), toShow.c_str(), std::to_string(withinTheHour / MINUTES_IN_HOURS).c_str());
+					} else {
+						sprintf_s(buffer, PREVIEW_DEADLINE_ITEM_AT.c_str(), toShow.c_str(), MariaTime::convertToTimeString(taskListDeadLine.at(i)->getEnd()).c_str());
+					}
+					toReturn += buffer;
+				}
+			}
+		}
+	}
+
+	_generatedTodayText = toReturn;
+	return toReturn;
+}
+
+string MariaUIPreview::generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine) {
+	string toReturn;
+	char buffer[STRING_BUFFER_SIZE];
+
+	//Tomorrow's Task
+	if (taskListTomorrow.size()>0) {
+		if (taskListTomorrow.size() == 1) {
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
+			toReturn += buffer;
+		} else {
+			sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_MULTIPLE.c_str(), taskListTomorrow.size(), MariaTime::convertToTimeString(taskListTomorrow.at(0)->getStart()).c_str());
+			toReturn += buffer;
+		}
+	} else {
+		sprintf_s(buffer, PREVIEW_EVENT_TOMORROW_NONE.c_str());
+		toReturn += buffer;
+	}
+
+	//Tomorrow's Deadline
+	if (taskListTomorrowDeadLine.size() > 0) {
+		if (taskListTomorrowDeadLine.size() == 1) {
+			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW.c_str(), MariaTime::convertToTimeString(taskListTomorrowDeadLine.at(0)->getEnd()).c_str());
+			toReturn += buffer;
+		} else {
+			sprintf_s(buffer, PREVIEW_DEADLINE_TOMORROW_MUTIPLE.c_str(), taskListTomorrowDeadLine.size());
+			toReturn += buffer;
+		}
+	}
+
+	_generatedTomorrowText = toReturn;
+	return toReturn;
+}
+
+string MariaUIPreview::generateSuggestionText(int day, vector<MariaTask*> taskListSuggest) {
+	string toReturn;
+	char buffer[STRING_BUFFER_SIZE];
+
+	//Find an empty day of the week.
+	if (day >= 0 && day <= 6) {
+		if (MariaTime::getCurrentTime().getDayWeek() != (day + DAY_OFFSET) % DAY_OF_WEEK) {
+			sprintf_s(buffer, PREVIEW_FREE_DAY.c_str(), MariaTime::DAYS[day]);
+			toReturn += buffer;
+		} else {
+			sprintf_s(buffer, PREVIEW_FREE_DAY_TODAY.c_str());
+			toReturn += buffer;
+		}
+	}
+
+	//Suggest a task from the list of floating.
+	if (taskListSuggest.size() > 0) {
+		MariaTask* generatedSuggestionTask = taskListSuggest.at(rand() % taskListSuggest.size());
+
+
+		if(generatedSuggestionTask->getCreated() == NULL) {
+			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_NO_DATE.c_str(), generatedSuggestionTask->getTitle().c_str());
+			toReturn += buffer;
+
+		} else {
+			string dateCreated = MariaTime::convertToDateString(generatedSuggestionTask->getCreated());
+			sprintf_s(buffer, PREVIEW_FLOATING_SUGGESTION_DEFAULT.c_str(), generatedSuggestionTask->getTitle().c_str(), dateCreated.c_str());
+			toReturn += buffer;
+		}
+	}
+
+	_generatedSuggestionText = toReturn;
+	return toReturn;
+}
+
+void MariaUIPreview::updateGUI(QPointF statePosition) {
+	_textToday->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y() + _qmainWindow->height() * START_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textTodayBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineToday->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+
+	//Calculate spaces inbetween today and tomorrow text with a minimum of 1 space.
+	int spaces = endLineCount(_textTodayBody->text().toStdString()) + 1;
+
+	_textTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textToday->geometry().y() + spaces * SPACING_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textTomorrowBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineTomorrow->setGeometry(QRect(_textToday->geometry().x(), _textTomorrow->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+
+	_textCalendar->setGeometry(QRect(_textToday->geometry().x(), statePosition.y() + _qmainWindow->height() * CALENDAR_HEIGHT_SCALE, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2, TITLE_SEPARATE_HEIGHT));
+	_textCalendarBody->setGeometry(QRect(_textToday->geometry().x() + BODY_XOFFSET, _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT + DIVIDER_HEIGHT, _qmainWindow->width() - TEXTBOX_X_OFFSET * 2 - BODY_XOFFSET, TITLE_AREA_HEIGHT));
+	_lineCalendar->setGeometry(QRect(_textToday->geometry().x(), _textCalendar->geometry().y() + TITLE_SEPARATE_HEIGHT, _qmainWindow->width(), DIVIDER_HEIGHT));
+}
+
+void MariaUIPreview::updateText() {
+	_textTodayBody->setText(QString::fromStdString(_generatedTodayText));
+	_textTomorrowBody->setText(QString::fromStdString(_generatedTomorrowText));
+	_textCalendarBody->setText(QString::fromStdString( _generatedSuggestionText));
+}
+	// End of segment: .\MariaApp\\MariaUIPreview.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIPreview.h
+	 */
+
+#pragma once
+
+#include <string>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaTaskManager.h"
+
+using namespace std;
+
+class MariaUIPreview : QWidget {
+public:
+	
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int MAX_CHAR_LENGTH = 40;
+	static const int FONT_SIZE = 12;
+	static const int STRING_BUFFER_SIZE = 255;
+	static const int MAX_TASK_SHOWN = 3;
+	static const int DAY_OFFSET = 1;
+	static const int DAY_OF_WEEK = 7;
+	static const int MINUTES_IN_HOURS = 60;
+
+	static const string PREVIEW_EVENT_TODAY_NONE;
+	static const string PREVIEW_EVENT_TODAY_FIRST_AT;
+	static const string PREVIEW_EVENT_TODAY_FIRST_REMAINING_TIME;
+	static const string PREVIEW_EVENT_TODAY_NEXT_AT;
+	static const string PREVIEW_EVENT_TODAY_NEXT_REMAINING_TIME;
+
+	static const string PREVIEW_EVENT_TOMORROW_NONE;
+	static const string PREVIEW_EVENT_TOMORROW;
+	static const string PREVIEW_EVENT_TOMORROW_MULTIPLE;
+	static const string PREVIEW_DEADLINE_TOMORROW;
+	static const string PREVIEW_DEADLINE_TOMORROW_MUTIPLE;
+
+	static const string PREVIEW_DEADLINE_TODAY_AT;
+	static const string PREVIEW_DEADLINE_TODAY_REMAINING_TIME;
+	static const string PREVIEW_DEADLINE_TODAY_MUTIPLE;
+	static const string PREVIEW_DEADLINE_ITEM_AT;
+	static const string PREVIEW_DEADLINE_ITEM_REMAINING_TIME;
+	static const string PREVIEW_DEADLINE_ITEM_TRIM;
+	
+	static const string PREVIEW_FLOATING_SUGGESTION_DEFAULT;
+	static const string PREVIEW_FLOATING_SUGGESTION_NO_DATE;
+	static const string PREVIEW_FREE_DAY;
+	static const string PREVIEW_FREE_DAY_TODAY;
+	
+	static const float START_HEIGHT_SCALE;
+	static const float CALENDAR_HEIGHT_SCALE;
+	static const float MESSAGE_HEIGHT;
+	static const float SPACING_HEIGHT;
+	static const float TITLE_SEPARATE_HEIGHT;
+	static const float TITLE_AREA_HEIGHT;
+	static const float BODY_XOFFSET;
+	static const float DIVIDER_HEIGHT;
+
+	MariaUIPreview(QMainWindow* qmainWindow);
+	~MariaUIPreview();
+
+	string generateTodayText(vector<MariaTask*> taskListNow, vector<MariaTask*> taskListAll, vector<MariaTask*> taskListDeadLine);
+	string generateTomorrowText(vector<MariaTask*> taskListTomorrow, vector<MariaTask*> taskListTomorrowDeadLine);
+	string generateSuggestionText(int day, vector<MariaTask*> taskListSuggest);
+	
+	void updateGUI(QPointF statePosition);
+	void updateText();
+
+private:
+	QMainWindow* _qmainWindow;
+
+	QLabel* _textToday;
+	QLabel* _textTodayBody;
+	QLabel* _lineToday;
+	QLabel* _textTomorrow;
+	QLabel* _textTomorrowBody;
+	QLabel* _lineTomorrow;
+	QLabel* _textCalendar;
+	QLabel* _textCalendarBody;
+	QLabel* _lineCalendar;
+
+	string _generatedTodayText;
+	string _generatedTomorrowText;
+	string _generatedSuggestionText;
+
+	int endLineCount(string text);
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIPreview.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateConflict.cpp
+	 */
+
+#include <assert.h> 
+#include "MariaUIStateConflict.h"
+
+const float MariaUIStateConflict::TASKBAR_STARTHEIGHT_SCALE = 0.1;
+const float MariaUIStateConflict::TASK_STARTHEIGHT_SCALE = 0.2;
+
+MariaUIStateConflict::MariaUIStateConflict(QMainWindow* qmainWindow, vector<MariaTask*> conflictedTask) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
+	assert(qmainWindow != NULL);
+
+	_conflictedTask = conflictedTask;
+}
+
+MariaUIStateConflict::~MariaUIStateConflict() {
+	clearUITask();
+}
+
+void MariaUIStateConflict::updateGUI() {
+	updateUITaskNumber();
+}
+
+void MariaUIStateConflict::initBeginState() {
+	clearUITask();
+
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height() * TASKBAR_STARTHEIGHT_SCALE);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
+}
+
+void MariaUIStateConflict::initActiveState() {
+	for (MariaTask* temp : _conflictedTask) {
+		addUITask(temp, MariaUITask::DisplayType::EXPANDED);
+	}
+
+	updateUITaskNumber();
+	updateUITaskPosition();
+	updatePage();
+}
+
+void MariaUIStateConflict::initEndState() {
+	eraseAllUITask();
+}
+
+bool MariaUIStateConflict::timerBeginState() {
+	updatePageTitleGUI();
+	return false;
+}
+
+bool MariaUIStateConflict::timerActiveState() {
+	return false;
+}
+
+bool MariaUIStateConflict::timerEndState() {
+	updatePageTitleGUI();
+	return false;
+}
+	// End of segment: .\MariaApp\\MariaUIStateConflict.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateConflict.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaUIStateDisplay.h"
+#include "MariaUITask.h"
+#include "MariaTask.h"
+
+class MariaUIStateConflict : public MariaUIStateDisplay {
+public:
+	static const int MAX_ITEM_IN_PAGE = 3;
+
+	MariaUIStateConflict(QMainWindow* qmainWindow, vector<MariaTask*> conflictedTask);
+	~MariaUIStateConflict();
+
+	void updateGUI();
+
+private:
+	static const int BACKGROUND_R = 255;
+	static const int BACKGROUND_G = 0;
+	static const int BACKGROUND_B = 0;
+	static const float TASK_STARTHEIGHT_SCALE;
+	static const float TASKBAR_STARTHEIGHT_SCALE;
+
+	vector<MariaTask*> _conflictedTask;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateConflict.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateCredits.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUI.h"
+#include "MariaUIStateCredits.h"
+
+const string MariaUIStateCredits::CREDITS_STRING = "MARIA\nMy Attentive, Reliable and Intelligent Assistant";
+const string MariaUIStateCredits::CREDITS_STRING_BODY = "Developed for CS2103T Software Engineering(S2 2014)\nNational University of Singapore\n\nDevelopers:\nJay Chua\nMelvyn Qwek\nRey Neo\n\nSpecial Thanks:\nDr Damith C. Rajapakse\nMrs Janet Chan\nMr Jerome Cheng";
+const float MariaUIStateCredits::FLOW_FACTOR = 0.01;
+const float MariaUIStateCredits::VALUE_THRESHOLD = 0.5;
+const float MariaUIStateCredits::DISPLAY_TEXT_WIDTH = 400;
+const float MariaUIStateCredits::DISPLAY_TEXT_HEIGHT = 60;
+const float MariaUIStateCredits::DISPLAYBODY_TEXT_WIDTH = 400;
+const float MariaUIStateCredits::DISPLAYBODY_TEXT_HEIGHT = 400;
+const float MariaUIStateCredits::LOGO_START_Y = -100;
+const float MariaUIStateCredits::LOGO_STAGE_Y_SCALE = 0.15;
+const float MariaUIStateCredits::TEXT_STAGE_Y_SCALE = 0.3;
+const float MariaUIStateCredits::TEXTBODY_STAGE_Y_SCALE = 0.3;
+
+MariaUIStateCredits::MariaUIStateCredits(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+	
+	_qmainWindow = qmainWindow;
+	
+	_displayText = new QLabel(_qmainWindow);
+	_displayTextBody = new QLabel(_qmainWindow);
+	_logo = new QLabel(_qmainWindow);
+	_logoImageIndex = 0;
+	_doneAnimating = false;
+	_transitionAuto = true;
+}
+
+MariaUIStateCredits::~MariaUIStateCredits() {
+	SAFE_DELETE(_logo);
+	SAFE_DELETE(_displayTextBody);
+	SAFE_DELETE(_displayText);
+}
+
+void MariaUIStateCredits::setDoneAnimating() {
+	_doneAnimating = true;
+}
+
+	// End of segment: .\MariaApp\\MariaUIStateCredits.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateCredits.cpp
+	 */
+
+void MariaUIStateCredits::initActiveState() {
+}
+
+void MariaUIStateCredits::initEndState() {
+}
+
+bool MariaUIStateCredits::timerBeginState() {
+	animateLogo();
+	updateGUIPosition();
+	return false;
+}
+
+bool MariaUIStateCredits::timerActiveState() {
+	animateLogo();
+
+	if (_doneAnimating) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool MariaUIStateCredits::timerEndState() {
+	animateLogo();
+	updateGUIPosition();
+	return false;
+}
+
+void MariaUIStateCredits::animateLogo() {
+	if (_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
+		_logoImageIndex++;
+	} else {
+		_logoImageIndex = 0;
+	}
+	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
+}
+
+void MariaUIStateCredits::updateGUIPosition() {
+	_displayText->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
+	_displayTextBody->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TEXTBODY_STAGE_Y_SCALE, DISPLAYBODY_TEXT_WIDTH, DISPLAYBODY_TEXT_HEIGHT));
+	_logo->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, getPosition().y() + _qmainWindow->height() * LOGO_STAGE_Y_SCALE, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+}
+	// End of segment: .\MariaApp\\MariaUIStateCredits.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateCredits.h
+	 */
+
+#pragma once
+
+#include <string>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+#include "MariaStateObject.h"
+
+using namespace std;
+
+class MariaUIStateCredits : public MariaStateObject {
+public:
+	MariaUIStateCredits(QMainWindow* qmainWindow);
+	~MariaUIStateCredits();
+
+	void setDoneAnimating();
+
+private:
+	static const int BACKGROUND_R = 37;
+	static const int BACKGROUND_G = 157;
+	static const int BACKGROUND_B = 207;
+	static const int LOGO_SPEED_RETARDER = 80;
+	static const int FONT_SIZE = 18;
+	static const int FONT_SIZE_BODY = 14;
+	static const string CREDITS_STRING;
+	static const string CREDITS_STRING_BODY;
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const float DISPLAY_TEXT_WIDTH;
+	static const float DISPLAY_TEXT_HEIGHT;
+	static const float DISPLAYBODY_TEXT_WIDTH;
+	static const float DISPLAYBODY_TEXT_HEIGHT;
+	static const float LOGO_START_Y;
+	static const float LOGO_STAGE_Y_SCALE;
+	static const float TEXT_STAGE_Y_SCALE;
+	static const float TEXTBODY_STAGE_Y_SCALE;
+	
+	QMainWindow* _qmainWindow;
+	
+	QLabel* _displayText;
+	QLabel* _displayTextBody;
+	QLabel* _logo;
+	int _logoImageIndex;
+	bool _doneAnimating;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+	
+	void animateLogo();
+	void updateGUIPosition();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateCredits.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateDisplay.cpp
+	 */
+
+#include <assert.h> 
+#include "MariaMacros.h"
+#include "MariaUIStateDisplay.h"
+#include "MariaUI.h"
+
+const string MariaUIStateDisplay::MESSAGE_ITEM_ABOVE = " item up above";
+const string MariaUIStateDisplay::MESSAGE_ITEMS_ABOVE = " items up above";
+const string MariaUIStateDisplay::MESSAGE_ITEM_BELOW = " item down below";
+const string MariaUIStateDisplay::MESSAGE_ITEMS_BELOW = " items down below";
+
+const float MariaUIStateDisplay::TITLE_Y_OFFSET = 4.0;
+const float MariaUIStateDisplay::TITLE_WIDTH = 400.0;
+const float MariaUIStateDisplay::TITLE_HEIGHT = 40.0;
+const float MariaUIStateDisplay::FONT_SIZE = 12.0;
+
+	// End of segment: .\MariaApp\\MariaUIStateDisplay.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateDisplay.cpp
+	 */
+
+void MariaUIStateDisplay::updateUITaskNumber() {
+	int maxShown = _taskStack.size() - _page * _maxTaskDisplay;
+	if (maxShown > _maxTaskDisplay) {
+		maxShown = _maxTaskDisplay;
+	}
+
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + maxShown; i++) {
+		_taskStack.at(i)->setTitlePretext(std::to_string(i + 1) + ". ");
+	}
+}
+
+MariaUITask* MariaUIStateDisplay::addUITask(MariaTask* task, MariaUITask::DisplayType type) {
+	assert(task != NULL);
+
+	int currentPosition = ((int)_taskStack.size()) - _page * _maxTaskDisplay;
+
+	int range = ((int)_taskStack.size()) - _page * _maxTaskDisplay;
+	if (range > _maxTaskDisplay) {
+		range = _maxTaskDisplay;
+	}
+	
+	float compoundPosition = 0.0;
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + range; i++) {
+		compoundPosition += _taskStack.at(i)->getTaskHeight();
+	}
+
+	float yOffset = 0.0;
+	if (currentPosition < 0) {
+		yOffset -= _qmainWindow->height();
+	}
+
+	if (currentPosition >= _maxTaskDisplay) {
+		yOffset += _qmainWindow->height();
+	}
+
+	MariaUITask* temp = new MariaUITask(_qmainWindow, task, type);
+	
+	if (currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
+		temp->setPosition(QPointF(_qmainWindow->width(), _taskStartHeight + compoundPosition + yOffset));
+		temp->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
+		temp->activate();
+	} else {
+		temp->setPosition(QPointF(0.0, _taskStartHeight + yOffset));
+		temp->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
+	}
+
+	if (task->getType() != MariaTask::FLOATING) {
+		temp->startUpdatingTime();
+	}
+
+	_taskStack.push_back(temp);
+	updateGUI();
+	
+	return temp;
+}
+
+void MariaUIStateDisplay::updateUITaskPosition() {
+	float compoundPosition = 0.0;
+	for (int i = 0; i < _taskStack.size(); i++) {
+		int currentPosition = i - _page * _maxTaskDisplay;
+		if (currentPosition >= 0 && currentPosition < _maxTaskDisplay) {
+			_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight + compoundPosition));
+			compoundPosition += _taskStack.at(i)->getTaskHeight();
+		} else {
+			if (currentPosition < 0) {
+				_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight -_qmainWindow->height()));
+			}
+			if (currentPosition >= _maxTaskDisplay) {
+				_taskStack.at(i)->setPosition(QPointF(_taskStack.at(i)->getPosition().x(), _taskStartHeight + _qmainWindow->height()));
+			}
+		}
+	}
+}
+
+MariaUITask* MariaUIStateDisplay::eraseUITask(int index) {
+	assert(index >= 0);
+	assert(index < _taskStack.size());
+
+	MariaUITask* temp = NULL;
+	temp = _taskStack[index];
+	_taskDisposeStack.push_back(temp);
+	temp->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, temp->getPosition().y()));
+	temp->stopUpdatingTime();
+	_taskStack.erase(_taskStack.begin() + index);
+
+	setPage(0);
+	return temp;
+}
+
+MariaUITask* MariaUIStateDisplay::eraseUITask(MariaTask* task) {
+	assert(task != NULL);
+
+	MariaUITask* temp = NULL;
+	for (int i = 0; i < _taskStack.size(); i++) {
+		if (_taskStack[i]->getMariaTask() == task) {
+			temp = _taskStack[i];
+			_taskDisposeStack.push_back(temp);
+			temp->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
+			temp->stopUpdatingTime();
+			_taskStack.erase(_taskStack.begin() + i);
+			setPage(i / _maxTaskDisplay);
+			break;
+		}
+	}
+	
+	return temp;
+}
+
+void MariaUIStateDisplay::eraseAllUITask() {
+	for (int i = 0; i < _taskStack.size(); i++) {
+		_taskStack.at(i)->setDestination(QPointF(-_qmainWindow->width() - TEXTBOX_X_OFFSET, _taskStack.at(i)->getPosition().y()));
+		_taskStack.at(i)->stopUpdatingTime();
+	}
+
+	while (_taskStack.size()>0) {
+		_taskDisposeStack.push_back(_taskStack.at(0));
+		_taskStack.erase(_taskStack.begin());
+	}
+	
+	setPage(0);
+}
+
+void MariaUIStateDisplay::clearUITask() {
+	for (int i = 0; i < _taskStack.size(); i++) {
+		_taskStack.at(i)->stopUpdatingTime();
+		SAFE_DELETE(_taskStack.at(i));
+	}
+
+	while(_taskStack.size() > 0) {
+		_taskStack.pop_back();
+	}
+
+	for (int i = 0; i < _taskDisposeStack.size(); i++) {
+		_taskDisposeStack.at(i)->stopUpdatingTime();
+		SAFE_DELETE(_taskDisposeStack.at(i));
+	}
+
+	while(_taskDisposeStack.size() > 0) {
+		_taskDisposeStack.pop_back();
+	}
+	setPage(0);
+}
+
+int MariaUIStateDisplay::getTotalUITask() {
+	return _taskStack.size();
+}
+
+bool MariaUIStateDisplay::isAllTaskAtLocation() {
+	bool toReturn = true;
+	
+	int maxShown = _taskStack.size() - _page * _maxTaskDisplay;
+	if (maxShown > _maxTaskDisplay) {
+		maxShown = _maxTaskDisplay;
+	}
+
+	//Only task that are visible are checked.
+	for (int i = _page * _maxTaskDisplay; i < _page * _maxTaskDisplay + maxShown; i++) {
+		if (!_taskStack.at(i)->isAtLocation()) {
+			toReturn = false;
+			break;
+		}
+	}
+	return toReturn;
+}
+
+
+int MariaUIStateDisplay::getMaxTaskDisplay() {
+	return _maxTaskDisplay;
+}
+
+bool MariaUIStateDisplay::setPage(int page) {
+	if (isPageValid(page)) {
+		_page = page;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaUIStateDisplay::setPageEnd() {
+	if (getTotalUITask() == 0) {
+		_page = 0;
+	} else {
+		_page = ((getTotalUITask() - 1) / _maxTaskDisplay);
+	}
+}
+
+int MariaUIStateDisplay::getPage() {
+	return _page;
+}
+
+bool MariaUIStateDisplay::isPageValid(int page) {
+	if (page >= 0 && page <= ceil((getTotalUITask() - 1) / _maxTaskDisplay)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaUIStateDisplay::updatePage() {
+	float compoundPosition = 0.0;
+	for (int i = 0; i < _taskStack.size(); i++) {
+
+		int currentPosition = i - _page * _maxTaskDisplay;
+		float yOffset = 0.0;
+
+		if (currentPosition < 0) {
+			yOffset -= _qmainWindow->height();
+		}
+
+		if (currentPosition >= _maxTaskDisplay) {
+			yOffset += _qmainWindow->height();
+		}
+		
+		if (yOffset == 0.0) {
+			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + compoundPosition + yOffset));
+			_taskStack.at(i)->activate();
+			compoundPosition += _taskStack.at(i)->getTaskHeight();
+		} else {
+			_taskStack.at(i)->setDestination(QPointF(0.0, _taskStartHeight + yOffset));
+		}
+
+		_taskStack.at(i)->updateDetails();
+	}
+	updateTitleText();
+	updateGUI();
+}
+
+void MariaUIStateDisplay::updatePageTitleGUI() {
+	_pageText->show();
+	_pageText->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() - TITLE_Y_OFFSET - TITLE_HEIGHT, TITLE_WIDTH, TITLE_HEIGHT));
+}
+
+void MariaUIStateDisplay::updateGUI() {
+}
+
+void MariaUIStateDisplay::updateTitleText() {
+	int offsetBeforePage = _page * _maxTaskDisplay;
+	//+1 to find the difference for the next page.
+	int offsetAfterPage = ((int)_taskStack.size() - (_page + 1) * _maxTaskDisplay);
+
+	string toShow;
+	string toShow2;
+	if (offsetBeforePage > 0) {
+		toShow += to_string(offsetBeforePage);
+
+		//Check if there are more than 1 item to include 's' in the string.
+		if (offsetBeforePage > 1) {
+			toShow += MESSAGE_ITEMS_ABOVE;
+		} else {
+			toShow += MESSAGE_ITEM_ABOVE;
+		}
+	}
+
+	if (offsetAfterPage > 0) {
+		toShow2 += to_string(offsetAfterPage);
+
+		//Check if there are more than 1 item to include 's' in the string.
+		if (offsetAfterPage > 1) {
+			toShow2 += MESSAGE_ITEMS_BELOW;
+		} else {
+			toShow2 += MESSAGE_ITEM_BELOW;
+		}
+	}
+
+	if (toShow.length() > 0 && toShow2.length() > 0) {
+		toShow += "\n";
+	}
+
+	_pageText->setText(QString::fromStdString(toShow + toShow2));
+}
+	// End of segment: .\MariaApp\\MariaUIStateDisplay.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateDisplay.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaStateObject.h"
+#include "MariaUITask.h"
+#include "MariaTask.h"
+
+class MariaUIStateDisplay : public MariaStateObject {
+public:
+	MariaUIStateDisplay(QMainWindow* qmainWindow, float taskStartHeight, int maxTaskDisplay);
+	~MariaUIStateDisplay();
+
+	MariaUITask* addUITask(MariaTask* task, MariaUITask::DisplayType type);
+	void updateUITaskPosition();
+	void updateUITaskNumber();
+	MariaUITask* eraseUITask(int index);
+	MariaUITask* eraseUITask(MariaTask* task);
+	void eraseAllUITask();
+	void clearUITask();
+	int getTotalUITask();
+	bool isAllTaskAtLocation();
+	
+	int getMaxTaskDisplay();
+
+	bool setPage(int page);
+	void setPageEnd();
+	int getPage();
+	bool isPageValid(int page);
+	void updatePage();
+	void updatePageTitleGUI();
+
+	//Inheritable function to update GUI if there is any UITask operations.
+	virtual void updateGUI();
+
+protected:
+	QMainWindow* _qmainWindow;
+	int _maxTaskDisplay;
+
+private:
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const string MESSAGE_ITEM_ABOVE;
+	static const string MESSAGE_ITEMS_ABOVE;
+	static const string MESSAGE_ITEM_BELOW;
+	static const string MESSAGE_ITEMS_BELOW;
+	static const float TITLE_Y_OFFSET;
+	static const float TITLE_WIDTH;
+	static const float TITLE_HEIGHT;
+	static const float FONT_SIZE;
+
+	std::vector<MariaUITask*> _taskStack;
+	std::vector<MariaUITask*> _taskDisposeStack;
+
+	float _taskStartHeight;
+	int _page;
+	QLabel* _pageText;
+	void updateTitleText();
+};
+	// End of segment: .\MariaApp\\MariaUIStateDisplay.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateHelp.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIStateHelp.h"
+#include "MariaUI.h"
+
+MariaUIStateHelp::MariaUIStateHelp(QMainWindow* qmainWindow, int screen) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow = qmainWindow;
+
+	_helpIndex = screen;
+	_helpImage = new QLabel(_qmainWindow);
+	_helpImage->setAlignment(Qt::AlignCenter);
+	_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + screen));
+	_helpImage->show();
+	_doneViewing = false;
+	_transitionAuto = true;
+}
+
+MariaUIStateHelp::~MariaUIStateHelp() {
+	SAFE_DELETE(_helpImage);
+}
+
+int MariaUIStateHelp::getHelpIndex() {
+	return _helpIndex;
+}
+
+void MariaUIStateHelp::setHelpIndex(int index) {
+	if (index >= 0 && index < MariaUI::AMOUNT_OF_HELP_IMAGE) {
+		_helpIndex = index;
+		_helpImage->setPixmap(*((MariaUI*)_qmainWindow)->getImageHandler(MariaUI::IMAGE_INDEX_HELP + index));
+	}
+}
+
+void MariaUIStateHelp::setDoneViewing() {
+	_doneViewing = true;
+}
+
+void MariaUIStateHelp::initBeginState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
+}
+
+void MariaUIStateHelp::initActiveState() {
+	
+}
+
+void MariaUIStateHelp::initEndState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+}
+
+bool MariaUIStateHelp::timerBeginState() {
+	_helpImage->setGeometry(QRect(getPosition().x(), getPosition().y(), HELP_IMAGE_WIDTH, HELP_IMAGE_HEIGHT));
+	return false;
+}
+
+bool MariaUIStateHelp::timerActiveState() {
+	if (_doneViewing) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool MariaUIStateHelp::timerEndState() {
+	_helpImage->setGeometry(QRect(getPosition().x(), getPosition().y(), HELP_IMAGE_WIDTH, HELP_IMAGE_HEIGHT));
+	return false;
+}
+	// End of segment: .\MariaApp\\MariaUIStateHelp.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateHelp.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaStateObject.h"
+
+class MariaUIStateHelp : public MariaStateObject {
+public:
+	MariaUIStateHelp(QMainWindow* qmainWindow, int screen = 0);
+	~MariaUIStateHelp();
+
+	int getHelpIndex();
+	void setHelpIndex(int index);
+	void setDoneViewing();
+
+private:
+	static const int BACKGROUND_R = 225;
+	static const int BACKGROUND_G = 191;
+	static const int BACKGROUND_B = 0;
+	static const int HELP_IMAGE_WIDTH = 480;
+	static const int HELP_IMAGE_HEIGHT = 640;
+
+	QMainWindow* _qmainWindow;
+	QLabel* _helpImage;
+	int _helpIndex;
+	bool _doneViewing;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateHelp.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateHome.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIStateHome.h"
+#include "MariaUI.h"
+
+const float MariaUIStateHome::TASK_STARTHEIGHT_SCALE = 0.65;
+const float MariaUIStateHome::TASKBAR_STARTHEIGHT_SCALE = 0.1;
+
+MariaUIStateHome::MariaUIStateHome(QMainWindow* qmainWindow, vector<MariaTask*> weekTask) : MariaUIStateDisplay(qmainWindow, TASK_STARTHEIGHT_SCALE, MAX_ITEM_IN_PAGE) {
+	assert(qmainWindow != NULL);
+
+	_preview = new MariaUIPreview(_qmainWindow);
+	_clock = new MariaUIClock(_qmainWindow);
+	_weekTask = weekTask;
+}
+
+MariaUIStateHome::~MariaUIStateHome() {
+	clearUITask();
+	SAFE_DELETE(_clock);
+	SAFE_DELETE(_preview);
+}
+
+void MariaUIStateHome::updateGUI() {
+	((MariaUI*)_qmainWindow)->forceLogicCall();
+	_preview->updateGUI(getPosition());
+}
+
+MariaUIPreview* MariaUIStateHome::getUIPreview() {
+	return _preview;
+}
+
+void MariaUIStateHome::initBeginState() {
+	clearUITask();
+	_clock->startUpdating();
+
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height() * TASKBAR_STARTHEIGHT_SCALE);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
+}
+
+void MariaUIStateHome::initActiveState() {
+	for (MariaTask* temp : _weekTask) {
+		addUITask(temp, MariaUITask::DisplayType::NORMAL);
+	}
+
+	updateUITaskPosition();
+	updatePage();
+}
+
+void MariaUIStateHome::initEndState() {
+	eraseAllUITask();
+}
+
+bool MariaUIStateHome::timerBeginState() {
+	_preview->updateGUI(getPosition());
+	_clock->updateGUI(getPosition());
+	updatePageTitleGUI();
+
+	return false;
+}
+
+bool MariaUIStateHome::timerActiveState() {
+	return false;
+}
+
+bool MariaUIStateHome::timerEndState() {
+	_preview->updateGUI(getPosition());
+	_clock->updateGUI(getPosition());
+	updatePageTitleGUI();
+
+	return false;
+}
+	// End of segment: .\MariaApp\\MariaUIStateHome.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateHome.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaUIStateDisplay.h"
+#include "MariaUIClock.h"
+#include "MariaUITask.h"
+#include "MariaTask.h"
+#include "MariaUIPreview.h"
+
+class MariaUIStateHome : public MariaUIStateDisplay {
+public:
+	static const int MAX_ITEM_IN_PAGE = 5;
+
+	MariaUIStateHome(QMainWindow* qmainWindow, vector<MariaTask*> weekTask);
+	~MariaUIStateHome();
+
+	void updateGUI();
+	MariaUIPreview* getUIPreview();
+
+private:
+	static const int BACKGROUND_R = 114;
+	static const int BACKGROUND_G = 143;
+	static const int BACKGROUND_B = 22;
+	static const float TASK_STARTHEIGHT_SCALE;
+	static const float TASKBAR_STARTHEIGHT_SCALE;
+
+	MariaUIPreview* _preview;
+	MariaUIClock * _clock;
+	vector<MariaTask*> _weekTask;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateHome.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateLoading.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIStateLoading.h"
+#include "MariaUI.h"
+
+const float MariaUIStateLoading::FLOW_FACTOR = 0.01;
+const float MariaUIStateLoading::VALUE_THRESHOLD = 0.5;
+const float MariaUIStateLoading::DISPLAY_TEXT_WIDTH = 300;
+const float MariaUIStateLoading::DISPLAY_TEXT_HEIGHT = 20;
+const float MariaUIStateLoading::LOGO_START_Y = -100;
+const float MariaUIStateLoading::LOGO_STAGE_Y_SCALE = 0.4;
+const float MariaUIStateLoading::TEXT_STAGE_Y_SCALE = 0.6;
+const float MariaUIStateLoading::DOTS_STAGE_Y_SCALE = 0.8;
+const float MariaUIStateLoading::DOTS_X_OFFSET = 10;
+const float MariaUIStateLoading::DOTS_SEPARATION_WIDTH = 50;
+const float MariaUIStateLoading::DOTS_X_SPEED = 0.15;
+const float MariaUIStateLoading::DOTS_X_VARIABLE_SPEED = 0.75;
+
+MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateObject(qmainWindow) {
+	assert(qmainWindow != NULL);
+
+	_qmainWindow = qmainWindow;
+	_displayText = new QLabel(_qmainWindow);
+	_logo = new QLabel(_qmainWindow);
+
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
+		_loadingDots[i] = new QLabel(_qmainWindow);
+	}
+
+	_logoImageIndex = 0;
+	_quitAfterLoading = false;
+	_doneLoading = false;
+	_transitionAuto = true;
+}
+
+MariaUIStateLoading::~MariaUIStateLoading() {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
+		SAFE_DELETE(_loadingDots[i]);
+	}
+	SAFE_DELETE(_logo);
+	SAFE_DELETE(_displayText);
+}
+
+void MariaUIStateLoading::setDisplayText(string text) {
+	QString qText = QString::fromStdString(text);
+	_displayText->setText(qText);
+}
+
+void MariaUIStateLoading::setLoadingDone() {
+	_doneLoading = true;
+}
+
+void MariaUIStateLoading::setQuitAfterLoadingTrue() {
+	_quitAfterLoading = true;
+}
+
+void MariaUIStateLoading::initBeginState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(MariaUICommandBar::DEFAULT_Y_POSITION);
+
+	((MariaUI*)_qmainWindow)->setBackgroundColor(MariaUI::WINDOW_DEFAULT_COLOR_R, MariaUI::WINDOW_DEFAULT_COLOR_G, MariaUI::WINDOW_DEFAULT_COLOR_B);
+
+	_displayText->setStyleSheet("color:#ffffff;");
+	_displayText->setAlignment(Qt::AlignCenter);
+	_displayText->setGeometry(QRect(_qmainWindow->width() * 0.5 - DISPLAY_TEXT_WIDTH * 0.5, _qmainWindow->height() * TEXT_STAGE_Y_SCALE, DISPLAY_TEXT_WIDTH, DISPLAY_TEXT_HEIGHT));
+	_displayText->hide();
+
+	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON));
+	_logo->setAlignment(Qt::AlignCenter);
+	_logoYPos = LOGO_START_Y;
+	_logo->setGeometry(QRect(_qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, _logoYPos, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+	_logo->show();
+}
+
+void MariaUIStateLoading::initActiveState() {
+	_displayText->show();
+	
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
+		_loadingDots[i]->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS));
+		_loadingDots[i]->show();
+		_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET + DOTS_SEPARATION_WIDTH * i;
+	}
+}
+
+void MariaUIStateLoading::initEndState() {
+	_displayText->hide();
+
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
+		_loadingDots[i]->hide();
+	}
+}
+
+bool MariaUIStateLoading::timerBeginState() {
+	animateLogo();
+
+	if (abs(_logoYPos -_qmainWindow->height() * LOGO_STAGE_Y_SCALE)>VALUE_THRESHOLD) {
+		_logoYPos += (_qmainWindow->height() * LOGO_STAGE_Y_SCALE - _logoYPos) * FLOW_FACTOR;
+		updateGUIPosition();
+
+		return true;
+	}
+	return false;
+}
+
+bool MariaUIStateLoading::timerActiveState() {
+	animateLogo();
+	bool allDotsLeft = animateDots();
+
+	if (allDotsLeft && _doneLoading) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool MariaUIStateLoading::timerEndState() {
+	animateLogo();
+
+	if (abs(_logoYPos - LOGO_START_Y)>VALUE_THRESHOLD) {
+		_logoYPos += (LOGO_START_Y - _logoYPos) * FLOW_FACTOR;
+		updateGUIPosition();
+		
+		return true;
+	} else {
+		if (_quitAfterLoading) {
+			((MariaUI*)_qmainWindow)->quitAction();
+		}
+
+		return false;
+	}
+}
+
+void MariaUIStateLoading::animateLogo() {
+	if (_logoImageIndex + LOGO_SPEED_RETARDER < MariaUI::AMOUNT_OF_ICON * LOGO_SPEED_RETARDER) {
+		_logoImageIndex++;
+	} else {
+		_logoImageIndex = 0;
+	}
+	_logo->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON + _logoImageIndex / LOGO_SPEED_RETARDER));
+}
+
+bool MariaUIStateLoading::animateDots() {
+	bool allDotsLeft = true;
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
+		if (_dotsXPos[i]< - DOTS_X_OFFSET - AMOUNT_OF_DOTS * DOTS_SEPARATION_WIDTH) {
+			_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET;
+		} else {
+			float newSpeed = (_dotsXPos[i] -_qmainWindow->width() * 0.5) / _qmainWindow->width();
+			_dotsXPos[i] -= abs(newSpeed) * DOTS_X_VARIABLE_SPEED + DOTS_X_SPEED;
+		}
+
+		if (_dotsXPos[i]> - DOTS_X_OFFSET) {
+			allDotsLeft = false;
+		}
+
+		_loadingDots[i]->setGeometry(QRect(_dotsXPos[i] - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width() * 0.5, _qmainWindow->height() * DOTS_STAGE_Y_SCALE , MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS)->height()));
+	}
+
+	return allDotsLeft;
+}
+
+void MariaUIStateLoading::updateGUIPosition() {
+	_logo->setGeometry(QRect(_qmainWindow->width() * 0.5 - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width() * 0.5, _logoYPos - MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height() * 0.5, MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->width(), MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_ICON)->height()));
+}
+	// End of segment: .\MariaApp\\MariaUIStateLoading.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateLoading.h
+	 */
+
+#pragma once
+
+#include <string>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+#include "MariaStateObject.h"
+
+using namespace std;
+
+class MariaUIStateLoading : public MariaStateObject {
+public:
+	MariaUIStateLoading(QMainWindow* qmainWindow);
+	~MariaUIStateLoading();
+
+	void setDisplayText(string text);
+	void setLoadingDone();
+	void setQuitAfterLoadingTrue();
+	
+private:
+	static const int AMOUNT_OF_DOTS = 5;
+	static const int LOGO_SPEED_RETARDER = 80;
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const float DISPLAY_TEXT_WIDTH;
+	static const float DISPLAY_TEXT_HEIGHT;
+	static const float LOGO_START_Y;
+	static const float LOGO_STAGE_Y_SCALE;
+	static const float TEXT_STAGE_Y_SCALE;
+	static const float DOTS_STAGE_Y_SCALE;
+	static const float DOTS_X_OFFSET;
+	static const float DOTS_SEPARATION_WIDTH;
+	static const float DOTS_X_SPEED;
+	static const float DOTS_X_VARIABLE_SPEED;
+	
+	QMainWindow* _qmainWindow;
+
+	QLabel* _displayText;
+	QLabel* _logo;
+	float _logoYPos;
+	int _logoImageIndex;
+
+	QLabel* _loadingDots[AMOUNT_OF_DOTS];
+	float _dotsXPos[AMOUNT_OF_DOTS];
+
+	bool _doneLoading;
+	bool _quitAfterLoading;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+	
+	void animateLogo();
+	bool animateDots();
+	void updateGUIPosition();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateLoading.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateShow.cpp
+	 */
+
+#include <assert.h> 
+#include "MariaMacros.h"
+#include "MariaUIStateShow.h"
+#include "MariaUI.h"
+
+	// End of segment: .\MariaApp\\MariaUIStateShow.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateShow.cpp
+	 */
+
+void MariaUIStateShow::updateGUI() {
+}
+
+void MariaUIStateShow::initBeginState() {
+	((MariaUI*)_qmainWindow)->getCommandBar()->setDestination(_qmainWindow->height() * TASKBAR_STARTHEIGHT_SCALE);
+	((MariaUI*)_qmainWindow)->setBackgroundColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B);
+
+	_titleLabel->show();
+}
+
+void MariaUIStateShow::initActiveState() {
+	for (MariaTask* temp : _listOfTasks) {
+		addUITask(temp, MariaUITask::DisplayType::DETAILED);
+	}
+
+	updateUITaskPosition();
+	updatePage();
+}
+
+void MariaUIStateShow::initEndState() {
+	eraseAllUITask();
+}
+
+bool MariaUIStateShow::timerBeginState() {
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	updatePageTitleGUI();
+	return false;
+}
+
+bool MariaUIStateShow::timerActiveState() {
+	return false;
+}
+
+bool MariaUIStateShow::timerEndState() {
+	_titleLabel->setGeometry(QRect(getPosition().x() + _qmainWindow->width() * 0.5 - TITLE_WIDTH * 0.5, getPosition().y() + _qmainWindow->height() * TITLE_HEIGHT_SCALE, TITLE_WIDTH, TITLE_HEIGHT));
+	updatePageTitleGUI();
+	return false;
+}
+	// End of segment: .\MariaApp\\MariaUIStateShow.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStateShow.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include "MariaUIStateDisplay.h"
+#include "MariaTime.h"
+#include "MariaUITask.h"
+#include "MariaTask.h"
+
+class MariaUIStateShow : public MariaUIStateDisplay {
+public:
+	static const int MAX_ITEM_IN_PAGE = 5;
+
+	MariaUIStateShow(QMainWindow* qmainWindow, string title, vector<MariaTask*> listOfTasks);
+	~MariaUIStateShow();
+	
+	void updateGUI();
+
+private:
+	static const int BACKGROUND_R = 116;
+	static const int BACKGROUND_G = 30;
+	static const int BACKGROUND_B = 168;
+	static const float TASK_STARTHEIGHT_SCALE;
+	static const float TASKBAR_STARTHEIGHT_SCALE;
+	static const float TITLE_WIDTH;
+	static const float TITLE_HEIGHT;
+	static const float TITLE_HEIGHT_SCALE;
+
+	QLabel* _titleLabel;
+	vector<MariaTask*> _listOfTasks;
+
+	void initBeginState();
+	void initActiveState();
+	void initEndState();
+	bool timerBeginState();
+	bool timerActiveState();
+	bool timerEndState();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUIStateShow.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStatus.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUIStatus.h"
+
+MariaUIStatus::MariaUIStatus(QMainWindow* qmainWindow) {
+	assert(qmainWindow != NULL);
+	
+	_qmainWindow = qmainWindow;
+
+	loadImages();
+
+	_statusImageIndex = 0;
+	_statusIcon = new QLabel(_qmainWindow);
+	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
+	_statusIcon->hide();
+
+	_statusAnimationTimer = new QTimer(this);
+	connect(_statusAnimationTimer, SIGNAL(timeout()), this, SLOT(updateStatusAnimation()));
+}
+
+MariaUIStatus::~MariaUIStatus(void) {
+	for (int i = 0; i < AMOUNT_OF_IMAGES; i++) {
+		SAFE_DELETE(_imageHandle[i]);
+	}
+	SAFE_DELETE(_statusAnimationTimer);
+	SAFE_DELETE(_statusIcon);
+}
+
+void MariaUIStatus::setStatus(StatusType type) {
+	if (_currentStatus != type) {
+		_currentStatus = type;
+		updateStatusAnimation();
+		if (!_statusAnimationTimer->isActive())
+			_statusAnimationTimer->start(ANIMATION_SPEED);
+	}
+}
+
+MariaUIStatus::StatusType MariaUIStatus::getStatus() {
+	return _currentStatus;
+}
+
+void MariaUIStatus::updateGUI(QPointF statePosition) {
+	_statusIcon->setGeometry(QRect(statePosition.x() + TEXTBOX_X_OFFSET, statePosition.y(), _imageHandle[0]->width(), _imageHandle[0]->height()));
+}
+
+void MariaUIStatus::updateStatusAnimation() {
+	_statusIcon->show();
+
+	switch(_currentStatus) {
+	case OK:
+		_statusAnimationTimer->stop();
+		_statusImageIndex = IMAGE_INDEX_OK;
+		break;
+	case INVALID:
+		_statusAnimationTimer->stop();
+		break;
+	case WAIT:
+		if (_statusImageIndex<IMAGE_INDEX_WAIT_0 || _statusImageIndex>IMAGE_INDEX_WAIT_3)
+			_statusImageIndex = IMAGE_INDEX_WAIT_0;
+		if (_statusImageIndex<IMAGE_INDEX_WAIT_3)
+			_statusImageIndex++;
+		else
+			_statusImageIndex = IMAGE_INDEX_WAIT_0;
+		break;
+	case UNKNOWN:
+		_statusAnimationTimer->stop();
+		_statusImageIndex = IMAGE_INDEX_UNKNOWN;
+		break;
+	case NONE:
+		_statusAnimationTimer->stop();
+		_statusIcon->hide();
+		break;
+	default:
+		break;
+	}
+	
+	_statusIcon->setPixmap(*_imageHandle[_statusImageIndex]);
+}
+
+	// End of segment: .\MariaApp\\MariaUIStatus.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUIStatus.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+
+class MariaUIStatus : QWidget {
+	Q_OBJECT
+
+public:
+	typedef enum{
+		OK, 
+		INVALID, 
+		WAIT, 
+		UNKNOWN, 
+		NONE
+	} StatusType;
+
+	MariaUIStatus(QMainWindow* qmainWindow);
+	~MariaUIStatus();
+
+	void setStatus(StatusType type);
+	StatusType getStatus();
+	void updateGUI(QPointF statePosition);
+
+protected slots:
+		void updateStatusAnimation();	
+
+private:
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int AMOUNT_OF_IMAGES = 6;
+	static const int IMAGE_INDEX_OK = 0;
+	static const int IMAGE_INDEX_UNKNOWN = 1;
+
+	//Image index assigned for animation must be consequtive.
+	static const int IMAGE_INDEX_WAIT_0 = 2;
+	static const int IMAGE_INDEX_WAIT_1 = 3;
+	static const int IMAGE_INDEX_WAIT_2 = 4;
+	static const int IMAGE_INDEX_WAIT_3 = 5;
+
+	//Animation speed in milliseconds.
+	static const int ANIMATION_SPEED = 500;
+
+	QMainWindow* _qmainWindow;
+
+	StatusType _currentStatus;
+	int _statusImageIndex;
+	QPixmap* _imageHandle[AMOUNT_OF_IMAGES];
+	QLabel* _statusIcon;
+	QTimer* _statusAnimationTimer;
+
+	void loadImages();
+};
+
+	// End of segment: .\MariaApp\\MariaUIStatus.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITask.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUITask.h"
+#include "MariaTime.h"
+
+const float MariaUITask::START_END_TIME_WIDTH = 120.0;
+const float MariaUITask::FLOW_FACTOR = 0.1;
+const float MariaUITask::VALUE_THRESHOLD = 1.0;
+const float MariaUITask::FONT_SIZE_TITLE = 16.0;
+const float MariaUITask::FONT_SIZE_TIME = 12.0;
+const float MariaUITask::FONT_SIZE_DESCRIPTION = 10.0;
+const float MariaUITask::FONT_SIZE_TITLE_DETAILED = 16.0;
+const float MariaUITask::TASK_HEIGHT = 36.0;
+const float MariaUITask::TASK_HEIGHT_FLOATING = 25.0;
+const float MariaUITask::TASK_HEIGHT_EXPANDED = 150.0;
+const float MariaUITask::TASK_HEIGHT_DETAILED = 90.0;
+const float MariaUITask::TASK_WIDTH_SHORTEN = 230.0;
+const float MariaUITask::DESCRIPTION_X_OFFSET = 0.0;
+const float MariaUITask::DESCRIPTION_Y_OFFSET = 20.0;
+const float MariaUITask::TIMESTAMP_X_OFFSET = 3.0;
+const float MariaUITask::TIME_Y_OFFSET = 6.0;
+const string MariaUITask::MESSAGE_DEADLINETASK_DUE = "Due in ";
+const string MariaUITask::MESSAGE_DEADLINETASK_OVERDUE = "Overdue";
+const string MariaUITask::MESSAGE_TIMEDTASK_BEFORE = "Starting in ";
+const string MariaUITask::MESSAGE_TIMEDTASK_AFTER = "Event started";
+const string MariaUITask::MESSAGE_TIME_START = "Start: ";
+const string MariaUITask::MESSAGE_TIME_END = "End: ";
+const string MariaUITask::MESSAGE_TIME_DUE = "Due: ";
+
+MariaUITask::MariaUITask(QMainWindow* qmainWindow, MariaTask* task, DisplayType type) {
+	assert(qmainWindow != NULL);
+	assert(task != NULL);
+
+	_qmainWindow = qmainWindow;
+	_taskReference = task;
+	_currentDisplayType = type;
+	_taskType = _taskReference->getType();
+
+	_destination = QPoint(0, 0);
+	_position = QPoint(0, 0);
+
+	_displayTitle = NULL;
+	_timeText = NULL;
+	_desciptionText = NULL;
+	_typeOfTask = NULL;
+	_startEndText = NULL;
+	_completed = NULL;
+
+	_active = false;
+	_atLocation = false;
+
+	_updatePositionTimer = NULL;
+	_updateTimeTextTimer = NULL;
+}
+
+MariaUITask::~MariaUITask() {
+	deactivate();
+}
+
+bool MariaUITask::setTitlePretext(string pretext) {
+	if (_taskReference != NULL && _displayTitle != NULL) {
+		_displayTitle->setText(QString::fromStdString(pretext) + QString::fromStdString(_taskReference->getTitle()));
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaUITask::setPosition(QPointF position) {
+	_position = position;
+	_atLocation = false;
+	if (_updatePositionTimer != NULL && !_updatePositionTimer->isActive()) {
+		_updatePositionTimer->start(GUI_UPDATE_FREQUENCY);
+	}
+}
+
+QPointF MariaUITask::getPosition() {
+	return _position;
+}
+
+void MariaUITask::setDestination(QPointF destination) {
+	_destination = destination;
+	_atLocation = false;
+	if (_updatePositionTimer != NULL && !_updatePositionTimer->isActive()) {
+		_updatePositionTimer->start(GUI_UPDATE_FREQUENCY);
+	}
+}
+
+QPointF MariaUITask::getDestination() {
+	return _destination;
+}
+
+bool MariaUITask::isAtLocation() {
+	return _atLocation;
+}
+
+bool MariaUITask::updateDetails() {
+	if (_active && _taskReference != NULL) {
+		_taskType = _taskReference->getType();
+
+		_typeOfTask->setPixmap(*(MariaUI::getImageHandler(_taskType)));
+
+		if (_displayTitle != NULL) {
+			string tempText = _taskReference->getTitle();
+			if (_currentDisplayType == DETAILED) {
+				if (tempText.size() > TITLE_CHAR_LIMIT_DETAILED) {
+					tempText = tempText.substr(0, TITLE_CHAR_LIMIT_DETAILED) + "...";
+				}
+			} else {
+				if (tempText.size() > TITLE_CHAR_LIMIT) {
+					tempText = tempText.substr(0, TITLE_CHAR_LIMIT) + "...";
+				}
+			}
+			_displayTitle->setText(QString::fromStdString(tempText));
+		}
+
+		if (_desciptionText != NULL) {
+			string tempText = _taskReference->getDescription();
+			if (tempText.size() > DESCRIPTION_CHAR_LIMIT) {
+				tempText = tempText.substr(0, DESCRIPTION_CHAR_LIMIT) + "...";
+			}
+			_desciptionText->setText(QString::fromStdString(tempText));
+		}
+
+		if (_startEndText != NULL) {
+			string timerText;
+			MariaTask* temp = _taskReference;
+			switch(temp->getType()) {
+			case MariaTask::TaskType::DEADLINE:
+				timerText += MESSAGE_TIME_DUE;
+				timerText += MariaTime::convertToDateString(_taskReference->getEnd()) + "\n";
+				timerText += MariaTime::convertToTimeString(_taskReference->getEnd());
+				break;
+			case MariaTask::TaskType::TIMED:
+				timerText += MESSAGE_TIME_START;
+				timerText += MariaTime::convertToDateString(_taskReference->getStart()) + "\n";
+				timerText += MariaTime::convertToTimeString(_taskReference->getStart()) + "\n";
+				timerText += MESSAGE_TIME_END;
+				timerText += MariaTime::convertToDateString(_taskReference->getEnd()) + "\n";
+				timerText += MariaTime::convertToTimeString(_taskReference->getEnd());
+				break;
+			case MariaTask::TaskType::FLOATING:
+			default:
+				break;
+			}
+			_startEndText->setText(QString::fromStdString(timerText));
+		}
+		if (_completed != NULL) {
+			if (_taskReference->getIsDone()) {
+				_completed->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_COMPLETED));
+			} else {
+				_completed->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_NOT_COMPLETED));
+			}
+		}
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void MariaUITask::stopUpdatingTime() {
+	if (_updateTimeTextTimer != NULL) {
+		if (_updateTimeTextTimer->isActive()) {
+			_updateTimeTextTimer->stop();
+		}
+	}
+}
+
+void MariaUITask::startUpdatingTime() {
+	if (_updateTimeTextTimer != NULL) {
+		if (!_updateTimeTextTimer->isActive()) {
+			_updateTimeTextTimer->start(TIME_UPDATE_FREQUENCY);
+		}
+	}
+}
+
+void MariaUITask::show() {
+	if (_displayTitle != NULL) {
+		_displayTitle->show();
+	}
+	if (_timeText != NULL) {
+		_timeText->show();
+	}
+	if (_typeOfTask != NULL) {
+		_typeOfTask->show();
+	}
+	if (_desciptionText != NULL) {
+		_desciptionText->show();
+	}
+	if (_startEndText != NULL) {
+		_startEndText->show();
+	}
+	if (_completed != NULL) {
+		_completed->show();
+	}
+}
+
+void MariaUITask::hide() {
+	if (_displayTitle != NULL) {
+		_displayTitle->hide();
+	}
+	if (_timeText != NULL) {
+		_timeText->hide();
+	}
+	if (_typeOfTask != NULL) {
+		_typeOfTask->hide();
+	}
+	if (_desciptionText != NULL) {
+		_desciptionText->hide();
+	}
+	if (_startEndText != NULL) {
+		_startEndText->hide();
+	}
+	if (_completed != NULL) {
+		_completed->hide();
+	}
+}
+
+
+float MariaUITask::getTaskHeight() {
+	float toReturn = 0.0;
+
+	switch(_currentDisplayType) {
+	case NORMAL:
+		if (_taskType == MariaTask::FLOATING) {
+			toReturn = TASK_HEIGHT_FLOATING;
+		} else {
+			toReturn = TASK_HEIGHT;
+		}
+		break;
+	case EXPANDED:
+		toReturn = TASK_HEIGHT_EXPANDED;
+		break;
+	case DETAILED:
+		toReturn = TASK_HEIGHT_DETAILED;
+		break;
+	}
+	return toReturn;
+}
+
+void MariaUITask::activate() {
+	if (!_active) {
+		_active = true;
+
+		switch(_currentDisplayType) {
+		case NORMAL:
+			this->setDisplayTitle();
+			this->setTimeTitle();
+			break;
+		case EXPANDED:
+			this->setDisplayTitle();
+			this->setDescription();
+			this->setTimeAndIcon();
+			break;
+		case DETAILED:
+			this->setDisplayTitle();
+			this->setDescription();
+			this->setTimeAndIcon();
+			break;
+		}
+
+		_updatePositionTimer = new QTimer(this);
+		connect(_updatePositionTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
+		_updatePositionTimer->start(1);
+
+		_updateTimeTextTimer = new QTimer(this);
+		connect(_updateTimeTextTimer, SIGNAL(timeout()), this, SLOT(updateTimeText()));
+		show();
+
+		startUpdatingTime();	
+		updateTimeText();
+		updateDetails();
+	}
+}
+
+void MariaUITask::deactivate() {
+	if (_active) {
+		_active = false;
+		if (_updateTimeTextTimer->isActive()) {
+			_updateTimeTextTimer->stop();
+		}
+
+		SAFE_DELETE(_updateTimeTextTimer);
+
+		if (_updatePositionTimer->isActive()) {
+			_updatePositionTimer->stop();
+		}
+
+		SAFE_DELETE(_updatePositionTimer);
+
+		if (_completed != NULL) {
+			SAFE_DELETE(_completed);
+		}
+
+		if (_startEndText != NULL) {
+			SAFE_DELETE(_startEndText);
+		}
+
+		if (_desciptionText != NULL) {
+			SAFE_DELETE(_desciptionText);
+		}
+
+		if (_timeText != NULL) {
+			SAFE_DELETE(_timeText);
+		}
+
+		if (_displayTitle != NULL) {
+			SAFE_DELETE(_displayTitle);
+		}
+
+		if (_typeOfTask != NULL) {
+			SAFE_DELETE(_typeOfTask);
+		}
+	}
+}
+
+bool MariaUITask::isActivated() {
+	return _active;
+}
+
+MariaTask* MariaUITask::getMariaTask() {
+	return _taskReference;
+}
+
+	// End of segment: .\MariaApp\\MariaUITask.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITask.cpp
+	 */
+
+void MariaUITask::updateTimeText() {
+	if (_active && _taskReference != NULL && _currentDisplayType == NORMAL) {
+		string timeFormatted = _taskReference->getTimeFromNow();
+
+		if (_taskReference->getType() == MariaTask::DEADLINE) {
+			if (timeFormatted.empty()) {
+				timeFormatted = MESSAGE_DEADLINETASK_OVERDUE;
+			} else {
+				timeFormatted = MESSAGE_DEADLINETASK_DUE + timeFormatted;
+			}
+			_timeText->setText(QString::fromStdString(timeFormatted));
+
+		}else if (_taskReference->getType() == MariaTask::TIMED) {
+			if (timeFormatted.empty()) {
+				timeFormatted = MESSAGE_TIMEDTASK_AFTER;
+			} else {
+				timeFormatted = MESSAGE_TIMEDTASK_BEFORE + timeFormatted;
+			}
+		}
+		_timeText->setText(QString::fromStdString(timeFormatted));
+	}	
+}
+
+	// End of segment: .\MariaApp\\MariaUITask.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITask.h
+	 */
+
+#pragma once
+
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+#include <string>
+#include "MariaUI.h"
+#include "MariaTask.h"
+
+class MariaUITask : QWidget{
+	Q_OBJECT
+public:
+	static const int GUI_UPDATE_FREQUENCY = 1;
+	static const int TIME_UPDATE_FREQUENCY = 1000;
+	static const int TITLE_CHAR_LIMIT = 40;
+	static const int TITLE_CHAR_LIMIT_DETAILED = 25;
+	static const int DESCRIPTION_CHAR_LIMIT = 120;
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int BULLET_SPACE = 20;
+	static const int BULLET_X_OFFSET = 2;
+	static const int BULLET_Y_OFFSET = 4;
+	static const float START_END_TIME_WIDTH;
+	static const float FLOW_FACTOR;
+	static const float VALUE_THRESHOLD;
+	static const float FONT_SIZE_TITLE;
+	static const float FONT_SIZE_TIME;
+	static const float FONT_SIZE_DESCRIPTION;
+	static const float FONT_SIZE_TITLE_DETAILED;
+	static const float TASK_HEIGHT;
+	static const float TASK_HEIGHT_FLOATING;
+	static const float TASK_HEIGHT_EXPANDED;
+	static const float TASK_HEIGHT_DETAILED;
+	static const float TASK_WIDTH_SHORTEN;
+	static const float DESCRIPTION_X_OFFSET;
+	static const float DESCRIPTION_Y_OFFSET;
+	static const float TIMESTAMP_X_OFFSET;
+	static const float TIME_Y_OFFSET;
+	static const string MESSAGE_DEADLINETASK_DUE;
+	static const string MESSAGE_DEADLINETASK_OVERDUE;
+	static const string MESSAGE_TIMEDTASK_BEFORE;
+	static const string MESSAGE_TIMEDTASK_AFTER;
+	static const string MESSAGE_TIME_START;
+	static const string MESSAGE_TIME_END;
+	static const string MESSAGE_TIME_DUE;
+
+	typedef enum{
+		NORMAL, 
+		EXPANDED, 
+		DETAILED
+	} DisplayType;
+
+	MariaUITask(QMainWindow* qmainWindow, MariaTask* task, DisplayType type);
+	~MariaUITask();
+
+	bool setTitlePretext(string pretext);
+	void setPosition(QPointF position);
+	QPointF getPosition();
+	void setDestination(QPointF destination);
+	QPointF getDestination();
+	bool isAtLocation();
+	bool updateDetails();
+
+	void stopUpdatingTime();
+	void startUpdatingTime();
+
+	void show();
+	void hide();
+
+	float getTaskHeight();
+
+	void activate();
+	void deactivate();
+	bool isActivated();
+
+	MariaTask* getMariaTask();
+
+protected slots:
+	bool updatePosition();
+	void updateTimeText();
+
+private:
+	QMainWindow* _qmainWindow;
+	MariaTask* _taskReference;
+	DisplayType _currentDisplayType;
+	MariaTask::TaskType _taskType;
+	
+	QPointF _destination;
+	QPointF _position;
+
+	QLabel* _displayTitle;
+	QLabel* _timeText;
+	QLabel* _desciptionText;
+	QLabel* _typeOfTask;
+	QLabel* _startEndText;
+	QLabel* _completed;
+
+	bool _active;
+	bool _atLocation;
+	
+	QTimer* _updatePositionTimer;
+	QTimer* _updateTimeTextTimer;
+
+	void setDisplayTitle();
+	void setTimeTitle();
+	void setDescription();
+	void setTimeAndIcon();
+};
+
+	// End of segment: .\MariaApp\\MariaUITask.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITextbox.cpp
+	 */
+
+#include <assert.h>
+#include "MariaMacros.h"
+#include "MariaUITextbox.h"
+
+const string MariaUITextbox::SUGGEST_TEXT_SAMPLE[] = {
+	"create Meeting with mom for dinner soon",
+	"create Do my assignment by today 23:59",
+	"create Make a trip to the library from today to tomorrow",
+	"edit Eat an apple change title Eat a pear",
+	"show today",
+	"help",
+	"delete assignment",
+	"quit",
+};
+
+	// End of segment: .\MariaApp\\MariaUITextbox.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITextbox.cpp
+	 */
+
+void MariaUITextbox::setQuestionText(const string text) {
+	QFontMetrics fm = QFontMetrics(_questionText->font());
+	_questionText->setText(fm.elidedText(QString::fromStdString(text), Qt::ElideRight, _questionText->width()));
+}
+
+void MariaUITextbox::setSuggestText(const string text) {
+	QFontMetrics fm = QFontMetrics(_suggestText->font());
+	_suggestText->setText(fm.elidedText(QString::fromStdString(text), Qt::ElideRight, _suggestText->width()));
+}
+
+void MariaUITextbox::setUserInput(const string text) {
+	QFontMetrics fm = QFontMetrics(_inputBox->font());
+	_inputBox->setText(fm.elidedText(QString::fromStdString(text), Qt::ElideRight, _inputBox->width()));
+}
+	
+string MariaUITextbox::getUserInput() {
+	return _inputBox->text().toStdString();
+}
+
+void MariaUITextbox::updateGUI(QPointF statePosition) {
+	_inputBox->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET, statePosition.y(), _qmainWindow->width() - TEXTBOX_X_OFFSET - TEXTBOX_X_OFFSET - RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_suggestText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y(), _qmainWindow->width() - TEXTBOX_X_OFFSET - TEXTBOX_X_OFFSET - RESERVED_STATUS_SPACE, TEXTBOX_HEIGHT));
+	_questionText->setGeometry(QRect(statePosition.x() + RESERVED_STATUS_SPACE + TEXTBOX_X_OFFSET + QUESTION_TEXT_X_OFFSET, statePosition.y() + QUESTION_TEXT_Y_OFFSET, _qmainWindow->width() - TEXTBOX_X_OFFSET - TEXTBOX_X_OFFSET - RESERVED_STATUS_SPACE, QUESTIONBOX_HEIGHT));
+}
+
+void MariaUITextbox::setFocus() {
+	_inputBox->setFocus();
+}
+
+QLineEdit* MariaUITextbox::getInputBoxReference() {
+	return _inputBox;
+}
+
+void MariaUITextbox::updateSuggestText() {
+	if (getUserInput().length() == 0) {
+		setSuggestText(SUGGEST_TEXT_SAMPLE[rand() % SUGGEST_TEXT_AMOUNT]);
+	}
+}
+	// End of segment: .\MariaApp\\MariaUITextbox.cpp
+
+
+
+
+
+	/**
+	 * origin: .\MariaApp\\MariaUITextbox.h
+	 */
+
+#pragma once
+
+#include <string>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QlineEdit>
+#include <QtWidgets/qlabel.h>
+#include <QtCore/QTimer>
+
+using namespace std;
+
+class MariaUITextbox : QWidget{
+	Q_OBJECT
+
+public:
+	static const int SUGGEST_TEXT_AMOUNT = 8;
+	static const int SUGGEST_TEXT_UPDATE_TIME = 5000;
+	static const int RESERVED_STATUS_SPACE = 30;
+	static const int TEXTBOX_X_OFFSET = 30;
+	static const int TEXTBOX_HEIGHT = 20;
+	static const int QUESTION_TEXT_X_OFFSET = 3;
+	static const int QUESTION_TEXT_Y_OFFSET = -52;
+	static const int QUESTIONBOX_HEIGHT = 48;
+	static const string SUGGEST_TEXT_SAMPLE[];
+	static const float FONT_SIZE_TYPED_TEXT;
+	static const float FONT_SIZE_QUESTION_TEXT;
+
+	MariaUITextbox(QMainWindow* qmainWindow);
+	~MariaUITextbox();
+	
+	void setQuestionText(const string text);
+	void setSuggestText(const string text);
+	void setUserInput(const string text);	
+	string getUserInput();
+	void updateGUI(QPointF statePosition);
+	void setFocus();
+	QLineEdit* getInputBoxReference();
+
+private:
+	QMainWindow* _qmainWindow;
+
+	QLineEdit* _inputBox;
+	QLabel* _questionText;
+	QLabel* _suggestText;
+
+	QTimer* _updateSuggestTextTimer;
+
+private slots:
+	void updateSuggestText();
+};
+
+
+	// End of segment: .\MariaApp\\MariaUITextbox.h
+
+
+
+
+
+	/**
+	 * origin: .\MariaTest\IntegratedTest.cpp
+	 */
+
+		//Integrated Test Case that simulates adding and finding a task successfully and unsuccessfully.
+		TEST_METHOD(MSSTest_AddSearchSearchTask) {
+			string inputString[3] = {"create UniqueTask101", 
+									"find Unique", 
+									"find Something"};
+
+			MariaInterpreter* interpreter = new MariaInterpreter();
+			MariaFileManager* fileManager = new MariaFileManager();
+			MariaTaskManager* taskManager = new MariaTaskManager(fileManager->openFile());
+
+			//Test for 'create UniqueTask101'
+			MariaInputObject* input = interpreter->parseInput(inputString[0]);
+
+			Assert::IsTrue(input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING);
+
+			MariaTask* toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
+			if (toAdd != NULL) {
+				fileManager->writeFile(taskManager->getAllTasks());
+			}
+			Assert::IsTrue(taskManager->findTask("UniqueTask101").size() == 1);
+			SAFE_DELETE(input);
+
+			//find Unique
+			input = interpreter->parseInput(inputString[1]);
+			Assert::IsTrue(taskManager->findTask(input->getTitle()).size() == 1);
+			SAFE_DELETE(input);
+
+			//find Something
+			input = interpreter->parseInput(inputString[2]);
+			Assert::IsTrue(taskManager->findTask(input->getTitle()).size() == 0);
+			SAFE_DELETE(input);
+
+			// Do some clean up
+			taskManager->archiveTask(taskManager->findTask("UniqueTask101")[0]);
+			fileManager->writeFile(taskManager->getAllTasks());
+
+			SAFE_DELETE(fileManager);
+			SAFE_DELETE(taskManager);
+		}
+	};
+}
+	// End of segment: .\MariaTest\IntegratedTest.cpp
 
 
 
