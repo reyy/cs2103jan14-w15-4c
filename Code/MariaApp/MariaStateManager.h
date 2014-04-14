@@ -17,10 +17,10 @@ public:
 	} STATE_TRANSITION;
 
 private:
-	STATE_TYPE _currentState;
+	StateType _currentState;
 	STATE_TRANSITION _currentTransition;
 	MariaStateObject* _currentStateObject;
-	std::queue<STATE_TYPE> _stateQueue;
+	std::queue<StateType> _stateQueue;
 	std::queue<MariaStateObject*> _stateQueueObject;
 
 	//A flag to activate endUpdate right after active starts.
@@ -43,9 +43,9 @@ public:
 	MariaStateManager();
 	~MariaStateManager();
 	
-	void queueState(STATE_TYPE type, MariaStateObject* stateObject);
+	void queueState(StateType type, MariaStateObject* stateObject);
 	void transitState();
-	STATE_TYPE getCurrentState();
+	StateType getCurrentState();
 	STATE_TRANSITION getTransition();
 	void clearQueuedState();
 	MariaStateObject* getCurrentStateObject();

@@ -93,7 +93,7 @@ void MariaStateManager::timerEndState() {
 	}
 }
 
-void MariaStateManager::queueState(STATE_TYPE type, MariaStateObject* stateObject) {
+void MariaStateManager::queueState(StateType type, MariaStateObject* stateObject) {
 
 	assert(type != NULL);
 	assert(stateObject != NULL);
@@ -118,7 +118,7 @@ void MariaStateManager::transitState() {
 	}
 }
 
-STATE_TYPE MariaStateManager::getCurrentState() {
+StateType MariaStateManager::getCurrentState() {
 	return _currentState;
 }
 

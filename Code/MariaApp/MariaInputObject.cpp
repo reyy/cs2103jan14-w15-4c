@@ -1,108 +1,87 @@
+//@author A0111821X
 #include "MariaMacros.h"
 #include "MariaInputObject.h"
 
 MariaInputObject::MariaInputObject() {
-	_commandType = INVALID;
+	commandType = INVALID;
 
-	_startTime = NULL;
-	_endTime = NULL;
-	_editTime = NULL;
+	startTime = NULL;
+	endTime = NULL;
+	editTime = NULL;
 }
 
 MariaInputObject::~MariaInputObject() {
-	if (_startTime != NULL) {
-		SAFE_DELETE(_startTime);
-	}
-
-	if (_endTime != NULL) {
-		SAFE_DELETE(_endTime);
-	}
-
-	if (_editTime != NULL) {
-		SAFE_DELETE(_editTime);
-	}
+	SAFE_DELETE(startTime);
+	SAFE_DELETE(endTime);
+	SAFE_DELETE(editTime);
 }
 
 void MariaInputObject::setOriginalInput(string originalInput) {
-	_originalInput = originalInput;
+	this->originalInput = originalInput;
 }
 
-void MariaInputObject::setCommandType(COMMAND_TYPE newCommandType) {
-	_commandType = newCommandType;
+void MariaInputObject::setCommandType(CommandType newCommandType) {
+	commandType = newCommandType;
 }
 
 void MariaInputObject::setTitle(string newTitle) {
-	_title = newTitle;
+	title = newTitle;
 }
 
 void MariaInputObject::setEditField(string newEditField) {
-	_editField = newEditField;
+	editField = newEditField;
 }
 
 void MariaInputObject::setOptionID(int newOptionID) {
-	_optionID = newOptionID;
+	optionID = newOptionID;
 }
 
 void MariaInputObject::setStartTime(MariaTime* newStartTime) {
-	if (_startTime != NULL) {
-		SAFE_DELETE(_startTime);
-	}
+	SAFE_DELETE(startTime);
 
-	_startTime = newStartTime;
+	startTime = newStartTime;
 }
 
 void MariaInputObject::setEndTime(MariaTime* newEndTime) {
-	if (_endTime != NULL) {
-		SAFE_DELETE(_endTime);
-	}
+	SAFE_DELETE(endTime);
 
-	_endTime = newEndTime;
+	endTime = newEndTime;
 }
 
 void MariaInputObject::setEditTime(MariaTime* newEditTime) {
-	if (_editTime != NULL) {
-		SAFE_DELETE(_editTime);
-	}
+	SAFE_DELETE(editTime);
 
-	_editTime = newEditTime;
-}
-
-void MariaInputObject::setStateType(STATE_TYPE newStateType) {
-	_stateType = newStateType;
+	editTime = newEditTime;
 }
 
 string MariaInputObject::getOriginalInput() const {
-	return _originalInput;
+	return originalInput;
 }
 
-MariaInputObject::COMMAND_TYPE MariaInputObject::getCommandType() const {
-	return _commandType;
+MariaInputObject::CommandType MariaInputObject::getCommandType() const {
+	return commandType;
 }
 
 string MariaInputObject::getTitle() const {
-	return _title;
+	return title;
 }
 
 string MariaInputObject::getEditField() const {
-	return _editField;
+	return editField;
 }
 
 int MariaInputObject::getOptionID() const {
-	return _optionID;
+	return optionID;
 }
 
 MariaTime* MariaInputObject::getStartTime() const {
-	return new MariaTime(*_startTime);
+	return new MariaTime(*startTime);
 }
 
 MariaTime* MariaInputObject::getEndTime() const {
-	return new MariaTime(*_endTime);
+	return new MariaTime(*endTime);
 }
 
 MariaTime* MariaInputObject::getEditTime() const {
-	return new MariaTime(*_editTime);
-}
-
-STATE_TYPE MariaInputObject::getStateType() const {
-	return _stateType;
+	return new MariaTime(*editTime);
 }

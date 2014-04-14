@@ -15,7 +15,7 @@ namespace MariaTest {
 			
 			MariaInputObject* input = interpreter->parseInput(inputString);
 
-			if(input->getCommandType() == MariaInputObject::COMMAND_TYPE::ADD_FLOATING) {
+			if(input->getCommandType() == MariaInputObject::CommandType::ADD_FLOATING) {
 				MariaTask *toAdd = taskManager->addTask(input->getTitle(), NULL, NULL);
 				if(toAdd != NULL) {
 						fileManager->writeFile(taskManager->getAllTasks());

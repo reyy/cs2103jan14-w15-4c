@@ -68,7 +68,7 @@ private:
 	void saveToFile();
 	void addTaskToUI(MariaTask* toAdd, MariaStateObject* state);
 	int getPageNumOfTask(MariaTask* task, vector<MariaTask*> listOfTasks, int maxTask);
-	//void addStateToQueue(STATE_TYPE type, );
+	//void addStateToQueue(StateType type, );
 	
 
 	static void __cdecl doShowHideWrapper(void* mariaLogic);

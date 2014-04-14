@@ -29,33 +29,36 @@ public:
 	static const string MESSAGE_NO_INPUT;
 	static const string MESSAGE_NO_OPTION;
 
-	MariaInterpreter(map<string, MariaInputObject::COMMAND_TYPE>* inputCommandList = NULL);
+	MariaInterpreter(map<string, MariaInputObject::CommandType>* inputCommandList = NULL);
 	~MariaInterpreter(void);
 
 	bool checkValidCommand(string input);
-	MariaInputObject* parseInput(string input, STATE_TYPE currentState = STATE_TYPE::HOME);
+	MariaInputObject* parseInput(string input, StateType currentState = StateType::HOME);
 
 private:
-	map<string, MariaInputObject::COMMAND_TYPE>* commandKeywordList;
+	map<string, MariaInputObject::CommandType>* commandKeywordList;
 
-	void parseAdd(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	// Actual commands
+	void parseAdd(string input, MariaInputObject* inputObject, StateType currentState);
 	void parseAddDeadlineTask(string input, MariaInputObject* inputObject);
 	void parseAddTimedTask(string input, MariaInputObject* inputObject);
-	void parseEdit(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseEdit(string input, MariaInputObject* inputObject, StateType currentState);
 	void parseEditType(string input, MariaInputObject* inputObject, int changeTitlePos, int changeStartPos, int changeEndPos, int changeDescPos);
 	void parseEditTitle(string input, MariaInputObject* inputObject);
 	void parseEditStartTime(string input, MariaInputObject* inputObject);
 	void parseEditEndTime(string input, MariaInputObject* inputObject);
 	void parseEditDescription(string input, MariaInputObject* inputObject);
-	void parseShow(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
-	void parseSearch(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
-	void parseDelete(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
-	void parseMarkDone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
-	void parseMarkUndone(string input, MariaInputObject* inputObject, STATE_TYPE currentState);
+	void parseShow(string input, MariaInputObject* inputObject, StateType currentState);
+	void parseSearch(string input, MariaInputObject* inputObject, StateType currentState);
+	void parseDelete(string input, MariaInputObject* inputObject, StateType currentState);
+	void parseMarkDone(string input, MariaInputObject* inputObject, StateType currentState);
+	void parseMarkUndone(string input, MariaInputObject* inputObject, StateType currentState);
 
+	// Parsing of date and time string into a MariaTime object.
 	void parseTime(string input, int& hour, int& min);
 	MariaTime* parseDateTimeString(vector<string> tokenizedInput);
 
+	// Regular expressions for format checks.
 	static const string EXPRESSION_DATE_FORMAT;
 	static const string EXPRESSION_DAYS_OF_WEEK;
 	static const string EXPRESSION_DAYS_OF_WEEK_INDIVIDUAL[7];
@@ -67,6 +70,7 @@ private:
 
 	static const string MODIFIER_ALL_TASKS;
 
+	// Delimiters that define how a text is seperated.
 	static const string DELIMITER_ADD_DEADLINE_TASK;
 	static const string DELIMITER_ADD_TIMED_TASK_START;
 	static const string DELIMITER_ADD_TIMED_TASK_END;
@@ -77,6 +81,7 @@ private:
 	static const string DELIMITER_SHOW_DATE_RANGE_START;
 	static const string DELIMITER_SHOW_DATE_RANGE_END;
 
+	// Checks if the string passed in is in accordance to the expression defined above.
 	bool hasDate(string text);
 	bool hasTime(string text);
 	bool hasDateTime(string text);
@@ -86,6 +91,7 @@ private:
 	bool hasToday(string text);
 	bool hasTomorrow(string text);
 
+	// Helper functions
 	bool checkValidTime(int hour, int min);
 	string extractFromBackOfString(string text, string delimiter, int& delimiterPos);
 	int getDayOfWeek(string text);

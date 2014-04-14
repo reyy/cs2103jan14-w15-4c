@@ -9,4 +9,4 @@ typedef enum {
 	LOADING, 
 	CREDITS, 
 	QUIT
-} STATE_TYPE;
+} StateType;

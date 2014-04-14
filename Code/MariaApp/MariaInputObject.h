@@ -1,7 +1,7 @@
+//@author A0111821X
 #pragma once
 
 #include "MariaTime.h"
-#include "MariaUIStateType.h"
 
 class MariaInputObject {
 public:
@@ -34,40 +34,37 @@ public:
 		PAGE_LEFT,
 		PAGE_RIGHT,
 		EXIT,
-	} COMMAND_TYPE;
+	} CommandType;
 
-	MariaInputObject();
-	~MariaInputObject();
+	MariaInputObject(void);
+	~MariaInputObject(void);
+
+	string			getOriginalInput() const;
+	CommandType		getCommandType() const;
+	string			getTitle() const;
+	string			getEditField() const;
+	int				getOptionID() const;
+	MariaTime*		getStartTime() const;
+	MariaTime*		getEndTime() const;
+	MariaTime*		getEditTime() const;
 
 	void setOriginalInput(string originalInput);
-	void setCommandType(COMMAND_TYPE newCommandType);
+	void setCommandType(CommandType newCommandType);
 	void setTitle(string newTitle);
 	void setEditField(string newEditField);
 	void setOptionID(int newOptionID);
 	void setStartTime(MariaTime* newStartTime);
 	void setEndTime(MariaTime* newEndTime);
 	void setEditTime(MariaTime* newEditTime);
-	void setStateType(STATE_TYPE newStateType);
-
-	string getOriginalInput() const;
-	COMMAND_TYPE getCommandType() const;
-	string getTitle() const;
-	string getEditField() const;
-	int getOptionID() const;
-	MariaTime* getStartTime() const;
-	MariaTime* getEndTime() const;
-	MariaTime* getEditTime() const;
-	STATE_TYPE getStateType() const;
 
 private:
-	COMMAND_TYPE _commandType;
-	STATE_TYPE _stateType;
+	CommandType		commandType;
 
-	string _originalInput;
-	string _title;
-	string _editField;
-	int _optionID;
-	MariaTime* _startTime;
-	MariaTime* _endTime;
-	MariaTime* _editTime;
+	string			originalInput;
+	string			title;
+	string			editField;
+	int				optionID;
+	MariaTime*		startTime;
+	MariaTime*		endTime;
+	MariaTime*		editTime;
 };
