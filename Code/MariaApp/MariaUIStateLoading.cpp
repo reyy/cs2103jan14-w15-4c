@@ -24,7 +24,7 @@ MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateO
 	_displayText = new QLabel(_qmainWindow);
 	_logo = new QLabel(_qmainWindow);
 
-	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
 		_loadingDots[i] = new QLabel(_qmainWindow);
 	}
 
@@ -35,7 +35,7 @@ MariaUIStateLoading::MariaUIStateLoading(QMainWindow* qmainWindow) : MariaStateO
 }
 
 MariaUIStateLoading::~MariaUIStateLoading() {
-	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
 		SAFE_DELETE(_loadingDots[i]);
 	}
 	SAFE_DELETE(_logo);
@@ -75,7 +75,7 @@ void MariaUIStateLoading::initBeginState() {
 void MariaUIStateLoading::initActiveState() {
 	_displayText->show();
 	
-	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
 		_loadingDots[i]->setPixmap(*MariaUI::getImageHandler(MariaUI::IMAGE_INDEX_DOTS));
 		_loadingDots[i]->show();
 		_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET + DOTS_SEPARATION_WIDTH * i;
@@ -85,7 +85,7 @@ void MariaUIStateLoading::initActiveState() {
 void MariaUIStateLoading::initEndState() {
 	_displayText->hide();
 
-	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
 		_loadingDots[i]->hide();
 	}
 }
@@ -141,7 +141,7 @@ void MariaUIStateLoading::animateLogo() {
 
 bool MariaUIStateLoading::animateDots() {
 	bool allDotsLeft = true;
-	for (int i = 0; i < AMOUNT_OF_DOTS;i++) {
+	for (int i = 0; i < AMOUNT_OF_DOTS; i++) {
 		if (_dotsXPos[i]< - DOTS_X_OFFSET - AMOUNT_OF_DOTS * DOTS_SEPARATION_WIDTH) {
 			_dotsXPos[i] = _qmainWindow->width() + DOTS_X_OFFSET;
 		} else {
